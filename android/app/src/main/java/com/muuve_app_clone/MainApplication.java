@@ -17,12 +17,12 @@ public class MainApplication extends NavigationApplication {
 
   private final ReactNativeHost mReactNativeHost =
       new NavigationReactNativeHost(this) {
-        @Override
+        // @Override
         public boolean getUseDeveloperSupport() {
           return BuildConfig.DEBUG;
         }
 
-        @Override
+        // @Override
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
@@ -31,18 +31,18 @@ public class MainApplication extends NavigationApplication {
           return packages;
         }
 
-        @Override
+        // @Override
         protected String getJSMainModuleName() {
           return "index";
         }
       };
 
-  @Override
+  // @Override
   public ReactNativeHost getReactNativeHost() {
     return mReactNativeHost;
   }
 
-  @Override
+  // @Override
   public void onCreate() {
     super.onCreate();
 
