@@ -3,6 +3,7 @@ import App from './src/App';
 import {name as appName} from './app.json';
 
 // import Home from './src/views/Home';
-import LoginPhoneNumber from './src/views/LoginPhone';
+// import LoginPhoneNumber from './src/views/LoginPhone';
+import GroupOrder from './src/views/GroupOrder';
 
-AppRegistry.registerComponent(appName, () => LoginPhoneNumber);
+AppRegistry.registerComponent(appName, () => GroupOrder);
