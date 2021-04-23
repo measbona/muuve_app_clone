@@ -3,24 +3,26 @@ package com.muuve_app_clone;
 import android.app.Application;
 import android.content.Context;
 import com.facebook.react.PackageList;
+import com.reactnativenavigation.NavigationApplication;
 import com.facebook.react.ReactApplication;
 import com.facebook.react.ReactInstanceManager;
 import com.facebook.react.ReactNativeHost;
+import com.reactnativenavigation.react.NavigationReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.soloader.SoLoader;
 import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 
-public class MainApplication extends Application implements ReactApplication {
+public class MainApplication extends NavigationApplication {
 
   private final ReactNativeHost mReactNativeHost =
-      new ReactNativeHost(this) {
-        @Override
+      new NavigationReactNativeHost(this) {
+        // @Override
         public boolean getUseDeveloperSupport() {
           return BuildConfig.DEBUG;
         }
 
-        @Override
+        // @Override
         protected List<ReactPackage> getPackages() {
           @SuppressWarnings("UnnecessaryLocalVariable")
           List<ReactPackage> packages = new PackageList(this).getPackages();
@@ -29,21 +31,21 @@ public class MainApplication extends Application implements ReactApplication {
           return packages;
         }
 
-        @Override
+        // @Override
         protected String getJSMainModuleName() {
           return "index";
         }
       };
 
-  @Override
+  // @Override
   public ReactNativeHost getReactNativeHost() {
     return mReactNativeHost;
   }
 
-  @Override
+  // @Override
   public void onCreate() {
     super.onCreate();
-    SoLoader.init(this, /* native exopackage */ false);
+
     initializeFlipper(this, getReactNativeHost().getReactInstanceManager());
   }
 

@@ -1,6 +1,3 @@
-import {AppRegistry} from 'react-native';
-import {name as appName} from './app.json';
+import {startApp} from './src/navigation';
 
-import Home from './src/views/Home';
-
-AppRegistry.registerComponent(appName, () => Home);
+startApp();

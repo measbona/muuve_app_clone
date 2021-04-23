@@ -1,14 +1,10 @@
 package com.muuve_app_clone;
 
-import com.facebook.react.ReactActivity;
+import android.os.Bundle;
+import com.reactnativenavigation.NavigationActivity;
 
-public class MainActivity extends ReactActivity {
-
-  /**
-   * Returns the name of the main component registered from JavaScript. This is used to schedule
-   * rendering of the component.
-   */
-  @Override
+public class MainActivity extends NavigationActivity {
+  // @Override
   protected String getMainComponentName() {
     return "muuve_app_clone";
   }
