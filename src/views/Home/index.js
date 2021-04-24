@@ -6,7 +6,6 @@ import MerchantCard from './components/Card';
 
 const Container = styled.View`
   flex: 1;
-  background-color: #f3f3f3;
 `;
 
 const ContentWrapper = styled.View`

@@ -1,5 +1,5 @@
 import {Navigation} from 'react-native-navigation';
-import {setRootHome, Screens} from './screen';
+import {Screens, showLoading, showPhoneLogin} from './screen';
 
 export const registerScreen = () => {
   Screens.forEach((ScreenComponent, key) =>
@@ -23,6 +23,9 @@ export const startApp = () => {
   Navigation.events().registerAppLaunchedListener(() => {
     setDefaultNavigation();
 
-    setRootHome();
+    showLoading();
+    setTimeout(() => {
+      showPhoneLogin();
+    }, 3000);
   });
 };

@@ -3,6 +3,7 @@ import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 
+import utils from '../../../utils';
 import SearchBar from './SearchBar';
 
 const SCREEN_WIDTH = Dimensions.get('screen').width;
@@ -11,7 +12,7 @@ const Wrapper = styled.View`
   height: 100px;
   padding-top: 30px;
   flex-direction: row;
-  background-color: #fcbd3e;
+  background-color: ${utils.colors.yellow};
   align-items: center;
   justify-content: center;
   width: ${SCREEN_WIDTH}px;
