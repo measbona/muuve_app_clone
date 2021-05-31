@@ -1,11 +1,15 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import {showModalNotice, goToMerchant} from '../../navigation/screen';
+
+import Colors from '../../utils/colors';
 
 import Header from './components/Header';
 import MerchantCard from './components/Card';
 
 const Container = styled.View`
   flex: 1;
+  background-color: ${Colors.lightGrey};
 `;
 
 const ContentWrapper = styled.View`
@@ -14,26 +18,47 @@ const ContentWrapper = styled.View`
 `;
 
 const HeadlineWrapper = styled.View`
-  margin-vertical: 20px;
+  margin-vertical: 13px;
 `;
 
 const Headline = styled.Text`
   font-size: 17px;
-  font-weight: 700;
-  color: #004da6;
+  font-weight: bold;
+  color: ${Colors.blue};
+`;
+
+const ScrollView = styled.ScrollView`
+  flex: 1;
 `;
 
 export default class Home extends React.PureComponent {
+  onCartPress = () => {
+    showModalNotice({
+      headline: 'Noticed',
+      description: 'Your cart is empty.',
+      buttonName: 'Cancel',
+    });
+  };
+
+  onMerchantPress = () => {
+    const {componentId} = this.props;
+
+    goToMerchant(componentId);
+  };
+
   render() {
     return (
       <Container>
-        <Header onCartPress={(value) => alert(value)} />
+        <Header onCartPress={this.onCartPress} />
         <ContentWrapper>
           <HeadlineWrapper>
             <Headline>All Stores</Headline>
           </HeadlineWrapper>
-          <MerchantCard />
-          <MerchantCard />
+          <ScrollView showVerticalScrollIndicator={false}>
+            <MerchantCard onPress={this.onMerchantPress} />
+            <MerchantCard onPress={this.onMerchantPress} />
+            <MerchantCard onPress={this.onMerchantPress} />
+          </ScrollView>
         </ContentWrapper>
       </Container>
     );

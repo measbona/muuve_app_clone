@@ -4,9 +4,9 @@ import styled from 'styled-components/native';
 
 import utils from '../../utils';
 
-import Header from './components/Header';
 import NameInput from './components/NameInput';
 import DateBirthInput from './components/BirthDate';
+import NavigationBack from '../../lib/NavigationBack';
 
 const Container = styled.View`
   flex: 1;
@@ -55,7 +55,7 @@ export default class ViewAccount extends React.Component {
 
     return (
       <Container>
-        <Header componentId={componentId} />
+        <NavigationBack title="Profile" navigate componentId={componentId} />
         <ContentWrapper activeOpacity={1} onPress={() => Keyboard.dismiss()}>
           <HeadlineWrapper>
             <Headline>Edit your profile</Headline>

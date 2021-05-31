@@ -1,60 +1,130 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import FAW5Icon from 'react-native-vector-icons/FontAwesome5';
+import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-const Wrapper = styled.View`
-  height: 100px;
+import Colors from '../../../utils/colors';
+
+const Wrapper = styled.TouchableOpacity`
   border-radius: 17px;
-  background-color: white;
   flex-direction: row;
   margin-bottom: 15px;
+  background-color: ${Colors.white};
 `;
 
-const ImageView = styled.Image`
+const MerchantLogo = styled.Image`
   width: 100px;
   height: 100px;
   border-radius: 17px;
 `;
 
-const MerchantInfoWrapper = styled.View``;
-
-const NameWrapper = styled.View`
-  margin-left: 5px;
+const Content = styled.View`
+  flex: 1;
   margin-vertical: 8px;
+  margin-horizontal: 8px;
+  justify-content: space-between;
+`;
+
+const MerchantInfo = styled.View`
 `;
 
 const Name = styled.Text`
-  font-size: 17px;
-  font-weight: 500;
+  font-size: 13px;
+  font-weight: bold;
+  margin-bottom: 5px;
 `;
 
-const InfoName = styled.Text`
-  color: grey;
-  margin-vertical: 5px;
-  font-weight: 700;
+const Category = styled.Text`
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 5px;
 `;
 
 const Discount = styled.Text`
-  font-weight: 700;
-  color: #004da6;
+  font-size: 11px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: ${Colors.blue};
+`;
+
+const Row = styled.View`
+  flex-direction: row;
+  justify-content: space-between;
+`;
+
+const Promotions = styled.View`
+  flex-direction: row;
+`;
+
+const Text = styled.Text`
+  font-size: 11px;
+  font-weight: bold;
+  color: ${Colors.blue};
+`;
+
+const Rating = styled.View`
+  align-items: center;
+  flex-direction: row;
+`;
+
+const DeliveryFee = styled.View`
+  align-items: center;
+  flex-direction: row;
+`;
+
+const Space = styled.View`
+  margin-horizontal: 2px;
 `;
 
 export default class Card extends React.PureComponent {
   render() {
+    const {onPress} = this.props;
+
     return (
-      <Wrapper>
-        <ImageView
+      <Wrapper activeOpacity={0.5} onPress={onPress}>
+        <MerchantLogo
           source={{
             uri:
               'https://www.focusbrands.com/wp-content/uploads/2020/05/auntie-annes_logo.png',
           }}
         />
-        <MerchantInfoWrapper>
-          <NameWrapper>
-            <Name>Auntie Anne's Cambodia</Name>
-            <InfoName>Snack</InfoName>
-            <Discount>20% discount</Discount>
-          </NameWrapper>
-        </MerchantInfoWrapper>
+        <Content>
+          <Row>
+            <MerchantInfo>
+              <Name>Auntie Anne's Cambodia</Name>
+              <Category>Snack, Juice, Noodle, Tea</Category>
+              <Discount>20% discount</Discount>
+            </MerchantInfo>
+            <Promotions>
+              <FAW5Icon
+                name="gift"
+                color={Colors.blue}
+                size={14}
+                style={{marginRight: 4}}
+              />
+              <MCIcon name="brightness-percent" color={Colors.blue} size={15} />
+            </Promotions>
+          </Row>
+
+          <Row>
+            <Rating>
+              <MCIcon
+                name="star"
+                color={Colors.yellow}
+                size={16}
+                style={{marginRight: 2}}
+              />
+              <Text>4/24 Ratings</Text>
+            </Rating>
+            <DeliveryFee>
+              <MCIcon name="motorbike" color={Colors.blue} size={17} />
+              <Text>FREE</Text>
+              <Space />
+              <MCIcon name="clock-outline" color={Colors.blue} size={15} />
+              <Text>~25 min</Text>
+            </DeliveryFee>
+          </Row>
+        </Content>
       </Wrapper>
     );
   }

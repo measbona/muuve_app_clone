@@ -37,6 +37,7 @@ const FooterWrapper = styled.View`
 
 const Text = styled.Text`
   font-size: 11px;
+  font-weight: 500;
   color: ${utils.colors.black};
   ${(props) => props.color && `color: blue; text-decoration: underline`}
 `;

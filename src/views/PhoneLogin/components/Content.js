@@ -1,20 +1,21 @@
 import React from 'react';
 import {Keyboard} from 'react-native';
 import styled from 'styled-components/native';
-import {setRootHome} from '../../../navigation/screen';
+
+import {setRootHome, showModalChoice} from '../../../navigation/screen';
 
 import utils from '../../../utils';
 
 const Wrapper = styled.TouchableOpacity`
   flex: 1;
-  padding-top: 65px;
+  padding-top: 40px;
   margin-horizontal: 20px;
 `;
 
 const HeadTextWrapper = styled.View``;
 
 const HeadText = styled.Text`
-  font-weight: 400;
+  font-weight: bold;
   color: ${utils.colors.black};
 `;
 
@@ -24,7 +25,7 @@ const TextInputWrapper = styled.View`
   flex-direction: row;
   margin-vertical: 10px;
   justify-content: space-between;
-  background-color: ${utils.colors.lightGrey};
+  background-color: ${utils.colors.grey};
 `;
 
 const TextInput = styled.TextInput`
@@ -46,7 +47,7 @@ const CambodiaFlagIcon = styled.Image`
 `;
 
 const PrefixNumber = styled.Text`
-  font-size: 12px;
+  font-size: 13px;
   font-weight: bold;
   margin-left: 10px;
 `;
@@ -76,7 +77,7 @@ const CodeBoxWrapper = styled.View`
   height: 50px;
   justify-content: center;
   border-radius: 15px;
-  background-color: ${utils.colors.lightGrey};
+  background-color: ${utils.colors.grey};
 `;
 
 const CodeBox = styled.TextInput`
@@ -88,6 +89,16 @@ const CodeBox = styled.TextInput`
 
 const Code = styled.Text`
   font-size: 17px;
+  font-weight: bold;
+  align-self: center;
+`;
+
+const DidNotReceiveCode = styled.TouchableOpacity`
+  margin-top: 20px;
+`;
+
+const Text = styled.Text`
+  font-size: 13px;
   font-weight: bold;
   align-self: center;
 `;
@@ -112,7 +123,7 @@ export default class Content extends React.PureComponent {
       <TextInputWrapper>
         <Head>
           <CambodiaFlagIcon
-            source={require('../../../assets/images/flag_icon.png')}
+            source={require('../../../assets/icons/flag_icon.png')}
           />
           <PrefixNumber>+855</PrefixNumber>
         </Head>
@@ -134,6 +145,7 @@ export default class Content extends React.PureComponent {
       <CodeWrapper>
         <CodeBoxWrapper>
           <CodeBox
+            autoFocus
             caretHidden
             defaultValue={code[0]}
             maxLength={6}
@@ -161,12 +173,20 @@ export default class Content extends React.PureComponent {
   };
 
   handleVerifyCode = () => {
-    const {mounted, code} = this.state;
+    const {mounted, code, phoneNumber} = this.state;
+
+    Keyboard.dismiss();
 
     if (!mounted && code.length === 6) {
       setRootHome();
     } else {
-      this.setState({mounted: false});
+      showModalChoice({
+        headline: 'Confirmation',
+        description: `A confirmation code will send to your via SMS or Notification. Please check your number is correct.\n\n+855${phoneNumber}`,
+        no: 'NO',
+        yes: 'YES',
+        onPress: () => this.setState({mounted: false}),
+      });
     }
   };
 
@@ -187,6 +207,13 @@ export default class Content extends React.PureComponent {
           disabled={phoneNumber.length < 1}>
           <ButtonText>{mounted ? `GET STARTED` : `NEXT`}</ButtonText>
         </ButtonWrapper>
+        {!mounted && (
+          <DidNotReceiveCode
+            activeOpacity={0.5}
+            onPress={() => this.setState({mounted: true})}>
+            <Text>Did not receiver a code?</Text>
+          </DidNotReceiveCode>
+        )}
       </Wrapper>
     );
   }

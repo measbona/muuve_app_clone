@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import {showModalChoice} from '../../navigation/screen';
 
 import utils from '../../utils';
 
@@ -12,16 +13,24 @@ import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Header from './components/Header';
 import Row from './components/Row';
 
-const Container = styled.View`
-  flex: 1;
-`;
+const Container = styled.View``;
 
 const Divider = styled.View`
-  height: 10px;
+  height: 5px;
   background-color: ${utils.colors.lightGrey};
 `;
 
 export default class Account extends React.Component {
+  onLogOutPress = () => {
+    showModalChoice({
+      headline: 'LOG OUT',
+      description: 'Are you sure you want to logout?',
+      no: 'Cancel',
+      yes: 'Log out',
+      onPress: () => {},
+    });
+  };
+
   render() {
     const {componentId} = this.props;
 
@@ -65,7 +74,7 @@ export default class Account extends React.Component {
           icon={MDICon}
           iconName="exit-to-app"
           iconSize={18}
-          onPress={() => {}}
+          onPress={this.onLogOutPress}
         />
       </Container>
     );

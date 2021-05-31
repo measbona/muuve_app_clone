@@ -1,7 +1,10 @@
 import React from 'react';
+import {Share} from 'react-native';
 import styled from 'styled-components';
 
-import Header from './components/Header';
+import Colors from '../../utils/colors';
+
+import NavigationBack from '../../lib/NavigationBack';
 import LinkBox from './components/LinkBox';
 
 const Container = styled.View`
@@ -16,7 +19,7 @@ const ContentWrapper = styled.View`
 const HeadlineWrapper = styled.View``;
 
 const Headline = styled.Text`
-  color: #fcbd3e;
+  color: ${Colors.yellow};
   font-size: 17px;
   font-weight: bold;
 `;
@@ -43,7 +46,7 @@ const ShareLinkWrapper = styled.TouchableOpacity`
   margin-top: 10px;
   border-radius: 10px;
   flex-direction: row;
-  background-color: rgba(0, 78, 162, 1);
+  background-color: ${Colors.blue};
 `;
 
 const ShareLink = styled.Text`
@@ -53,10 +56,35 @@ const ShareLink = styled.Text`
 `;
 
 export default class GroupOrder extends React.PureComponent {
+  onSharePress = async () => {
+    try {
+      const result = await Share.share({
+        url: 'https://stgmuuve.page.link/5SFGTV78SSKJ23',
+      });
+      if (result.action === Share.sharedAction) {
+        if (result.activityType) {
+          // shared with activity type of result.activityType
+        } else {
+          // shared
+        }
+      } else if (result.action === Share.dismissedAction) {
+        // dismissed
+      }
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
   render() {
+    const {componentId} = this.props;
+
     return (
       <Container>
-        <Header />
+        <NavigationBack
+          title="Group Order"
+          navigate
+          componentId={componentId}
+        />
         <ContentWrapper>
           <HeadlineWrapper>
             <Headline>Start a group order</Headline>
@@ -69,7 +97,7 @@ export default class GroupOrder extends React.PureComponent {
             <Image source={require('../../assets/images/friends.png')} />
           </ImageWrapper>
           <LinkBox />
-          <ShareLinkWrapper activeOpacity={0.7}>
+          <ShareLinkWrapper activeOpacity={0.7} onPress={this.onSharePress}>
             <ShareLink>SHARE LINK</ShareLink>
           </ShareLinkWrapper>
         </ContentWrapper>

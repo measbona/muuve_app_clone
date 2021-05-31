@@ -10,6 +10,14 @@ import ViewAccount from '../views/ViewAccount';
 import GroupOrder from '../views/GroupOrder';
 import Loading from '../views/Loading';
 import PhoneLogin from '../views/PhoneLogin';
+import OrderDetails from '../views/OrderDetails';
+import Merchant from '../views/Merchant';
+import Checkout from '../views/Checkout';
+import GroupOrderCart from '../views/GroupOrderCart';
+
+import Toast from '../lib/Toast';
+import ModalChoice from '../views/Modal/ModalChoice';
+import ModalNotice from '../views/Modal/ModalNotice';
 
 export const HOME = 'MuuveAppClone.Home';
 export const ORDER = 'MuuveAppClone.Order';
@@ -18,6 +26,14 @@ export const VIEW_ACCOUNT = 'MuuveAppClone.ViewAccount';
 export const GROUP_ORDER = 'MuuveAppClone.GroupOrder';
 export const LOADING = 'MuuveAppClone.Loading';
 export const PHONE_LOGIN = 'MuuveAppClone.PhoneLogin';
+export const ORDER_DETAILS = 'MuuveAppClone.OrderDetails';
+export const MERCHANT = 'MuuveAppClone.Merchant';
+export const CHECKOUT = 'MuuveAppClone.Checkout';
+export const GROUP_ORDER_CART = 'MuuveAppClone.GroupOrderCart';
+
+export const TOAST = 'MuuveAppClone.Toast';
+export const MODAL_CHOICE = 'MuuveAppClone.ModalChoice';
+export const MODAL_NOTICE = 'MuuveAppClone.ModalNotice';
 
 export const Screens = new Map();
 
@@ -28,6 +44,14 @@ Screens.set(VIEW_ACCOUNT, ViewAccount);
 Screens.set(GROUP_ORDER, GroupOrder);
 Screens.set(LOADING, Loading);
 Screens.set(PHONE_LOGIN, PhoneLogin);
+Screens.set(ORDER_DETAILS, OrderDetails);
+Screens.set(MERCHANT, Merchant);
+Screens.set(CHECKOUT, Checkout);
+Screens.set(GROUP_ORDER_CART, GroupOrderCart);
+
+Screens.set(TOAST, Toast);
+Screens.set(MODAL_CHOICE, ModalChoice);
+Screens.set(MODAL_NOTICE, ModalNotice);
 
 const hideBottomTabs = {
   bottomTabs: {
@@ -143,6 +167,102 @@ export const showPhoneLogin = () => {
     root: {
       component: {
         name: PHONE_LOGIN,
+      },
+    },
+  });
+};
+
+export const showModalChoice = (passProps) => {
+  Navigation.showOverlay({
+    component: {
+      name: MODAL_CHOICE,
+      passProps,
+      options: {
+        layout: {
+          backgroundColor: 'transparent',
+          componentBackgroundColor: 'transparent',
+        },
+        modalPresentationStyle: 'overCurrentContext',
+      },
+    },
+  });
+};
+
+export const showModalNotice = (passProps) => {
+  Navigation.showOverlay({
+    component: {
+      name: MODAL_NOTICE,
+      passProps,
+      options: {
+        layout: {
+          backgroundColor: 'transparent',
+          componentBackgroundColor: 'transparent',
+        },
+        modalPresentationStyle: 'overCurrentContext',
+      },
+    },
+  });
+};
+
+export const goToOrderDetails = (componentId, passProps) => {
+  Navigation.push(componentId, {
+    component: {
+      name: ORDER_DETAILS,
+      passProps,
+      options: {
+        ...hideBottomTabs,
+      },
+    },
+  });
+};
+
+export const goToMerchant = (componentId, passProps) => {
+  Navigation.push(componentId, {
+    component: {
+      name: MERCHANT,
+      passProps,
+      options: {
+        ...hideBottomTabs,
+      },
+    },
+  });
+};
+
+export const showToast = (passProps) =>
+  Navigation.showOverlay({
+    component: {
+      name: TOAST,
+      passProps,
+      options: {
+        layout: {
+          componentBackgroundColor: 'transparent',
+        },
+        overlay: {
+          interceptTouchOutside: false,
+        },
+      },
+    },
+  });
+
+export const goToCheckout = (componentId, passProps) => {
+  Navigation.push(componentId, {
+    component: {
+      name: CHECKOUT,
+      passProps,
+      options: {
+        ...hideBottomTabs,
+      },
+    },
+  });
+};
+
+export const goToGroupOrderCart = (componentId, passProps) => {
+  Navigation.push(componentId, {
+    component: {
+      name: GROUP_ORDER_CART,
+      passProps,
+      options: {
+        ...hideBottomTabs,
       },
     },
   });

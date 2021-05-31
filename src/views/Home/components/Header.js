@@ -1,27 +1,52 @@
 import React from 'react';
-import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 import utils from '../../../utils';
 import SearchBar from './SearchBar';
 
-const SCREEN_WIDTH = Dimensions.get('screen').width;
-
 const Wrapper = styled.View`
-  height: 100px;
-  padding-top: 30px;
-  flex-direction: row;
+  padding-top: 40px;
+  padding-bottom: 15px;
+  border-bottom-left-radius: 17px;
+  border-bottom-right-radius: 17px;
   background-color: ${utils.colors.yellow};
-  align-items: center;
-  justify-content: center;
-  width: ${SCREEN_WIDTH}px;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
 `;
 
 const CartButton = styled.TouchableOpacity`
-  margin-left: 12px;
+  align-self: flex-end;
+`;
+
+const LocationWrapper = styled.View`
+  margin-bottom: 5px;
+  flex-direction: row;
+  padding-vertical: 12px;
+  margin-horizontal: 20px;
+  justify-content: space-between;
+`;
+
+const LocationName = styled.Text`
+  font-size: 14px;
+  font-weight: bold;
+  color: ${utils.colors.blue};
+`;
+
+const Row = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const PlaceName = styled.Text`
+  font-size: 10px;
+`;
+
+const Column = styled.View`
+  align-items: center;
+`;
+
+const BlankSpace = styled.View`
+  margin-right: 25px;
 `;
 
 export default class Header extends React.PureComponent {
@@ -30,13 +55,28 @@ export default class Header extends React.PureComponent {
 
     return (
       <Wrapper>
+        <LocationWrapper>
+          <BlankSpace />
+          <Column>
+            <Row>
+              <MIcon name="my-location" size={17} style={{marginRight: 3}} />
+              <LocationName>Current Location</LocationName>
+              <MIcon
+                name="keyboard-arrow-down"
+                color={utils.colors.blue}
+                size={20}
+              />
+            </Row>
+            <PlaceName>Street 76 A, 1202002 Doun Penh, C...</PlaceName>
+          </Column>
+          <CartButton
+            hitSlop={{top: 12, bottom: 12, left: 12, right: 12}}
+            activeOpacity={0.7}
+            onPress={onCartPress}>
+            <FontAwesomeIcon name="shopping-basket" size={20} />
+          </CartButton>
+        </LocationWrapper>
         <SearchBar />
-        <CartButton
-          hitSlop={{top: 12, bottom: 12, left: 12, right: 12}}
-          activeOpacity={0.7}
-          onPress={() => onCartPress('PropsPress')}>
-          <FontAwesomeIcon name="shopping-basket" size={20} />
-        </CartButton>
       </Wrapper>
     );
   }

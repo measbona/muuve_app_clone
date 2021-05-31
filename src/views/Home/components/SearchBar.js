@@ -1,20 +1,19 @@
 import React from 'react';
-import {Dimensions} from 'react-native';
 import styled from 'styled-components/native';
 import FontAwsomeIcon from 'react-native-vector-icons/FontAwesome';
 
-const SCREEN_WIDTH = Dimensions.get('screen').width;
-
 const Wrapper = styled.View`
+  padding: 9px;
   align-items: center;
   border-radius: 50px;
   flex-direction: row;
   background-color: white;
+  margin-horizontal: 16px;
 `;
 
 const TextInput = styled.TextInput`
-  height: 35px;
-  width: ${SCREEN_WIDTH / 1.4}px;
+  flex: 1;
+  font-size: 13px;
 `;
 
 const Icon = styled(FontAwsomeIcon)`

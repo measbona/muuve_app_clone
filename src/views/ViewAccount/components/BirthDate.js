@@ -26,7 +26,7 @@ const TextInputWrapper = styled.View`
   margin-top: 10px;
   border-radius: 17px;
   margin-horizontal: 2px;
-  background-color: ${utils.colors.lightGrey};
+  background-color: ${utils.colors.grey};
 `;
 
 const Skeleton = styled.View`
