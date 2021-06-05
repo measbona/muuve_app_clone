@@ -8,6 +8,8 @@ target 'muuve_app_clone' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  pod 'Firebase/Analytics'
+
   target 'muuve_app_cloneTests' do
     inherit! :complete
     # Pods for testing

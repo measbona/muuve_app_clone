@@ -2,6 +2,8 @@ import React from 'react';
 import styled from 'styled-components/native';
 import {showModalNotice, goToMerchant} from '../../navigation/screen';
 
+import firebase from '@react-native-firebase/database';
+
 import Colors from '../../utils/colors';
 
 import Header from './components/Header';
@@ -32,6 +34,15 @@ const ScrollView = styled.ScrollView`
 `;
 
 export default class Home extends React.PureComponent {
+  async componentDidMount() {
+    const ref = firebase()
+      .ref('/restaurants/-LQIcxT5QNto78oUB80d')
+      .once('value');
+    const data = await ref;
+
+    alert(JSON.stringify(data))
+  }
+
   onCartPress = () => {
     showModalNotice({
       headline: 'Noticed',
