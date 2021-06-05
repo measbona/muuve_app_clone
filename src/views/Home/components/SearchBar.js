@@ -2,8 +2,9 @@ import React from 'react';
 import styled from 'styled-components/native';
 import FontAwsomeIcon from 'react-native-vector-icons/FontAwesome';
 
+import Colors from '../../../utils/colors';
+
 const Wrapper = styled.View`
-  padding: 9px;
   align-items: center;
   border-radius: 50px;
   flex-direction: row;
@@ -17,7 +18,7 @@ const TextInput = styled.TextInput`
 `;
 
 const Icon = styled(FontAwsomeIcon)`
-  color: #004da6;
+  color: ${Colors.blue};
   margin-horizontal: 15px;
 `;
 

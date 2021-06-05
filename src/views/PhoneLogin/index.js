@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components/native';
 
-import utils from '../../utils';
+import Device from '../../utils/device';
+import Colors from '../../utils/colors';
 
 import Content from './components/Content';
 
@@ -11,10 +12,10 @@ const Container = styled.View`
 `;
 
 const HeaderWrapper = styled.View`
-  padding-top: 50px;
+  padding-top: ${Device.hasNotch ? 40 : 15}px;
   align-items: center;
   justify-content: center;
-  background-color: ${utils.colors.yellow};
+  background-color: ${Colors.yellow};
   border-bottom-left-radius: 17px;
   border-bottom-right-radius: 17px;
 `;
@@ -26,19 +27,20 @@ const Row = styled.View`
 `;
 
 const FooterWrapper = styled.View`
-  height: 85px;
   align-items: center;
   padding-bottom: 10px;
+  padding-top: 20px;
   justify-content: center;
-  background-color: ${utils.colors.yellow};
   border-top-left-radius: 17px;
   border-top-right-radius: 17px;
+  background-color: ${Colors.yellow};
+  padding-bottom: ${Device.isIphoneX ? 30 : 20}px;
 `;
 
 const Text = styled.Text`
   font-size: 11px;
-  font-weight: 500;
-  color: ${utils.colors.black};
+  font-weight: bold;
+  color: ${Colors.black};
   ${(props) => props.color && `color: blue; text-decoration: underline`}
 `;
 

@@ -3,15 +3,17 @@ import styled from 'styled-components/native';
 import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
-import utils from '../../../utils';
+import Colors from '../../../utils/colors';
+import Device from '../../../utils/device';
+
 import SearchBar from './SearchBar';
 
 const Wrapper = styled.View`
-  padding-top: 40px;
   padding-bottom: 15px;
   border-bottom-left-radius: 17px;
   border-bottom-right-radius: 17px;
-  background-color: ${utils.colors.yellow};
+  background-color: ${Colors.yellow};
+  padding-top: ${Device.hasNotch ? 40 : 10}px;
 `;
 
 const CartButton = styled.TouchableOpacity`
@@ -29,7 +31,7 @@ const LocationWrapper = styled.View`
 const LocationName = styled.Text`
   font-size: 14px;
   font-weight: bold;
-  color: ${utils.colors.blue};
+  color: ${Colors.blue};
 `;
 
 const Row = styled.View`
@@ -61,11 +63,7 @@ export default class Header extends React.PureComponent {
             <Row>
               <MIcon name="my-location" size={17} style={{marginRight: 3}} />
               <LocationName>Current Location</LocationName>
-              <MIcon
-                name="keyboard-arrow-down"
-                color={utils.colors.blue}
-                size={20}
-              />
+              <MIcon name="keyboard-arrow-down" color={Colors.blue} size={20} />
             </Row>
             <PlaceName>Street 76 A, 1202002 Doun Penh, C...</PlaceName>
           </Column>

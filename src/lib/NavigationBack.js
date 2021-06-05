@@ -2,14 +2,16 @@ import React from 'react';
 import styled from 'styled-components/native';
 import MTIcon from 'react-native-vector-icons/MaterialIcons';
 import {popBack} from '../navigation/screen';
-//ios 30px;
+
 import Colors from '../utils/colors';
+import Device from '../utils/device';
 
 const Wrapper = styled.View`
-  padding-top: 40px;
+  padding-top: ${Device.isIphoneX ? 68 : 42}px;
+  padding-bottom: 15px;
   padding-left: 10px;
-  min-height: 105px;
-  border-radius: 17px;
+  border-bottom-left-radius: 17px;
+  border-bottom-right-radius: 17px;
   align-items: center;
   flex-direction: row;
   background-color: ${Colors.yellow};
