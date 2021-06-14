@@ -2,9 +2,12 @@ import React from 'react';
 import {Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 
-import {setRootHome, showModalChoice} from '../../../navigation/screen';
+import Auth from '@react-native-firebase/auth';
 
 import utils from '../../../utils';
+import PhoneInput from './PhoneInput';
+
+import {setRootHome, showModalChoice, showModalNotice} from '../../../navigation/screen';
 
 const Wrapper = styled.TouchableOpacity`
   flex: 1;
@@ -17,39 +20,6 @@ const HeadTextWrapper = styled.View``;
 const HeadText = styled.Text`
   font-weight: bold;
   color: ${utils.colors.black};
-`;
-
-const TextInputWrapper = styled.View`
-  height: 40px;
-  border-radius: 17px;
-  flex-direction: row;
-  margin-vertical: 10px;
-  justify-content: space-between;
-  background-color: ${utils.colors.grey};
-`;
-
-const TextInput = styled.TextInput`
-  flex: 1;
-  font-size: 13px;
-  font-weight: bold;
-  margin-left: 10px;
-`;
-
-const Head = styled.View`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const CambodiaFlagIcon = styled.Image`
-  width: 27px;
-  height: 17px;
-  margin-left: 20px;
-`;
-
-const PrefixNumber = styled.Text`
-  font-size: 13px;
-  font-weight: bold;
-  margin-left: 10px;
 `;
 
 const ButtonWrapper = styled.TouchableOpacity`
@@ -103,39 +73,15 @@ const Text = styled.Text`
   align-self: center;
 `;
 
+const ActivityIndicator = styled.ActivityIndicator``;
+
 export default class Content extends React.PureComponent {
   state = {
-    phoneNumber: '',
+    code: [],
+    confirm: null,
     mounted: true,
-    code: '',
-  };
-
-  componentDidUpdate() {
-    const {code} = this.state;
-
-    if (code.length === 6) {
-      setRootHome();
-    }
-  }
-
-  renderPhoneNumberInput = () => {
-    return (
-      <TextInputWrapper>
-        <Head>
-          <CambodiaFlagIcon
-            source={require('../../../assets/icons/flag_icon.png')}
-          />
-          <PrefixNumber>+855</PrefixNumber>
-        </Head>
-        <TextInput
-          caretHidden
-          maxLength={10}
-          keyboardType="number-pad"
-          placeholder="Enter phone number"
-          onChangeText={(num) => this.setState({phoneNumber: num})}
-        />
-      </TextInputWrapper>
-    );
+    loading: false,
+    phoneNumber: '',
   };
 
   renderVerificationInput = () => {
@@ -172,48 +118,93 @@ export default class Content extends React.PureComponent {
     );
   };
 
-  handleVerifyCode = () => {
-    const {mounted, code, phoneNumber} = this.state;
+  handleVerifyCode = async () => {
+    const {mounted, phoneNumber} = this.state;
 
     Keyboard.dismiss();
 
-    if (!mounted && code.length === 6) {
-      setRootHome();
-    } else {
-      showModalChoice({
+    if (mounted) {
+      return showModalChoice({
         headline: 'Confirmation',
         description: `A confirmation code will send to your via SMS or Notification. Please check your number is correct.\n\n+855${phoneNumber}`,
         no: 'NO',
         yes: 'YES',
-        onPress: () => this.setState({mounted: false}),
+        onPress: this.onPhoneAuth,
       });
-    }
+    } else {
+      this.codeVerification()
+    } 
   };
 
+  onPhoneAuth = async () => {
+    const { phoneNumber } = this.state
+
+    try {
+      const confirmation = await Auth().signInWithPhoneNumber(`+855${phoneNumber}`);
+
+      if (confirmation) {
+        this.setState({confirm: confirmation, mounted: false});
+      }
+    } catch (error) {
+      //
+    }
+  }
+
+  codeVerification = async () => {
+    const { confirm, code } = this.state
+
+    try {
+      this.setState({ loading: true })
+
+      const isCorrect = await confirm.confirm(code)
+
+      if (isCorrect) {
+        this.setState({ loading: false })
+
+        setRootHome()
+      }
+    } catch (error) {
+      showModalNotice({
+        headline: 'Invalid Code',
+        description: 'Your code is invalid. Please try again.',
+        buttonName: 'Confirm',
+      });
+
+      this.setState({ loading: false })
+    }
+  }
+
   render() {
-    const {phoneNumber, mounted} = this.state;
+    const {phoneNumber, mounted, loading, code} = this.state;
+
+    const buttonText = mounted ? 'NEXT' : 'GET STARTED'
+    const disabled = mounted ? phoneNumber.length <= 7 : code.length !== 6
 
     return (
       <Wrapper activeOpacity={1} onPress={() => Keyboard.dismiss()}>
         <HeadTextWrapper>
           <HeadText>Login with your phone number</HeadText>
         </HeadTextWrapper>
+
         {mounted
-          ? this.renderPhoneNumberInput()
+          ? <PhoneInput onChangeText={(num) => this.setState({phoneNumber: num})} />
           : this.renderVerificationInput()}
-        <ButtonWrapper
-          activeOpacity={0.8}
-          onPress={this.handleVerifyCode}
-          disabled={phoneNumber.length < 1}>
-          <ButtonText>{mounted ? `GET STARTED` : `NEXT`}</ButtonText>
+
+        <ButtonWrapper disabled={disabled} activeOpacity={0.8} onPress={this.handleVerifyCode}>
+          {loading ? (
+            <ActivityIndicator size="small" color="black" />
+          ) : (
+            <ButtonText>{buttonText}</ButtonText>
+          )}
         </ButtonWrapper>
-        {!mounted && (
+
+        {!mounted ? (
           <DidNotReceiveCode
             activeOpacity={0.5}
-            onPress={() => this.setState({mounted: true})}>
+            onPress={() => this.setState({ mounted: true, confirm: null, code: '' })}>
             <Text>Did not receiver a code?</Text>
           </DidNotReceiveCode>
-        )}
+        ) : null}
       </Wrapper>
     );
   }

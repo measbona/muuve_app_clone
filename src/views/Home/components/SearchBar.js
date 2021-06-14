@@ -6,6 +6,7 @@ import Colors from '../../../utils/colors';
 
 const Wrapper = styled.View`
   align-items: center;
+  height: 30px;
   border-radius: 50px;
   flex-direction: row;
   background-color: white;

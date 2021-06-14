@@ -1,6 +1,8 @@
-import React from 'react';
-import {ActivityIndicator} from 'react-native';
+import React, {useState, useEffect} from 'react';
+import {forEach} from 'lodash'
 import styled from 'styled-components/native';
+import firebase from '@react-native-firebase/database'
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import utils from '../../utils';
 
@@ -11,10 +13,32 @@ const Container = styled.View`
   background-color: ${utils.colors.yellow};
 `;
 
-export default () => {
+const Loading = styled.ActivityIndicator``;
+
+export default props => {
+  const {resolve} = props
+
+  useEffect(() => {
+    fetchMerchant()
+
+    resolve(true)
+  });
+
+  const fetchMerchant = async () => {
+    try {
+      const ref = await firebase().ref('restaurants').once('value')
+      const data = await ref.val()
+      const restaurants = JSON.stringify(data)
+
+      await AsyncStorage.setItem('restaurants', restaurants)
+    } catch (error) {
+      throw new Error('Error fetching merchant')
+    }
+  }
+
   return (
     <Container>
-      <ActivityIndicator size="small" color="black" animating />
+      <Loading size="small" color="black" animating />
     </Container>
-  );
+  ); 
 };

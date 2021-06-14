@@ -1,7 +1,8 @@
 import React from 'react';
+import {get} from 'lodash'
 import styled from 'styled-components/native';
 
-const Wrapper = styled.View`
+const Wrapper = styled.TouchableOpacity`
   flex-direction: row;
   padding-horizontal: 20px;
   justify-content: space-between;
@@ -22,18 +23,19 @@ const ItemImage = styled.Image`
 `;
 
 export default (props) => {
+  const {item, onPress} = props
+
+  const name = get(item, 'name', 'N/A')
+  const price = get(item, 'current_price', 'N/A')
+  const logo = get(item, 'images.thumb', '')
+
   return (
-    <Wrapper>
+    <Wrapper activeOpacity={0.5} onPress={onPress}>
       <InfoWrapper>
-        <Text>Caramel Machiato Frappe</Text>
-        <Text price>$2.35</Text>
+        <Text>{name}</Text>
+        <Text price>{`$${price}`}</Text>
       </InfoWrapper>
-      <ItemImage
-        source={{
-          uri:
-            'https://cdn.auntieannes.com/-/media/auntie-annes/cards/featured/celebratehappiness_pretzel-buckets_450x430.jpg?v=1&d=20200102T163436Z&h=430&w=450&la=en&hash=84C9C95CC159D72D7E2F149D749F5B16',
-        }}
-      />
+      <ItemImage source={{ uri:logo }} />
     </Wrapper>
   );
 };

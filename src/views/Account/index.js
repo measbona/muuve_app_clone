@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import Auth from '@react-native-firebase/auth';
 import {showModalChoice} from '../../navigation/screen';
 
 import utils from '../../utils';
@@ -27,7 +28,7 @@ export default class Account extends React.Component {
       description: 'Are you sure you want to logout?',
       no: 'Cancel',
       yes: 'Log out',
-      onPress: () => {},
+      onPress: () => Auth().signOut(),
     });
   };
 

@@ -153,13 +153,18 @@ export const goToGroupOrder = (componentId, passProps) => {
 };
 
 export const showLoading = () => {
-  Navigation.setRoot({
-    root: {
-      component: {
-        name: LOADING,
+  return new Promise(resolve => {
+    Navigation.setRoot({
+      root: {
+        component: {
+          name: LOADING,
+          passProps: {
+            resolve,
+          }
+        },
       },
-    },
-  });
+    });
+  })
 };
 
 export const showPhoneLogin = () => {

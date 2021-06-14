@@ -18,10 +18,6 @@
 		2DCD954D1E0B4F2C00145EB5 /* muuve_app_cloneTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* muuve_app_cloneTests.m */; };
 		57AFE09860AB2B952C08D640 /* libPods-muuve_app_clone.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5530B3F8299BE27D50E5C792 /* libPods-muuve_app_clone.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		AC468EE2266BCF140070542D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AC468EE1266BCF140070542D /* GoogleService-Info.plist */; };
-		AC468EE3266BCF140070542D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AC468EE1266BCF140070542D /* GoogleService-Info.plist */; };
-		AC468EE4266BCF140070542D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AC468EE1266BCF140070542D /* GoogleService-Info.plist */; };
-		AC468EE5266BCF140070542D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AC468EE1266BCF140070542D /* GoogleService-Info.plist */; };
 		AC46DB202626B74700F078C1 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC46DB102626B74700F078C1 /* Fontisto.ttf */; };
 		AC46DB212626B74700F078C1 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC46DB112626B74700F078C1 /* Octicons.ttf */; };
 		AC46DB222626B74700F078C1 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC46DB122626B74700F078C1 /* Feather.ttf */; };
@@ -38,6 +34,7 @@
 		AC46DB2D2626B74800F078C1 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC46DB1D2626B74700F078C1 /* EvilIcons.ttf */; };
 		AC46DB2E2626B74800F078C1 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC46DB1E2626B74700F078C1 /* SimpleLineIcons.ttf */; };
 		AC46DB2F2626B74800F078C1 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = AC46DB1F2626B74700F078C1 /* MaterialIcons.ttf */; };
+		AC8E758C2674CDBC008BE4B3 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = AC8E758B2674CDBC008BE4B3 /* GoogleService-Info.plist */; };
 		AEC67A850F06C2CCA9BB19B7 /* libPods-muuve_app_clone-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 140D7AFB35C468D8292D1ADF /* libPods-muuve_app_clone-tvOSTests.a */; };
 		F9FE981A582596DCD9AEC181 /* libPods-muuve_app_clone-muuve_app_cloneTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 64A1908D7294F1D2575FB6BA /* libPods-muuve_app_clone-muuve_app_cloneTests.a */; };
 /* End PBXBuildFile section */
@@ -82,7 +79,6 @@
 		64A1908D7294F1D2575FB6BA /* libPods-muuve_app_clone-muuve_app_cloneTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-muuve_app_clone-muuve_app_cloneTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		671276925499543A90EFB32E /* libPods-muuve_app_clone-tvOS.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-muuve_app_clone-tvOS.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = muuve_app_clone/LaunchScreen.storyboard; sourceTree = "<group>"; };
-		AC468EE1266BCF140070542D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		AC46DB102626B74700F078C1 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
 		AC46DB112626B74700F078C1 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
 		AC46DB122626B74700F078C1 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
@@ -99,6 +95,7 @@
 		AC46DB1D2626B74700F078C1 /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
 		AC46DB1E2626B74700F078C1 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
 		AC46DB1F2626B74700F078C1 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
+		AC8E758B2674CDBC008BE4B3 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		BBD94A33D1A57C2BAF26CAD9 /* Pods-muuve_app_clone-tvOS.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-muuve_app_clone-tvOS.release.xcconfig"; path = "Target Support Files/Pods-muuve_app_clone-tvOS/Pods-muuve_app_clone-tvOS.release.xcconfig"; sourceTree = "<group>"; };
 		CE11FFA2B7300057A0B640F9 /* Pods-muuve_app_clone-muuve_app_cloneTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-muuve_app_clone-muuve_app_cloneTests.release.xcconfig"; path = "Target Support Files/Pods-muuve_app_clone-muuve_app_cloneTests/Pods-muuve_app_clone-muuve_app_cloneTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -162,6 +159,7 @@
 		13B07FAE1A68108700A75B9A /* muuve_app_clone */ = {
 			isa = PBXGroup;
 			children = (
+				AC8E758B2674CDBC008BE4B3 /* GoogleService-Info.plist */,
 				AC46DB0F2626B74700F078C1 /* Fonts */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -170,7 +168,6 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
-				AC468EE1266BCF140070542D /* GoogleService-Info.plist */,
 			);
 			name = muuve_app_clone;
 			sourceTree = "<group>";
@@ -397,7 +394,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC468EE3266BCF140070542D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -416,7 +412,7 @@
 				AC46DB2C2626B74800F078C1 /* Zocial.ttf in Resources */,
 				AC46DB2E2626B74800F078C1 /* SimpleLineIcons.ttf in Resources */,
 				AC46DB222626B74700F078C1 /* Feather.ttf in Resources */,
-				AC468EE2266BCF140070542D /* GoogleService-Info.plist in Resources */,
+				AC8E758C2674CDBC008BE4B3 /* GoogleService-Info.plist in Resources */,
 				AC46DB212626B74700F078C1 /* Octicons.ttf in Resources */,
 				AC46DB242626B74800F078C1 /* FontAwesome5_Brands.ttf in Resources */,
 				AC46DB262626B74800F078C1 /* AntDesign.ttf in Resources */,
@@ -432,7 +428,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */,
-				AC468EE4266BCF140070542D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -440,7 +435,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				AC468EE5266BCF140070542D /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

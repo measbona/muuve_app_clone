@@ -1,6 +1,9 @@
 import React from 'react';
+import {map, get} from 'lodash'
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
+import firebase from '@react-native-firebase/database'
 import {
   goToGroupOrder,
   showModalChoice,
@@ -74,7 +77,25 @@ const Image = styled.Image`
 export default class Merchant extends React.PureComponent {
   state = {
     groupOrderStatred: false,
+    items: {},
   };
+
+  componentDidMount() {
+    this.getItems()
+  }
+
+  getItems = async () => {
+    const { restaurant } = this.props
+    
+    try {
+      const ref = await firebase().ref(`items/${restaurant.key}`).once('value')
+      const items = await ref.val()
+      
+      this.setState({ items })
+    } catch (error) {
+      throw new Error('Fail getting items')
+    }
+  }
 
   onEndSession = () => {
     showModalChoice({
@@ -106,24 +127,27 @@ export default class Merchant extends React.PureComponent {
       },
     });
   };
+  
+  onItemPress = () => {
+  }
 
   render() {
-    const {groupOrderStatred} = this.state;
-    const {componentId} = this.props;
+    const {groupOrderStatred, items} = this.state;
+    const {componentId, restaurant} = this.props;
+
+    const merchantName = get(restaurant, 'name', 'N/A')
+    const banner = get(restaurant, 'images.banner')
 
     return (
       <Container>
         <NavigationBack
-          title="Merchant Name"
+          title={merchantName}
           navigate
           componentId={componentId}
         />
         <BannerWrapper>
           <Image
-            source={{
-              uri:
-                'https://cdn.auntieannes.com/-/media/auntie-annes/newsroom/pretzel_nation_creation_winner.jpg?v=1&d=20181114T183106Z',
-            }}
+            source={{ uri: banner }}
           />
         </BannerWrapper>
         <GroupOrderWrapper>
@@ -169,17 +193,12 @@ export default class Merchant extends React.PureComponent {
         <Content>
           <SearchBar />
           <ScrollView showVerticalScrollIndicator={false}>
-            <Item />
-            <Divider />
-            <Item />
-            <Divider />
-            <Item />
-            <Divider />
-            <Item />
-            <Divider />
-            <Item />
-            <Divider />
-            <Item />
+            {map(items, (item, key) => 
+              <React.Fragment key={key}>
+                <Item item={item} onPress={this.onItemPress} />
+                <Divider />
+              </React.Fragment>
+            )}
           </ScrollView>
         </Content>
         <CheckoutBottomSheet onPress={this.onCheckoutPress} />

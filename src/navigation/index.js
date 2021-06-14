@@ -1,5 +1,6 @@
 import {Navigation} from 'react-native-navigation';
-import {Screens, showLoading, showPhoneLogin} from './screen';
+import Auth from '@react-native-firebase/auth';
+import {Screens, setRootHome, showLoading, showPhoneLogin} from './screen';
 
 export const registerScreen = () => {
   Screens.forEach((ScreenComponent, key) =>
@@ -23,9 +24,14 @@ export const startApp = () => {
   Navigation.events().registerAppLaunchedListener(() => {
     setDefaultNavigation();
 
-    showLoading();
-    setTimeout(() => {
-      showPhoneLogin();
-    }, 3000);
+    Auth().onAuthStateChanged(async (user) => {
+      if (user) {
+        await showLoading();
+        
+        setRootHome()
+      } else {
+        showPhoneLogin();
+      }
+    });
   });
 };

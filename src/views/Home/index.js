@@ -1,8 +1,8 @@
 import React from 'react';
+import {map} from 'lodash'
 import styled from 'styled-components/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {showModalNotice, goToMerchant} from '../../navigation/screen';
-
-import firebase from '@react-native-firebase/database';
 
 import Colors from '../../utils/colors';
 
@@ -34,14 +34,20 @@ const ScrollView = styled.ScrollView`
 `;
 
 export default class Home extends React.PureComponent {
-  async componentDidMount() {
-    const ref = firebase()
-      .ref('/restaurants/-LQIcxT5QNto78oUB80d')
-      .once('value');
-    const data = await ref;
-
-    alert(JSON.stringify(data))
+  state = {
+    restaurants: null
   }
+
+  componentDidMount() {
+    this.getRestaurantsFromStorage()
+  };
+
+  getRestaurantsFromStorage = async () => {
+    const restaurantStorage = await AsyncStorage.getItem('restaurants')
+    const restaurants = JSON.parse(restaurantStorage)
+
+    this.setState({ restaurants })
+  };
 
   onCartPress = () => {
     showModalNotice({
@@ -51,13 +57,15 @@ export default class Home extends React.PureComponent {
     });
   };
 
-  onMerchantPress = () => {
+  onMerchantPress = restaurant => {
     const {componentId} = this.props;
 
-    goToMerchant(componentId);
+    goToMerchant(componentId, { restaurant });
   };
 
   render() {
+    const { restaurants } = this.state
+
     return (
       <Container>
         <Header onCartPress={this.onCartPress} />
@@ -66,9 +74,11 @@ export default class Home extends React.PureComponent {
             <Headline>All Stores</Headline>
           </HeadlineWrapper>
           <ScrollView showVerticalScrollIndicator={false}>
-            <MerchantCard onPress={this.onMerchantPress} />
-            <MerchantCard onPress={this.onMerchantPress} />
-            <MerchantCard onPress={this.onMerchantPress} />
+            {map(restaurants, restaurant => (
+              <React.Fragment key={restaurant.key}>
+                <MerchantCard restaurant={restaurant} onPress={() => this.onMerchantPress(restaurant)} />
+              </React.Fragment>
+            ))}
           </ScrollView>
         </ContentWrapper>
       </Container>
