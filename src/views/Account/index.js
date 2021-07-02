@@ -1,7 +1,8 @@
 import React from 'react';
 import styled from 'styled-components/native';
 import Auth from '@react-native-firebase/auth';
-import {showModalChoice} from '../../navigation/screen';
+import { showModalChoice } from '../../navigation/screen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import utils from '../../utils';
 
@@ -22,6 +23,21 @@ const Divider = styled.View`
 `;
 
 export default class Account extends React.Component {
+  state = {
+    user: null
+  }
+
+  componentDidMount() {
+    this.getCurrentUserData()
+  }
+
+  getCurrentUserData = async () => {
+    const userStorage = await AsyncStorage.getItem('user')
+    const user = JSON.parse(userStorage)
+
+    this.setState({ user })
+  }
+
   onLogOutPress = () => {
     showModalChoice({
       headline: 'LOG OUT',
@@ -32,12 +48,17 @@ export default class Account extends React.Component {
     });
   };
 
+  onViewAccountSavePress = (data) => {
+    return this.setState({ user: data })
+  }
+
   render() {
-    const {componentId} = this.props;
+    const { user } = this.state
+    const { componentId } = this.props;
 
     return (
       <Container>
-        <Header componentId={componentId} />
+        <Header user={user} componentId={componentId} onSavePress={this.onViewAccountSavePress}/>
         <Row
           name="Language"
           icon={ATIcon}

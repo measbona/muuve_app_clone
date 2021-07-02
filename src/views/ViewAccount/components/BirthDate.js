@@ -41,7 +41,7 @@ const TextInput = styled.TextInput`
   color: ${utils.colors.black};
 `;
 
-export default ({name, onDayChange, onMonthChange, onYearChange}) => {
+export default ({name, onDayChange, onMonthChange, onYearChange, day, month, year}) => {
   return (
     <Wrapper>
       <TitleWrapper>
@@ -51,6 +51,7 @@ export default ({name, onDayChange, onMonthChange, onYearChange}) => {
         <TextInputWrapper>
           <TextInput
             keyboardType="number-pad"
+            value={day}
             textAlign="right"
             placeholder="Day"
             onChangeText={(text) => onDayChange(text)}
@@ -60,6 +61,7 @@ export default ({name, onDayChange, onMonthChange, onYearChange}) => {
         <TextInputWrapper>
           <TextInput
             keyboardType="default"
+            value={month}
             textAlign="right"
             placeholder="Month"
             onChangeText={(text) => onMonthChange(text)}
@@ -69,6 +71,7 @@ export default ({name, onDayChange, onMonthChange, onYearChange}) => {
         <TextInputWrapper>
           <TextInput
             keyboardType="number-pad"
+            value={year}
             textAlign="right"
             placeholder="Year"
             onChangeText={(text) => onYearChange(text)}

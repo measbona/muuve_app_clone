@@ -37,7 +37,7 @@ const TextInput = styled.TextInput`
   color: ${utils.colors.black};
 `;
 
-export default ({name, placeholder, onChange}) => {
+export default ({name, placeholder, onChange, value}) => {
   return (
     <Wrapper>
       <TitleWrapper>
@@ -46,6 +46,7 @@ export default ({name, placeholder, onChange}) => {
       </TitleWrapper>
       <TextInputWrapper>
         <TextInput
+          value={value}
           placeholder={placeholder}
           onChangeText={(text) => onChange(text)}
         />

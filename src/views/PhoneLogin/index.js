@@ -46,6 +46,8 @@ const Text = styled.Text`
 
 export default class PhoneLogin extends React.PureComponent {
   render() {
+    const { componentId } = this.props
+
     return (
       <Container>
         <HeaderWrapper>
@@ -54,7 +56,7 @@ export default class PhoneLogin extends React.PureComponent {
             source={require('../../assets/images/muuve_logo.png')}
           />
         </HeaderWrapper>
-        <Content />
+        <Content componentId={componentId} />
         <FooterWrapper>
           <Text>By continuing your agree to our</Text>
           <Row>

@@ -128,7 +128,15 @@ export default class Merchant extends React.PureComponent {
     });
   };
   
-  onItemPress = () => {
+  onItemPress = async (item, itemKey) => {
+    const { restaurant: { key } } = this.props
+    // const data = {}
+
+    // data[itemKey] = {
+    //   name: item.name,
+    //   price: item.current_price,
+    //   images: item.images,
+    // }
   }
 
   render() {
@@ -173,6 +181,7 @@ export default class Merchant extends React.PureComponent {
             </Button>
           )}
         </GroupOrderWrapper>
+
         <CategoryWrapper>
           <ScrollView horizontal showHorizontalScrollIndicator={false}>
             <Button activeOpacity={0.5}>
@@ -190,18 +199,21 @@ export default class Merchant extends React.PureComponent {
             </Button>
           </ScrollView>
         </CategoryWrapper>
+
         <Content>
           <SearchBar />
           <ScrollView showVerticalScrollIndicator={false}>
             {map(items, (item, key) => 
               <React.Fragment key={key}>
-                <Item item={item} onPress={this.onItemPress} />
+                <Item item={item} onPress={() => this.onItemPress(item, key)} />
                 <Divider />
               </React.Fragment>
             )}
           </ScrollView>
         </Content>
-        <CheckoutBottomSheet onPress={this.onCheckoutPress} />
+
+        {/* <CheckoutBottomSheet onPress={this.onCheckoutPress} /> */}
+
       </Container>
     );
   }

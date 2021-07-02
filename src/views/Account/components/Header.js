@@ -55,7 +55,10 @@ const PhoneNumber = styled.Text`
 
 export default class Header extends React.PureComponent {
   render() {
-    const {componentId} = this.props;
+    const {componentId, user, onSavePress} = this.props;
+
+    const userName = user && `${user.family_name} ${user.first_name}`
+    const phoneNumber = user && user.phone_number
 
     return (
       <Wrapper>
@@ -64,16 +67,16 @@ export default class Header extends React.PureComponent {
             source={require('../../../assets/images/user_placeholder.jpg')}
           />
           <UserInfoWrapper>
-            <UserName>Muuve Account</UserName>
+            <UserName>{userName}</UserName>
             <ViewAccountWrapper
               activeOpacity={0.7}
-              onPress={() => goToViewAccount(componentId)}>
+              onPress={() => goToViewAccount(componentId, { onSavePress })}>
               <ViewAccount>View Account</ViewAccount>
             </ViewAccountWrapper>
           </UserInfoWrapper>
         </AccountWrapper>
         <PhoneNumberWrapper>
-          <PhoneNumber>+85577777777</PhoneNumber>
+          <PhoneNumber>{phoneNumber}</PhoneNumber>
         </PhoneNumberWrapper>
       </Wrapper>
     );

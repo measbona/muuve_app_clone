@@ -27,7 +27,7 @@ export const startApp = () => {
     Auth().onAuthStateChanged(async (user) => {
       if (user) {
         await showLoading();
-        
+
         setRootHome()
       } else {
         showPhoneLogin();

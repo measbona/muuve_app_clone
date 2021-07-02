@@ -2,12 +2,13 @@ import React from 'react';
 import {Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 
+import Database from '@react-native-firebase/database'
 import Auth from '@react-native-firebase/auth';
 
 import utils from '../../../utils';
 import PhoneInput from './PhoneInput';
 
-import {setRootHome, showModalChoice, showModalNotice} from '../../../navigation/screen';
+import {setRootHome, showModalChoice,goToOrderDetails,  showModalNotice, goToViewAccount} from '../../../navigation/screen';
 
 const Wrapper = styled.TouchableOpacity`
   flex: 1;
@@ -118,7 +119,7 @@ export default class Content extends React.PureComponent {
     );
   };
 
-  handleVerifyCode = async () => {
+  handleVerifyCode = () => {
     const {mounted, phoneNumber} = this.state;
 
     Keyboard.dismiss();
@@ -133,7 +134,7 @@ export default class Content extends React.PureComponent {
       });
     } else {
       this.codeVerification()
-    } 
+    }
   };
 
   onPhoneAuth = async () => {
@@ -152,6 +153,7 @@ export default class Content extends React.PureComponent {
 
   codeVerification = async () => {
     const { confirm, code } = this.state
+    const { componentId } = this.props
 
     try {
       this.setState({ loading: true })
@@ -159,18 +161,16 @@ export default class Content extends React.PureComponent {
       const isCorrect = await confirm.confirm(code)
 
       if (isCorrect) {
-        this.setState({ loading: false })
-
-        setRootHome()
+        return this.setState({ loading: false })
       }
     } catch (error) {
+      this.setState({ loading: false })
+
       showModalNotice({
         headline: 'Invalid Code',
         description: 'Your code is invalid. Please try again.',
         buttonName: 'Confirm',
       });
-
-      this.setState({ loading: false })
     }
   }
 
