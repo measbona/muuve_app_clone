@@ -1,4 +1,5 @@
 import React from 'react';
+import {size, forEach} from 'lodash';
 import styled from 'styled-components/native';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
@@ -47,17 +48,28 @@ const Checkout = styled.Text`
   font-weight: 600;
 `;
 
+const sumCartTotal = (cart) => {
+  let total = 0;
+
+  forEach(cart, (item) => (total += item.price));
+
+  return total;
+};
+
 export default (props) => {
-  const {onPress} = props;
+  const {cart, onPress} = props;
+  const itemCount = size(cart);
 
   return (
     <Wrapper activeOpacity={0.5} onPress={onPress}>
       <ItemAmountWrapper>
         <PriceWrapper>
-          <Text>1 Item</Text>
+          <Text>
+            {itemCount === 1 ? `${itemCount} Item` : `${itemCount} Items`}
+          </Text>
           <Text>Total Price</Text>
         </PriceWrapper>
-        <Price>$2.97</Price>
+        <Price>{`$ ${sumCartTotal(cart)}`}</Price>
       </ItemAmountWrapper>
       <CheckoutWrapper>
         <Checkout>Checkout</Checkout>

@@ -1,21 +1,24 @@
 import React from 'react';
-import {map, get} from 'lodash'
+import {connect} from 'react-redux';
+import {map, get, filter, reduce, size} from 'lodash';
 import styled from 'styled-components/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
-import firebase from '@react-native-firebase/database'
 import {
   goToGroupOrder,
   showModalChoice,
   goToCheckout,
+  showModalNotice,
 } from '../../navigation/screen';
+
+import ItemActions from '../../redux/ItemRedux';
+import CartActions from '../../redux/CartRedux';
 
 import Device from '../../utils/device';
 import Colors from '../../utils/colors';
 
-import NavigationBack from '../../lib/NavigationBack';
-import SearchBar from './components/SearchBar';
 import Item from './components/Item';
+import SearchBar from './components/SearchBar';
+import NavigationBack from '../../lib/NavigationBack';
 import CheckoutBottomSheet from './components/CheckoutBottomSheet';
 
 const Container = styled.View`
@@ -74,38 +77,25 @@ const Image = styled.Image`
   width: ${Device.screenWidth}px;
 `;
 
-export default class Merchant extends React.PureComponent {
-  state = {
-    groupOrderStatred: false,
-    items: {},
-  };
+class Merchant extends React.PureComponent {
+  constructor(props) {
+    super(props);
+
+    const {cart} = props;
+
+    this.state = {
+      selectedItems: cart || {},
+    };
+  }
 
   componentDidMount() {
-    this.getItems()
-  }
+    const {items, restaurant, getItem} = this.props;
+    const merchantKey = restaurant.key;
 
-  getItems = async () => {
-    const { restaurant } = this.props
-    
-    try {
-      const ref = await firebase().ref(`items/${restaurant.key}`).once('value')
-      const items = await ref.val()
-      
-      this.setState({ items })
-    } catch (error) {
-      throw new Error('Fail getting items')
+    if (!items[merchantKey]) {
+      getItem(merchantKey);
     }
   }
-
-  onEndSession = () => {
-    showModalChoice({
-      headline: 'End Session',
-      description: `Your participants is ordering their items. Are you sure to terminate this session?`,
-      no: 'Cancel',
-      yes: 'Continue',
-      onPress: () => this.setState({groupOrderStatred: false}),
-    });
-  };
 
   onCheckoutPress = () => {
     const {componentId} = this.props;
@@ -113,38 +103,99 @@ export default class Merchant extends React.PureComponent {
     goToCheckout(componentId);
   };
 
+  onEndSession = () => {
+    const {setEnableGroupOrderSession} = this.props;
+
+    showModalChoice({
+      headline: 'End Session',
+      description:
+        'Your participants is ordering their items. Are you sure to terminate this session?',
+      no: 'Cancel',
+      yes: 'Continue',
+      onPress: () => setEnableGroupOrderSession(false),
+    });
+  };
+
   onGroupOrderPress = () => {
-    const {componentId} = this.props;
+    const {componentId, setEnableGroupOrderSession, merchant} = this.props;
+
     showModalChoice({
       headline: 'Group Order',
-      description: `Share your group order link with others. They can add their favorite items. Checkout and get it all delivered together.`,
+      description:
+        'Share your group order link with others. They can add their favorite items. Checkout and get it all delivered together.',
       no: 'Cancel',
       yes: 'Start Group Order',
       onPress: () => {
-        this.setState({groupOrderStatred: true}, () => {
-          goToGroupOrder(componentId);
-        });
+        setEnableGroupOrderSession(true);
+        goToGroupOrder(componentId, {merchant});
       },
     });
   };
-  
-  onItemPress = async (item, itemKey) => {
-    const { restaurant: { key } } = this.props
-    // const data = {}
 
-    // data[itemKey] = {
-    //   name: item.name,
-    //   price: item.current_price,
-    //   images: item.images,
-    // }
-  }
+  onItemPress = async (item, itemKey) => {
+    const {selectedItems} = this.state;
+    const {setCartItem, restaurant, setCartKey, cartKey} = this.props;
+
+    const restaurantKey = restaurant.key;
+    const removeItem = Boolean(selectedItems[itemKey]);
+
+    if (cartKey && cartKey !== restaurant.key) {
+      return showModalNotice({
+        headline: 'Noticed',
+        description: "You can't make order with multiple stores.",
+        buttonName: 'Cancel',
+      });
+    }
+
+    if (removeItem) {
+      const remainItems = filter(
+        selectedItems,
+        (selectedItem) => selectedItem.key !== itemKey,
+      );
+      const newSelectedItems = reduce(
+        remainItems,
+        (result, remainItem) => {
+          result[remainItem.key] = {
+            key: remainItem.key,
+            name: remainItem.name,
+            price: remainItem.price,
+          };
+
+          return result;
+        },
+        {},
+      );
+
+      this.setState({selectedItems: newSelectedItems});
+      setCartItem(newSelectedItems);
+
+      if (size(newSelectedItems) === 0) {
+        setCartKey(null);
+      }
+    } else {
+      const newSelectedItems = {
+        ...selectedItems,
+        [itemKey]: {key: itemKey, name: item.name, price: item.current_price},
+      };
+
+      this.setState({selectedItems: newSelectedItems});
+      setCartItem(newSelectedItems);
+      setCartKey(restaurantKey);
+    }
+  };
 
   render() {
-    const {groupOrderStatred, items} = this.state;
-    const {componentId, restaurant} = this.props;
+    const {selectedItems} = this.state;
+    const {
+      componentId,
+      restaurant,
+      items,
+      cart,
+      isStartGroupOrder,
+    } = this.props;
 
-    const merchantName = get(restaurant, 'name', 'N/A')
-    const banner = get(restaurant, 'images.banner')
+    const merchantName = get(restaurant, 'name', 'N/A');
+    const banner = get(restaurant, 'images.banner');
 
     return (
       <Container>
@@ -153,13 +204,13 @@ export default class Merchant extends React.PureComponent {
           navigate
           componentId={componentId}
         />
+
         <BannerWrapper>
-          <Image
-            source={{ uri: banner }}
-          />
+          <Image source={{uri: banner}} />
         </BannerWrapper>
+
         <GroupOrderWrapper>
-          {!groupOrderStatred ? (
+          {!isStartGroupOrder ? (
             <Button activeOpacity={0.5} onPress={this.onGroupOrderPress}>
               <MIcon
                 name="group-add"
@@ -203,18 +254,43 @@ export default class Merchant extends React.PureComponent {
         <Content>
           <SearchBar />
           <ScrollView showVerticalScrollIndicator={false}>
-            {map(items, (item, key) => 
-              <React.Fragment key={key}>
-                <Item item={item} onPress={() => this.onItemPress(item, key)} />
-                <Divider />
-              </React.Fragment>
-            )}
+            {map(items[restaurant.key], (item, key) => {
+              const isSelectedItem = selectedItems[key];
+
+              return (
+                <React.Fragment key={key}>
+                  <Item
+                    isSelectedItem={isSelectedItem}
+                    item={item}
+                    onPress={() => this.onItemPress(item, key)}
+                  />
+                  <Divider />
+                </React.Fragment>
+              );
+            })}
           </ScrollView>
         </Content>
 
-        {/* <CheckoutBottomSheet onPress={this.onCheckoutPress} /> */}
-
+        {size(cart) > 0 ? (
+          <CheckoutBottomSheet cart={cart} onPress={this.onCheckoutPress} />
+        ) : null}
       </Container>
     );
   }
 }
+
+const mapState = ({item, cart}) => ({
+  cart: cart.data,
+  cartKey: cart.key,
+  items: item.data,
+  isStartGroupOrder: cart.enableGroupOrderSession,
+});
+
+const mapDispatch = {
+  getItem: ItemActions.getItem,
+  setCartItem: CartActions.setCartItem,
+  setCartKey: CartActions.setCartKey,
+  setEnableGroupOrderSession: CartActions.setEnableGroupOrderSession,
+};
+
+export default connect(mapState, mapDispatch)(Merchant);

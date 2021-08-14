@@ -1,13 +1,15 @@
 import React from 'react';
-import {map} from 'lodash'
+import {connect} from 'react-redux';
 import styled from 'styled-components/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {map} from 'lodash';
 import {showModalNotice, goToMerchant} from '../../navigation/screen';
 
 import Colors from '../../utils/colors';
 
 import Header from './components/Header';
 import MerchantCard from './components/Card';
+
+import RestaurantActions from '../../redux/RestaurantRedux';
 
 const Container = styled.View`
   flex: 1;
@@ -33,21 +35,14 @@ const ScrollView = styled.ScrollView`
   flex: 1;
 `;
 
-export default class Home extends React.PureComponent {
-  state = {
-    restaurants: null
-  }
-
+class Home extends React.PureComponent {
   componentDidMount() {
-    this.getRestaurantsFromStorage()
-  };
+    const {loaded, fetchRestaurants} = this.props;
 
-  getRestaurantsFromStorage = async () => {
-    const restaurantStorage = await AsyncStorage.getItem('restaurants')
-    const restaurants = JSON.parse(restaurantStorage)
-
-    this.setState({ restaurants })
-  };
+    if (!loaded) {
+      fetchRestaurants();
+    }
+  }
 
   onCartPress = () => {
     showModalNotice({
@@ -57,14 +52,14 @@ export default class Home extends React.PureComponent {
     });
   };
 
-  onMerchantPress = restaurant => {
+  onMerchantPress = (restaurant) => {
     const {componentId} = this.props;
 
-    goToMerchant(componentId, { restaurant });
+    goToMerchant(componentId, {restaurant});
   };
 
   render() {
-    const { restaurants } = this.state
+    const {restaurants} = this.props;
 
     return (
       <Container>
@@ -74,9 +69,12 @@ export default class Home extends React.PureComponent {
             <Headline>All Stores</Headline>
           </HeadlineWrapper>
           <ScrollView showVerticalScrollIndicator={false}>
-            {map(restaurants, restaurant => (
+            {map(restaurants, (restaurant) => (
               <React.Fragment key={restaurant.key}>
-                <MerchantCard restaurant={restaurant} onPress={() => this.onMerchantPress(restaurant)} />
+                <MerchantCard
+                  restaurant={restaurant}
+                  onPress={() => this.onMerchantPress(restaurant)}
+                />
               </React.Fragment>
             ))}
           </ScrollView>
@@ -85,3 +83,14 @@ export default class Home extends React.PureComponent {
     );
   }
 }
+
+const mapState = ({restaurant}) => ({
+  loaded: restaurant.loaded,
+  restaurants: restaurant.data,
+});
+
+const mapDispatch = {
+  fetchRestaurants: RestaurantActions.getRestaurants,
+};
+
+export default connect(mapState, mapDispatch)(Home);

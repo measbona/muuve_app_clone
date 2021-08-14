@@ -117,7 +117,7 @@ export default (props) => {
       <UnavailableItems>
         What if any items of your order are unavailable?
       </UnavailableItems>
-      <Button>
+      <Button activeOpacity={0.7}>
         <ButtonText>Replace with similiar item</ButtonText>
       </Button>
     </Wrapper>

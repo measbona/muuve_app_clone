@@ -8,7 +8,7 @@ import Order from '../views/Order';
 import Account from '../views/Account';
 import ViewAccount from '../views/ViewAccount';
 import GroupOrder from '../views/GroupOrder';
-import Loading from '../views/Loading';
+import Initialize from '../views/Initialize';
 import PhoneLogin from '../views/PhoneLogin';
 import OrderDetails from '../views/OrderDetails';
 import Merchant from '../views/Merchant';
@@ -24,7 +24,7 @@ export const ORDER = 'MuuveAppClone.Order';
 export const ACCOUNT = 'MuuveAppClone.Account';
 export const VIEW_ACCOUNT = 'MuuveAppClone.ViewAccount';
 export const GROUP_ORDER = 'MuuveAppClone.GroupOrder';
-export const LOADING = 'MuuveAppClone.Loading';
+export const INITIALIZE = 'MuuveAppClone.Initialize';
 export const PHONE_LOGIN = 'MuuveAppClone.PhoneLogin';
 export const ORDER_DETAILS = 'MuuveAppClone.OrderDetails';
 export const MERCHANT = 'MuuveAppClone.Merchant';
@@ -42,7 +42,7 @@ Screens.set(ORDER, Order);
 Screens.set(ACCOUNT, Account);
 Screens.set(VIEW_ACCOUNT, ViewAccount);
 Screens.set(GROUP_ORDER, GroupOrder);
-Screens.set(LOADING, Loading);
+Screens.set(INITIALIZE, Initialize);
 Screens.set(PHONE_LOGIN, PhoneLogin);
 Screens.set(ORDER_DETAILS, OrderDetails);
 Screens.set(MERCHANT, Merchant);
@@ -152,19 +152,14 @@ export const goToGroupOrder = (componentId, passProps) => {
   });
 };
 
-export const showLoading = () => {
-  return new Promise(resolve => {
-    Navigation.setRoot({
-      root: {
-        component: {
-          name: LOADING,
-          passProps: {
-            resolve,
-          }
-        },
+export const rootInitial = () => {
+  Navigation.setRoot({
+    root: {
+      component: {
+        name: INITIALIZE,
       },
-    });
-  })
+    },
+  });
 };
 
 export const showPhoneLogin = () => {

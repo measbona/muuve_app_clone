@@ -8,6 +8,9 @@
     "start": "react-native start",
     "test": "jest",
     "lint": "eslint .",
+    "ios-clean": "rm -rf ./ios/Pods && npm run pod",
+    "android-clean": "cd ./android && ./gradlew clean && cd ..",
+    "clean": "rm -rf ./node_modules && npm i",
     "build-android-debug": "cd ./android && ./gradlew clean && cd .. && npx jetifier && cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug"
   },
   "dependencies": {
@@ -25,6 +28,15 @@
     "react-native-device-info": "8.1.3",
     "react-native-navigation": "7.13.0",
     "react-native-vector-icons": "8.1.0",
+    "react-redux": "7.2.4",
+    "reactotron-apisauce": "3.0.0",
+    "reactotron-react-native": "5.0.0",
+    "reactotron-redux": "3.1.3",
+    "reactotron-redux-saga": "4.2.3",
+    "redux": "4.1.0",
+    "redux-saga": "1.1.3",
+    "reduxsauce": "1.2.1",
+    "seamless-immutable": "7.1.4",
     "styled-components": "5.2.3"
   },
   "devDependencies": {

@@ -55,10 +55,10 @@ const PhoneNumber = styled.Text`
 
 export default class Header extends React.PureComponent {
   render() {
-    const {componentId, user, onSavePress} = this.props;
+    const {componentId, user} = this.props;
 
-    const userName = user && `${user.family_name} ${user.first_name}`
-    const phoneNumber = user && user.phone_number
+    const userName = user && `${user.family_name} ${user.first_name}`;
+    const phoneNumber = user && user.phone_number;
 
     return (
       <Wrapper>
@@ -70,7 +70,7 @@ export default class Header extends React.PureComponent {
             <UserName>{userName}</UserName>
             <ViewAccountWrapper
               activeOpacity={0.7}
-              onPress={() => goToViewAccount(componentId, { onSavePress })}>
+              onPress={() => goToViewAccount(componentId)}>
               <ViewAccount>View Account</ViewAccount>
             </ViewAccountWrapper>
           </UserInfoWrapper>

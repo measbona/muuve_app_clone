@@ -1,19 +1,19 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import styled from 'styled-components/native';
-import Auth from '@react-native-firebase/auth';
-import { showModalChoice } from '../../navigation/screen';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-import utils from '../../utils';
-
 import IOIcon from 'react-native-vector-icons/Ionicons';
 import ATIcon from 'react-native-vector-icons/AntDesign';
 import FTOIcon from 'react-native-vector-icons/Fontisto';
 import MDICon from 'react-native-vector-icons/MaterialIcons';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
+import {showModalChoice} from '../../navigation/screen';
+
 import Header from './components/Header';
 import Row from './components/Row';
+
+import Modules from '../../modules';
+import utils from '../../utils';
 
 const Container = styled.View``;
 
@@ -22,43 +22,43 @@ const Divider = styled.View`
   background-color: ${utils.colors.lightGrey};
 `;
 
-export default class Account extends React.Component {
-  state = {
-    user: null
+class Account extends React.Component {
+  constructor(props) {
+    super(props);
+
+    const {profile} = props;
+
+    this.state = {
+      user: profile || {},
+    };
   }
 
-  componentDidMount() {
-    this.getCurrentUserData()
-  }
+  componentDidUpdate(prevProps) {
+    const {profile} = this.props;
+    const {profile: prevProfile} = prevProps;
 
-  getCurrentUserData = async () => {
-    const userStorage = await AsyncStorage.getItem('user')
-    const user = JSON.parse(userStorage)
-
-    this.setState({ user })
+    if (prevProfile !== profile) {
+      this.setState({user: profile});
+    }
   }
 
   onLogOutPress = () => {
-    showModalChoice({
+    return showModalChoice({
       headline: 'LOG OUT',
       description: 'Are you sure you want to logout?',
       no: 'Cancel',
       yes: 'Log out',
-      onPress: () => Auth().signOut(),
+      onPress: () => Modules.Profile.signOut(),
     });
   };
 
-  onViewAccountSavePress = (data) => {
-    return this.setState({ user: data })
-  }
-
   render() {
-    const { user } = this.state
-    const { componentId } = this.props;
+    const {user} = this.state;
+    const {componentId} = this.props;
 
     return (
       <Container>
-        <Header user={user} componentId={componentId} onSavePress={this.onViewAccountSavePress}/>
+        <Header user={user} componentId={componentId} />
         <Row
           name="Language"
           icon={ATIcon}
@@ -102,3 +102,9 @@ export default class Account extends React.Component {
     );
   }
 }
+
+const mapState = ({profile}) => ({
+  profile: profile.data,
+});
+
+export default connect(mapState)(Account);

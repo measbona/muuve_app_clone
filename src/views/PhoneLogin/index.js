@@ -41,18 +41,18 @@ const Text = styled.Text`
   font-size: 11px;
   font-weight: bold;
   color: ${Colors.black};
-  ${(props) => props.color && `color: blue; text-decoration: underline`}
+  ${(props) => props.color && 'color: blue; text-decoration: underline'}
 `;
 
 export default class PhoneLogin extends React.PureComponent {
   render() {
-    const { componentId } = this.props
+    const {componentId} = this.props;
 
     return (
       <Container>
         <HeaderWrapper>
           <Image
-            style={{width:120, height: 120}}
+            style={{width: 120, height: 120}}
             source={require('../../assets/images/muuve_logo.png')}
           />
         </HeaderWrapper>

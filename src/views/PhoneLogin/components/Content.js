@@ -2,13 +2,16 @@ import React from 'react';
 import {Keyboard} from 'react-native';
 import styled from 'styled-components/native';
 
-import Database from '@react-native-firebase/database'
 import Auth from '@react-native-firebase/auth';
 
 import utils from '../../../utils';
 import PhoneInput from './PhoneInput';
 
-import {setRootHome, showModalChoice,goToOrderDetails,  showModalNotice, goToViewAccount} from '../../../navigation/screen';
+import {
+  setRootHome,
+  showModalChoice,
+  showModalNotice,
+} from '../../../navigation/screen';
 
 const Wrapper = styled.TouchableOpacity`
   flex: 1;
@@ -133,15 +136,17 @@ export default class Content extends React.PureComponent {
         onPress: this.onPhoneAuth,
       });
     } else {
-      this.codeVerification()
+      this.codeVerification();
     }
   };
 
   onPhoneAuth = async () => {
-    const { phoneNumber } = this.state
+    const {phoneNumber} = this.state;
 
     try {
-      const confirmation = await Auth().signInWithPhoneNumber(`+855${phoneNumber}`);
+      const confirmation = await Auth().signInWithPhoneNumber(
+        `+855${phoneNumber}`,
+      );
 
       if (confirmation) {
         this.setState({confirm: confirmation, mounted: false});
@@ -149,22 +154,23 @@ export default class Content extends React.PureComponent {
     } catch (error) {
       //
     }
-  }
+  };
 
   codeVerification = async () => {
-    const { confirm, code } = this.state
-    const { componentId } = this.props
+    const {confirm, code} = this.state;
 
     try {
-      this.setState({ loading: true })
+      this.setState({loading: true});
 
-      const isCorrect = await confirm.confirm(code)
+      const isCorrect = await confirm.confirm(code);
 
       if (isCorrect) {
-        return this.setState({ loading: false })
+        this.setState({loading: false});
+
+        return setRootHome();
       }
     } catch (error) {
-      this.setState({ loading: false })
+      this.setState({loading: false});
 
       showModalNotice({
         headline: 'Invalid Code',
@@ -172,13 +178,13 @@ export default class Content extends React.PureComponent {
         buttonName: 'Confirm',
       });
     }
-  }
+  };
 
   render() {
     const {phoneNumber, mounted, loading, code} = this.state;
 
-    const buttonText = mounted ? 'NEXT' : 'GET STARTED'
-    const disabled = mounted ? phoneNumber.length <= 7 : code.length !== 6
+    const buttonText = mounted ? 'NEXT' : 'GET STARTED';
+    const disabled = mounted ? phoneNumber.length <= 7 : code.length !== 6;
 
     return (
       <Wrapper activeOpacity={1} onPress={() => Keyboard.dismiss()}>
@@ -186,11 +192,18 @@ export default class Content extends React.PureComponent {
           <HeadText>Login with your phone number</HeadText>
         </HeadTextWrapper>
 
-        {mounted
-          ? <PhoneInput onChangeText={(num) => this.setState({phoneNumber: num})} />
-          : this.renderVerificationInput()}
+        {mounted ? (
+          <PhoneInput
+            onChangeText={(num) => this.setState({phoneNumber: num})}
+          />
+        ) : (
+          this.renderVerificationInput()
+        )}
 
-        <ButtonWrapper disabled={disabled} activeOpacity={0.8} onPress={this.handleVerifyCode}>
+        <ButtonWrapper
+          disabled={disabled}
+          activeOpacity={0.8}
+          onPress={this.handleVerifyCode}>
           {loading ? (
             <ActivityIndicator size="small" color="black" />
           ) : (
@@ -201,7 +214,9 @@ export default class Content extends React.PureComponent {
         {!mounted ? (
           <DidNotReceiveCode
             activeOpacity={0.5}
-            onPress={() => this.setState({ mounted: true, confirm: null, code: '' })}>
+            onPress={() =>
+              this.setState({mounted: true, confirm: null, code: ''})
+            }>
             <Text>Did not receiver a code?</Text>
           </DidNotReceiveCode>
         ) : null}

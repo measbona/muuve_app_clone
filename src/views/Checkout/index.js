@@ -50,7 +50,7 @@ class Checkout extends React.PureComponent {
     return (
       <Container>
         <NavigationBack title="Checkout" navigate componentId={componentId} />
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <Merchant />
           <Divider />
           <DeliveryLocation />

@@ -1,16 +1,18 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import {Keyboard} from 'react-native';
 import moment from 'moment';
 import styled from 'styled-components/native';
 import firebase from '@react-native-firebase/app';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import {showModalNotice, popBack} from '../../navigation/screen';
 
 import utils from '../../utils';
-import { showModalNotice, popBack } from '../../navigation/screen'
 
 import NameInput from './components/NameInput';
 import DateBirthInput from './components/BirthDate';
 import NavigationBack from '../../lib/NavigationBack';
+
+import ProfileActions from '../../redux/ProfileRedux';
 
 const Container = styled.View`
   flex: 1;
@@ -45,68 +47,62 @@ const ButtonText = styled.Text`
   color: ${utils.colors.black};
 `;
 
-export default class ViewAccount extends React.Component {
-  state = {
-    day: '',
-    year: '',
-    month: '',
-    firstName: '',
-    familyName: '',
-  };
+class ViewAccount extends React.Component {
+  constructor(props) {
+    super(props);
 
-  componentDidMount() {
-    this.getUserFromStorage()
-  }
+    const {profile} = props;
 
-  getUserFromStorage = async () => {
-    const userStorage = await AsyncStorage.getItem('user')
-    const user = JSON.parse(userStorage)
+    const day = profile.dob.split('-')[0];
+    const month = profile.dob.split('-')[1];
+    const year = profile.dob.split('-')[2];
 
-    const { family_name: familyName, first_name: firstName, dob  } = user
-    const day = dob && dob.split('-')[0] || ''
-    const month = dob && dob.split('-')[1] || ''
-    const year = dob && dob.split('-')[2] || ''
-
-    this.setState({
-      familyName,
-      firstName,
-      day,
-      month,
-      year
-    })
+    this.state = {
+      day: day || '',
+      year: year || '',
+      month: month || '',
+      firstName: profile.first_name || '',
+      familyName: profile.family_name || '',
+    };
   }
 
   validationData = () => {
-    const { familyName, firstName } = this.state
+    const {familyName, firstName} = this.state;
 
     return new Promise((resolve) => {
-
       if (familyName.length === 0 || firstName.length === 0) {
-        const isFamilyNameError = familyName.length === 0
+        const isFamilyNameError = familyName.length === 0;
 
         return showModalNotice({
           headline: 'Invalid Input',
-          description: `${isFamilyNameError ? 'Family Name' : 'Frist Name'} can't be blank.`,
+          description: `${
+            isFamilyNameError ? 'Family Name' : 'Frist Name'
+          } can't be blank.`,
           buttonName: 'Continue',
         });
       }
 
-      resolve(true)
-    })
-  }
+      resolve(true);
+    });
+  };
 
   onSavePress = async () => {
-    const { day, year, month, firstName, familyName } = this.state
-    const { componentId, onSavePress } = this.props
+    const {day, year, month, firstName, familyName} = this.state;
+    const {componentId, setProfile} = this.props;
 
-    const uid = firebase.auth().currentUser.uid
-    const phoneNumber = firebase.auth().currentUser.phoneNumber
-    const dob = day > 0 && month.length !== 0 && year > 0 && `${day}-${month}-${year}` || ''
+    const uid = firebase.auth().currentUser.uid;
+    const phoneNumber = firebase.auth().currentUser.phoneNumber;
+    const dob =
+      (day > 0 &&
+        month.length !== 0 &&
+        year > 0 &&
+        `${day}-${month}-${year}`) ||
+      '';
 
     try {
-      await this.validationData()
+      await this.validationData();
 
-      const updates = {}
+      const updates = {};
       const data = {
         family_name: familyName,
         first_name: firstName,
@@ -116,23 +112,22 @@ export default class ViewAccount extends React.Component {
         language: 'kh',
         phone_number: phoneNumber,
         created_at: Number(moment().format('x')),
-      }
+      };
 
-      updates[`users/${uid}`] = data
+      updates[`users/${uid}`] = data;
 
-      onSavePress(data)
-      await AsyncStorage.setItem('user', JSON.stringify(data))
-      await firebase.database().ref().update(updates)
+      setProfile(data);
+      await firebase.database().ref().update(updates);
 
-      return popBack(componentId)
+      return popBack(componentId);
     } catch (error) {
-      alert(`Error: ${error.message}`)
+      alert(`Error: ${error.message}`);
     }
-  }
+  };
 
   render() {
-    const { day, year, month, firstName, familyName } = this.state
-    const { componentId } = this.props;
+    const {day, year, month, firstName, familyName} = this.state;
+    const {componentId} = this.props;
 
     return (
       <Container>
@@ -170,3 +165,13 @@ export default class ViewAccount extends React.Component {
     );
   }
 }
+
+const mapState = ({profile}) => ({
+  profile: profile.data,
+});
+
+const mapDispatch = {
+  setProfile: ProfileActions.setProfile,
+};
+
+export default connect(mapState, mapDispatch)(ViewAccount);
