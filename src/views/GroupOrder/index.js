@@ -1,8 +1,11 @@
 import React from 'react';
+import {connect} from 'react-redux';
 import {Share} from 'react-native';
 import styled from 'styled-components';
+import firebase from '@react-native-firebase/app';
 
-import Colors from '../../utils/colors';
+import Modules from '../../modules';
+import utils from '../../utils';
 
 import NavigationBack from '../../lib/NavigationBack';
 import LinkBox from './components/LinkBox';
@@ -19,7 +22,7 @@ const ContentWrapper = styled.View`
 const HeadlineWrapper = styled.View``;
 
 const Headline = styled.Text`
-  color: ${Colors.yellow};
+  color: ${utils.colors.yellow};
   font-size: 17px;
   font-weight: bold;
 `;
@@ -46,7 +49,7 @@ const ShareLinkWrapper = styled.TouchableOpacity`
   margin-top: 10px;
   border-radius: 10px;
   flex-direction: row;
-  background-color: ${Colors.blue};
+  background-color: ${utils.colors.blue};
 `;
 
 const ShareLink = styled.Text`
@@ -55,11 +58,40 @@ const ShareLink = styled.Text`
   font-weight: bold;
 `;
 
-export default class GroupOrder extends React.PureComponent {
+class GroupOrder extends React.PureComponent {
+  state = {
+    url: null,
+  };
+
+  componentDidMount() {
+    this.createGroupOrderLink();
+  }
+
+  createGroupOrderLink = async () => {
+    const {user} = this.props;
+
+    const {id: gcid} = firebase.firestore().collection('group_orders').doc();
+
+    const deepLink = `https://muuveclone.page.link/grouporder?gcid=${gcid}`;
+
+    const linkParams = {
+      deepLink,
+      domain: 'https://muuveclone.page.link',
+      title: 'Group Order',
+      description: `${user.family_name} ${user.first_name} would like to invite you to join the order`,
+    };
+
+    const dynamicLink = await Modules.DynamicLinks.buildShortLink(linkParams);
+
+    this.setState({url: dynamicLink});
+  };
+
   onSharePress = async () => {
+    const {url} = this.state;
+
     try {
       const result = await Share.share({
-        url: 'https://stgmuuve.page.link/5SFGTV78SSKJ23',
+        url,
       });
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
@@ -76,6 +108,7 @@ export default class GroupOrder extends React.PureComponent {
   };
 
   render() {
+    const {url} = this.state;
     const {componentId} = this.props;
 
     return (
@@ -96,7 +129,7 @@ export default class GroupOrder extends React.PureComponent {
           <ImageWrapper>
             <Image source={require('../../assets/images/friends.png')} />
           </ImageWrapper>
-          <LinkBox />
+          <LinkBox url={url} />
           <ShareLinkWrapper activeOpacity={0.7} onPress={this.onSharePress}>
             <ShareLink>SHARE LINK</ShareLink>
           </ShareLinkWrapper>
@@ -105,3 +138,9 @@ export default class GroupOrder extends React.PureComponent {
     );
   }
 }
+
+const mapState = ({profile}) => ({
+  user: profile.data,
+});
+
+export default connect(mapState)(GroupOrder);

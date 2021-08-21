@@ -86,6 +86,9 @@ export const popBack = (componentId) => Navigation.pop(componentId);
 
 export const dismissOverLay = () => Navigation.dismissAllOverlays();
 
+export const bindComponent = (component) =>
+  Navigation.events().bindComponent(component);
+
 export const setRootHome = async () => {
   const homeIcon = await FontIcon.getImageSource(
     'home',

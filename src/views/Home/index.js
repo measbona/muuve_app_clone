@@ -1,39 +1,42 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import styled from 'styled-components/native';
-import {map} from 'lodash';
+import {
+  View,
+  Text,
+  FlatList,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import {showModalNotice, goToMerchant} from '../../navigation/screen';
 
-import Colors from '../../utils/colors';
+import utils from '../../utils';
 
 import Header from './components/Header';
 import MerchantCard from './components/Card';
 
 import RestaurantActions from '../../redux/RestaurantRedux';
 
-const Container = styled.View`
-  flex: 1;
-  background-color: ${Colors.lightGrey};
-`;
-
-const ContentWrapper = styled.View`
-  flex: 1;
-  margin-horizontal: 16px;
-`;
-
-const HeadlineWrapper = styled.View`
-  margin-vertical: 13px;
-`;
-
-const Headline = styled.Text`
-  font-size: 17px;
-  font-weight: bold;
-  color: ${Colors.blue};
-`;
-
-const ScrollView = styled.ScrollView`
-  flex: 1;
-`;
+const styles = StyleSheet.create({
+  conatiner: {
+    flex: 1,
+    backgroundColor: utils.colors.lightGrey,
+  },
+  contentWrapper: {
+    flex: 1,
+    marginHorizontal: 16,
+  },
+  headlineWrapper: {marginVertical: 13},
+  headline: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: utils.colors.blue,
+  },
+  flatList: {marginHorizontal: 15},
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+});
 
 class Home extends React.PureComponent {
   componentDidMount() {
@@ -58,28 +61,52 @@ class Home extends React.PureComponent {
     goToMerchant(componentId, {restaurant});
   };
 
+  renderHeaderComponent = () => {
+    return (
+      <View style={styles.headlineWrapper}>
+        <Text style={styles.headline}>All Stores</Text>
+      </View>
+    );
+  };
+
+  renderRestaurant = ({item}) => {
+    return (
+      <React.Fragment key={item.key}>
+        <MerchantCard
+          restaurant={item}
+          onPress={() => this.onMerchantPress(item)}
+        />
+      </React.Fragment>
+    );
+  };
+
   render() {
-    const {restaurants} = this.props;
+    const {restaurants, loaded} = this.props;
+
+    const restaurantData = utils.helpers.convertObjectToArray(restaurants);
 
     return (
-      <Container>
+      <View style={styles.conatiner}>
         <Header onCartPress={this.onCartPress} />
-        <ContentWrapper>
-          <HeadlineWrapper>
-            <Headline>All Stores</Headline>
-          </HeadlineWrapper>
-          <ScrollView showVerticalScrollIndicator={false}>
-            {map(restaurants, (restaurant) => (
-              <React.Fragment key={restaurant.key}>
-                <MerchantCard
-                  restaurant={restaurant}
-                  onPress={() => this.onMerchantPress(restaurant)}
-                />
-              </React.Fragment>
-            ))}
-          </ScrollView>
-        </ContentWrapper>
-      </Container>
+        {loaded ? (
+          <FlatList
+            data={restaurantData}
+            contentContainerStyle={styles.flatList}
+            renderItem={this.renderRestaurant}
+            ListHeaderComponent={this.renderHeaderComponent}
+            keyExtractor={(restaurant) => restaurant.key}
+            showsVerticalScrollIndicator={false}
+          />
+        ) : (
+          <View style={styles.loading}>
+            <ActivityIndicator
+              size="large"
+              color={utils.colors.yellow}
+              animating
+            />
+          </View>
+        )}
+      </View>
     );
   }
 }

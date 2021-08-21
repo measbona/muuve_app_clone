@@ -1,52 +1,48 @@
 import React from 'react';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {size, forEach} from 'lodash';
-import styled from 'styled-components/native';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
-import Colors from '../../../utils/colors';
+import utils from '../../../utils';
 
-const Wrapper = styled.TouchableOpacity`
-  justify-content: space-between;
-  padding-horizontal: 20px;
-  flex-direction: row;
-  padding-bottom: 20px;
-  border-top-left-radius: 17px;
-  border-top-right-radius: 17px;
-  background-color: ${Colors.yellow};
-`;
-
-const ItemAmountWrapper = styled.View`
-  margin-vertical: 15px;
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const Text = styled.Text`
-  font-size: 14px;
-  font-weight: 600;
-`;
-
-const PriceWrapper = styled.View`
-  align-self: flex-end;
-`;
-
-const Price = styled.Text`
-  font-size: 16px;
-  align-self: flex-end;
-  margin-left: 20px;
-  font-weight: 600;
-  color: ${Colors.blue};
-`;
-
-const CheckoutWrapper = styled.View`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const Checkout = styled.Text`
-  font-size: 16px;
-  font-weight: 600;
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    left: 0,
+    right: 0,
+    bottom: 0,
+    position: 'absolute',
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    borderTopLeftRadius: 17,
+    borderTopRightRadius: 17,
+    justifyContent: 'space-between',
+    backgroundColor: utils.colors.yellow,
+  },
+  itemCountWrapper: {
+    marginVertical: 15,
+    flexDirection: 'row',
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  priceWrapper: {alignSelf: 'flex-end'},
+  price: {
+    fontSize: 16,
+    alignSelf: 'flex-end',
+    marginLeft: 20,
+    fontWeight: 'bold',
+    color: utils.colors.blue,
+  },
+  checkoutWrapper: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  checkout: {
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+});
 
 const sumCartTotal = (cart) => {
   let total = 0;
@@ -61,20 +57,23 @@ export default (props) => {
   const itemCount = size(cart);
 
   return (
-    <Wrapper activeOpacity={0.5} onPress={onPress}>
-      <ItemAmountWrapper>
-        <PriceWrapper>
-          <Text>
+    <TouchableOpacity
+      style={[styles.wrapper, utils.shadows.lightShadow]}
+      activeOpacity={0.5}
+      onPress={onPress}>
+      <View style={styles.itemCountWrapper}>
+        <View style={styles.priceWrapper}>
+          <Text style={styles.text}>
             {itemCount === 1 ? `${itemCount} Item` : `${itemCount} Items`}
           </Text>
-          <Text>Total Price</Text>
-        </PriceWrapper>
-        <Price>{`$ ${sumCartTotal(cart)}`}</Price>
-      </ItemAmountWrapper>
-      <CheckoutWrapper>
-        <Checkout>Checkout</Checkout>
+          <Text style={styles.text}>Total Price</Text>
+        </View>
+        <Text style={styles.price}>{`$ ${sumCartTotal(cart)}`}</Text>
+      </View>
+      <View style={styles.checkoutWrapper}>
+        <Text style={[styles.checkout, {fontSize: 17}]}>Checkout</Text>
         <MIcon name="arrow-forward" size={18} style={{marginLeft: 5}} />
-      </CheckoutWrapper>
-    </Wrapper>
+      </View>
+    </TouchableOpacity>
   );
 };

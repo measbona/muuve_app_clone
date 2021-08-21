@@ -38,9 +38,9 @@ const Copy = styled.Text`
   font-weight: bold;
 `;
 
-export default () => {
+export default ({url}) => {
   const copyToClipboard = () => {
-    Clipboard.setString('https://stgmuuve.page.link/5SFGTV78SSKJ23');
+    Clipboard.setString(url);
 
     showToast({message: 'Copied'});
   };
@@ -48,7 +48,7 @@ export default () => {
   return (
     <Wrapper>
       <LinkWrapper>
-        <Link numberOfLines={1}>https://stgmuuve.page.link/5SFGTV78SSKJ23</Link>
+        <Link numberOfLines={1}>{url}</Link>
       </LinkWrapper>
       <CopyButton activeOpacity={0.5} onPress={() => copyToClipboard()}>
         <Copy>COPY</Copy>

@@ -1,33 +1,33 @@
 import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
-import styled from 'styled-components/native';
+import {View, ActivityIndicator, StyleSheet} from 'react-native';
 import {delay} from 'lodash';
 
 import utils from '../../utils';
 
-import ProfileActions from '../../redux/ProfileRedux';
+import AppActions from '../../redux/AppRedux';
 
-const Container = styled.View`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  background-color: ${utils.colors.yellow};
-`;
-
-const ActivityIndicator = styled.ActivityIndicator``;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: utils.colors.yellow,
+  },
+});
 
 export default () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
     delay(() => {
-      dispatch(ProfileActions.initialProfile());
+      dispatch(AppActions.appInitial());
     });
   });
 
   return (
-    <Container>
-      <ActivityIndicator size="small" color="black" animating />
-    </Container>
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color="black" animating />
+    </View>
   );
 };

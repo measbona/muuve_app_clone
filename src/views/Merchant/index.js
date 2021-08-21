@@ -1,81 +1,46 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
-import {map, get, filter, reduce, size} from 'lodash';
-import styled from 'styled-components/native';
-import MIcon from 'react-native-vector-icons/MaterialIcons';
 import {
-  goToGroupOrder,
-  showModalChoice,
-  goToCheckout,
-  showModalNotice,
-} from '../../navigation/screen';
+  View,
+  FlatList,
+  Animated,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
+import {get, filter, reduce, size} from 'lodash';
+import * as Navigator from '../../navigation/screen';
+
+import utils from '../../utils';
+
+import Item from './components/Item';
+import SearchBar from '../../lib/SearchBar';
+import TopBanner from './components/TopBanner';
+import TopNavBar from './components/TopNavBar';
+import GroupOrder from './components/GroupOrder';
+import ListCategories from './components/ListCategories';
+import CheckoutBottomSheet from './components/CheckoutBottomSheet';
+import MerchantInfoSection from './components/MerchantInfoSection';
 
 import ItemActions from '../../redux/ItemRedux';
 import CartActions from '../../redux/CartRedux';
 
-import Device from '../../utils/device';
-import Colors from '../../utils/colors';
-
-import Item from './components/Item';
-import SearchBar from './components/SearchBar';
-import NavigationBack from '../../lib/NavigationBack';
-import CheckoutBottomSheet from './components/CheckoutBottomSheet';
-
-const Container = styled.View`
-  flex: 1;
-  position: relative;
-`;
-
-const ScrollView = styled.ScrollView``;
-
-const Content = styled.View`
-  flex: 1;
-`;
-
-const Divider = styled.View`
-  border-width: 1px;
-  margin-vertical: 15px;
-  margin-horizontal: 20px;
-  border-color: ${Colors.grey};
-`;
-
-const GroupOrderWrapper = styled.View`
-  margin-top: 10px;
-  margin-bottom: 10px;
-  margin-left: 16px;
-  align-items: flex-start;
-`;
-
-const CategoryWrapper = styled.View`
-  margin-left: 16px;
-  flex-direction: row;
-`;
-
-const Button = styled.TouchableOpacity`
-  margin-right: 10px;
-  border-radius: 50px;
-  flex-direction: row;
-  align-items: center;
-  padding-vertical: 7px;
-  padding-horizontal: 15px;
-  background-color: ${Colors.grey};
-`;
-
-const ButtonText = styled.Text`
-  font-size: 14px;
-  font-weight: bold;
-  color: ${Colors.blue};
-`;
-
-const BannerWrapper = styled.View`
-  position: relative;
-`;
-
-const Image = styled.Image`
-  height: ${150}px;
-  resize-mode: cover;
-  width: ${Device.screenWidth}px;
-`;
+const styles = StyleSheet.create({
+  emptySpace: {
+    marginVertical: 25,
+  },
+  divider: {
+    borderWidth: 1,
+    marginVertical: 15,
+    marginHorizontal: 20,
+    borderColor: utils.colors.grey,
+  },
+  flatList: {marginTop: 30},
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+});
 
 class Merchant extends React.PureComponent {
   constructor(props) {
@@ -86,6 +51,8 @@ class Merchant extends React.PureComponent {
     this.state = {
       selectedItems: cart || {},
     };
+
+    this.scrollY = new Animated.Value(0);
   }
 
   componentDidMount() {
@@ -100,13 +67,13 @@ class Merchant extends React.PureComponent {
   onCheckoutPress = () => {
     const {componentId} = this.props;
 
-    goToCheckout(componentId);
+    Navigator.goToCheckout(componentId);
   };
 
   onEndSession = () => {
     const {setEnableGroupOrderSession} = this.props;
 
-    showModalChoice({
+    Navigator.showModalChoice({
       headline: 'End Session',
       description:
         'Your participants is ordering their items. Are you sure to terminate this session?',
@@ -119,7 +86,7 @@ class Merchant extends React.PureComponent {
   onGroupOrderPress = () => {
     const {componentId, setEnableGroupOrderSession, merchant} = this.props;
 
-    showModalChoice({
+    Navigator.showModalChoice({
       headline: 'Group Order',
       description:
         'Share your group order link with others. They can add their favorite items. Checkout and get it all delivered together.',
@@ -127,7 +94,7 @@ class Merchant extends React.PureComponent {
       yes: 'Start Group Order',
       onPress: () => {
         setEnableGroupOrderSession(true);
-        goToGroupOrder(componentId, {merchant});
+        Navigator.goToGroupOrder(componentId, {merchant});
       },
     });
   };
@@ -140,7 +107,7 @@ class Merchant extends React.PureComponent {
     const removeItem = Boolean(selectedItems[itemKey]);
 
     if (cartKey && cartKey !== restaurant.key) {
-      return showModalNotice({
+      return Navigator.showModalNotice({
         headline: 'Noticed',
         description: "You can't make order with multiple stores.",
         buttonName: 'Cancel',
@@ -184,112 +151,135 @@ class Merchant extends React.PureComponent {
     }
   };
 
-  render() {
-    const {selectedItems} = this.state;
-    const {
-      componentId,
-      restaurant,
-      items,
-      cart,
-      isStartGroupOrder,
-    } = this.props;
+  renderHeaderComponent = () => {
+    const {isStartGroupOrder, restaurant} = this.props;
 
     const merchantName = get(restaurant, 'name', 'N/A');
-    const banner = get(restaurant, 'images.banner');
 
     return (
-      <Container>
-        <NavigationBack
-          title={merchantName}
-          navigate
+      <React.Fragment>
+        <MerchantInfoSection merchantName={merchantName} />
+        <GroupOrder
+          onEndSession={this.onEndSession}
+          isStartGroupOrder={isStartGroupOrder}
+          onGroupOrderPress={this.onGroupOrderPress}
+        />
+        <ListCategories />
+        <SearchBar placeholder="Search" style={{marginVertical: 15}} />
+      </React.Fragment>
+    );
+  };
+
+  renderFooterComponent = () => {
+    const {cart} = this.props;
+
+    if (size(cart) > 0) {
+      return <View style={{marginVertical: 60}} />;
+    }
+
+    return <View style={styles.emptySpace} />;
+  };
+
+  renderItem = ({item, key, index}) => {
+    const {selectedItems} = this.state;
+    const {restaurant, items} = this.props;
+
+    const itemsCount = size(items[restaurant.key]);
+    const isSelectedItem = selectedItems[item.key];
+    const isLastItem = itemsCount === index + 1;
+
+    return (
+      <React.Fragment key={item.key}>
+        <Item
+          item={item}
+          isSelectedItem={isSelectedItem}
+          onPress={() => this.onItemPress(item, item.key)}
+        />
+        {!isLastItem && <View style={styles.divider} />}
+      </React.Fragment>
+    );
+  };
+
+  render() {
+    const {componentId, restaurant, items, cart, loaded} = this.props;
+
+    const itemsData = utils.helpers.convertObjectToArray(items[restaurant.key]);
+    const opacity = this.scrollY.interpolate({
+      inputRange: [0, 100],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+
+    const reverseOpacity = this.scrollY.interpolate({
+      inputRange: [0, 100],
+      outputRange: [0, 1],
+      extrapolate: 'clamp',
+    });
+
+    const scale = this.scrollY.interpolate({
+      inputRange: [-100, 0, 100],
+      outputRange: [1.2, 1, 1],
+      extrapolate: 'clamp',
+    });
+
+    return (
+      <View style={{flex: 1}}>
+        <TopBanner
+          scale={scale}
+          opacity={opacity}
+          banner={restaurant.images.banner}
+        />
+        <TopNavBar
+          opacity={opacity}
           componentId={componentId}
+          merchantName={restaurant.name}
+          reverseOpacity={reverseOpacity}
         />
 
-        <BannerWrapper>
-          <Image source={{uri: banner}} />
-        </BannerWrapper>
-
-        <GroupOrderWrapper>
-          {!isStartGroupOrder ? (
-            <Button activeOpacity={0.5} onPress={this.onGroupOrderPress}>
-              <MIcon
-                name="group-add"
-                size={20}
-                color={Colors.blue}
-                style={{marginRight: 5}}
-              />
-              <ButtonText>Group Order</ButtonText>
-            </Button>
-          ) : (
-            <Button activeOpacity={0.5} onPress={this.onEndSession}>
-              <MIcon
-                name="exit-to-app"
-                size={18}
-                color={Colors.blue}
-                style={{marginRight: 5}}
-              />
-              <ButtonText>End Session</ButtonText>
-            </Button>
-          )}
-        </GroupOrderWrapper>
-
-        <CategoryWrapper>
-          <ScrollView horizontal showHorizontalScrollIndicator={false}>
-            <Button activeOpacity={0.5}>
-              <ButtonText>Menu</ButtonText>
-              <MIcon name="keyboard-arrow-down" color={Colors.blue} size={20} />
-            </Button>
-            <Button activeOpacity={0.5}>
-              <ButtonText>Editor's Choice</ButtonText>
-            </Button>
-            <Button activeOpacity={0.5}>
-              <ButtonText>Drink</ButtonText>
-            </Button>
-            <Button activeOpacity={0.5}>
-              <ButtonText>Other</ButtonText>
-            </Button>
-          </ScrollView>
-        </CategoryWrapper>
-
-        <Content>
-          <SearchBar />
-          <ScrollView showVerticalScrollIndicator={false}>
-            {map(items[restaurant.key], (item, key) => {
-              const isSelectedItem = selectedItems[key];
-
-              return (
-                <React.Fragment key={key}>
-                  <Item
-                    isSelectedItem={isSelectedItem}
-                    item={item}
-                    onPress={() => this.onItemPress(item, key)}
-                  />
-                  <Divider />
-                </React.Fragment>
-              );
-            })}
-          </ScrollView>
-        </Content>
+        {!loaded ? (
+          <FlatList
+            data={itemsData}
+            contentContainerStyle={styles.flatList}
+            ListHeaderComponent={this.renderHeaderComponent}
+            ListFooterComponent={this.renderFooterComponent}
+            showsVerticalScrollIndicator={false}
+            renderItem={this.renderItem}
+            keyExtractor={(item) => item.key}
+            onScroll={Animated.event(
+              [{nativeEvent: {contentOffset: {y: this.scrollY}}}],
+              {useNativeDriver: false},
+            )}
+          />
+        ) : (
+          <View style={styles.loading}>
+            <ActivityIndicator
+              size="large"
+              color={utils.colors.yellow}
+              animating
+            />
+          </View>
+        )}
 
         {size(cart) > 0 ? (
           <CheckoutBottomSheet cart={cart} onPress={this.onCheckoutPress} />
         ) : null}
-      </Container>
+      </View>
     );
   }
 }
 
 const mapState = ({item, cart}) => ({
   cart: cart.data,
-  cartKey: cart.key,
   items: item.data,
+  cartKey: cart.key,
+  loaded: item.loading,
   isStartGroupOrder: cart.enableGroupOrderSession,
 });
 
 const mapDispatch = {
   getItem: ItemActions.getItem,
-  setCartItem: CartActions.setCartItem,
   setCartKey: CartActions.setCartKey,
+  setCartItem: CartActions.setCartItem,
   setEnableGroupOrderSession: CartActions.setEnableGroupOrderSession,
 };
 

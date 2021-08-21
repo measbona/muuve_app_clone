@@ -2,8 +2,8 @@ import {call, put} from 'redux-saga/effects';
 import * as Navigator from '../navigation/screen';
 import Modules from '../modules';
 
+import AppActions from '../redux/AppRedux';
 import ProfileActions from '../redux/ProfileRedux';
-import RestaurantsActions from '../redux/RestaurantRedux';
 
 const alertError = (error) => {
   if (error && error.message) {
@@ -28,9 +28,7 @@ function* handleUserProfile() {
     const userProfile = yield call(Modules.Profile.fetch);
 
     yield put(ProfileActions.setProfile(userProfile));
-    yield put(RestaurantsActions.getRestaurants());
-
-    yield call(Navigator.setRootHome);
+    yield put(AppActions.handleDynamicLink());
   } catch (error) {
     yield call(alertError, error);
   }

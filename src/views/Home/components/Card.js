@@ -1,157 +1,119 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import { get } from 'lodash'
-import styled from 'styled-components/native';
-import FAW5Icon from 'react-native-vector-icons/FontAwesome5';
+import {View, Text, TouchableOpacity, Image, StyleSheet} from 'react-native';
+import {get} from 'lodash';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import Colors from '../../../utils/colors';
+import utils from '../../../utils';
 
-const Wrapper = styled.TouchableOpacity`
-  border-radius: 17px;
-  flex-direction: row;
-  margin-bottom: 15px;
-  background-color: ${Colors.white};
-`;
-
-const MerchantLogo = styled.Image`
-  width: 100px;
-  height: 100px;
-  border-radius: 17px;
-`;
-
-const Content = styled.View`
-  flex: 1;
-  margin-vertical: 8px;
-  margin-horizontal: 8px;
-  justify-content: space-between;
-`;
-
-const MerchantInfo = styled.View`
-`;
-
-const Name = styled.Text`
-  font-size: 13px;
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-const Category = styled.Text`
-  font-size: 11px;
-  font-weight: bold;
-  margin-bottom: 5px;
-`;
-
-const Discount = styled.Text`
-  font-size: 11px;
-  font-weight: bold;
-  color: ${Colors.red};
-`;
-
-const Row = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const PromotionRow = styled.View`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const Text = styled.Text`
-  font-size: 11px;
-  font-weight: bold;
-  color: ${Colors.blue};
-`;
-
-const Rating = styled.View`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const DeliveryFee = styled.View`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const Space = styled.View`
-  margin-horizontal: 2px;
-`;
-
-const DiscountRow = styled.View`
-  flex-direction: row;
-  align-items: center;
-`;
-
-const PromotionSeperator = styled.Text`
-  font-size: 18px;
-  margin-horizontal: 5px;
-  color: ${Colors.red};
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    marginBottom: 15,
+    borderRadius: 17,
+    flexDirection: 'row',
+    backgroundColor: utils.colors.white,
+  },
+  merchantLogo: {
+    width: 85,
+    height: 85,
+    borderRadius: 17,
+    backgroundColor: utils.colors.grey,
+  },
+  content: {
+    flex: 1,
+    paddingVertical: 5,
+    marginHorizontal: 8,
+    justifyContent: 'space-between',
+  },
+  text: {
+    fontSize: 12,
+    marginBottom: 2,
+    fontWeight: 'bold',
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  rating: {
+    alignSelf: 'flex-end',
+    flexDirection: 'row',
+  },
+  deliveryFee: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  space: {marginHorizontal: 4},
+});
 
 export default class Card extends React.PureComponent {
   render() {
-    const { onPress, restaurant} = this.props;
+    const {onPress, restaurant} = this.props;
 
-    const name = get(restaurant, 'name', 'N/A')
-    const discount = get(restaurant, 'discount_rate', 0)
-    const hasDiscount = discount > 0
-    const cartBased = get(restaurant, 'cart_based', false)
-    const logo = get(restaurant, 'images.logo')
-
-    const reviewer = get(restaurant, 'reviewers', 0)
-    const ratingCount = get(restaurant, 'rating_count', 0)
-    const rating = Math.floor(ratingCount/reviewer)
-
-    const cookingDuration = get(restaurant, 'cooking_duration')
+    const reviewer = get(restaurant, 'reviewers', 0);
+    const ratingCount = get(restaurant, 'rating_count', 0);
+    const rating = Math.floor(ratingCount / reviewer);
 
     return (
-      <Wrapper activeOpacity={0.5} onPress={onPress}>
-        <MerchantLogo source={{ uri: logo }} />
-        <Content>
-          <Row>
-            <MerchantInfo>
-              <Name>{name}</Name>
-              <Category>Snack, Juice, Noodle, Tea</Category>
-              <PromotionRow>
-                {hasDiscount ? (
-                  <DiscountRow>
-                    <MCIcon name="brightness-percent" color={Colors.red} size={15} style={{ marginRight: 2 }}/>
-                    <Discount>{`${discount}% Discount`}</Discount>
-                  </DiscountRow>
-                ) : null}
-                {hasDiscount && cartBased && <PromotionSeperator>{'\u2022'}</PromotionSeperator>}
-                {cartBased ? (
-                  <FAW5Icon
-                    name="gift"
-                    color={Colors.red}
-                    size={14}
-                    style={{marginRight: 4}}
-                  />
-                ) : null}
-              </PromotionRow>
-            </MerchantInfo>
-          </Row>
+      <TouchableOpacity
+        style={styles.wrapper}
+        activeOpacity={0.5}
+        onPress={onPress}>
+        <Image
+          style={styles.merchantLogo}
+          source={{uri: restaurant.images.logo}}
+        />
 
-          <Row>
-            <Rating>
+        <View style={styles.content}>
+          <View style={styles.row}>
+            <View>
+              <Text style={[styles.text, {fontSize: 14}]}>
+                {restaurant.name.replace(/^ /g, '')}
+              </Text>
+              <Text style={[styles.text, {color: utils.colors.border}]}>
+                Snack, Juice, Noodle, Tea
+              </Text>
+            </View>
+          </View>
+
+          <View style={styles.row}>
+            <View style={styles.rating}>
               <MCIcon
                 name="star"
-                color={Colors.yellow}
+                color={utils.colors.yellow}
                 size={16}
                 style={{marginRight: 2}}
               />
-              <Text>{`${rating}/${ratingCount}`}</Text>
-            </Rating>
-            <DeliveryFee>
-              <MCIcon name="motorbike" color={Colors.blue} size={17} />
-              <Text>FREE</Text>
-              <Space />
-              <MCIcon name="clock-outline" color={Colors.blue} size={15} />
-              <Text>{`~${cookingDuration} min`}</Text>
-            </DeliveryFee>
-          </Row>
-        </Content>
-      </Wrapper>
+              <Text
+                style={[
+                  styles.text,
+                  {color: utils.colors.blue},
+                ]}>{`${rating}/${ratingCount}`}</Text>
+            </View>
+            <View style={styles.deliveryFee}>
+              <MCIcon
+                name="motorbike"
+                color={utils.colors.blue}
+                size={18}
+                style={{marginBottom: 2}}
+              />
+              <Text style={[styles.text, {color: utils.colors.blue}]}>
+                $0.75
+              </Text>
+              <View style={styles.space} />
+              <MCIcon
+                name="clock-time-five-outline"
+                color={utils.colors.blue}
+                size={15}
+              />
+              <Text
+                style={[
+                  styles.text,
+                  {color: utils.colors.blue},
+                ]}>{`~${restaurant.cooking_duration} min`}</Text>
+            </View>
+          </View>
+        </View>
+      </TouchableOpacity>
     );
   }
 }

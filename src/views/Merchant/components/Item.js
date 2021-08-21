@@ -1,63 +1,68 @@
 import React from 'react';
+import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import {get} from 'lodash';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
-import styled from 'styled-components/native';
 
-import utils from '../../../utils'
+import utils from '../../../utils';
 
-const Wrapper = styled.TouchableOpacity`
-  flex-direction: row;
-  padding-horizontal: 20px;
-  justify-content: space-between;
-`;
-
-const InfoWrapper = styled.View`
-  justify-content: space-between;
-`;
-
-const Text = styled.Text`
-  font-weight: 600;
-  font-size: ${(props) => (props.price ? 12 : 14)}px;
-`;
-
-const ImageWrapper = styled.View`
-  align-items: flex-end;
-`;
-
-const ItemImage = styled.Image`
-  width: 70px;
-  height: 70px;
-`;
-
-const SelectedBadge = styled.View`
-  position: absolute;
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    flexDirection: 'row',
+    paddingHorizontal: 25,
+    justifyContent: 'space-between',
+  },
+  infoWrapper: {
+    justifyContent: 'space-between',
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+  imageWrapper: {
+    alignItems: 'flex-end',
+    backgroundColor: utils.colors.grey,
+  },
+  itemImage: {
+    width: 70,
+    height: 70,
+  },
+  selectedBadge: {
+    position: 'absolute',
+  },
+});
 
 export default (props) => {
   const {item, onPress, isSelectedItem} = props;
 
   const name = get(item, 'name', 'N/A');
+  const logo = get(item, 'images.thumb', null);
   const price = get(item, 'current_price', 'N/A');
-  const logo = get(item, 'images.thumb', '');
+
+  const itemImageSource = logo
+    ? {uri: logo}
+    : require('../../../assets/images/muuve_logo.png');
 
   return (
-    <Wrapper activeOpacity={0.5} onPress={onPress}>
-      <InfoWrapper>
-        <Text>{name}</Text>
-        <Text price>{`$${price}`}</Text>
-      </InfoWrapper>
-      <ImageWrapper>
-        <ItemImage source={{uri: logo}} />
+    <TouchableOpacity
+      style={styles.wrapper}
+      activeOpacity={0.7}
+      onPress={onPress}>
+      <View style={styles.infoWrapper}>
+        <Text style={styles.text}>{name}</Text>
+        <Text style={[styles.text, {fontSize: 12}]}>{`$${price}`}</Text>
+      </View>
+      <View style={styles.imageWrapper}>
+        <Image style={styles.itemImage} source={itemImageSource} />
         {isSelectedItem ? (
-          <SelectedBadge>
+          <View style={styles.selectedBadge}>
             <MCIcon
               name="checkbox-marked-circle"
               size={20}
               color={utils.colors.blue}
             />
-          </SelectedBadge>
+          </View>
         ) : null}
-      </ImageWrapper>
-    </Wrapper>
+      </View>
+    </TouchableOpacity>
   );
 };
