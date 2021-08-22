@@ -1,57 +1,37 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import styled from 'styled-components/native';
-import {goToViewAccount} from '../../../navigation/screen';
+import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import * as Navigator from '../../../navigation/screen';
 
-import Colors from '../../../utils/colors';
-import Device from '../../../utils/device';
+import utils from '../../../utils';
 
-const Wrapper = styled.View`
-  padding-top: ${Device.isIphoneX ? 44 : 30}px;
-  flex-direction: row;
-  padding-bottom: 10px;
-  padding-horizontal: 20px;
-  justify-content: space-between;
-  border-bottom-left-radius: 17px;
-  border-bottom-right-radius: 17px;
-  background-color: ${Colors.yellow};
-`;
-
-const AccountWrapper = styled.View`
-  flex-direction: row;
-`;
-
-const Image = styled.Image`
-  width: 40px;
-  height: 40px;
-  border-radius: 50px;
-`;
-
-const UserInfoWrapper = styled.View`
-  margin-left: 13px;
-`;
-
-const UserName = styled.Text`
-  font-size: 16px;
-  font-weight: bold;
-  padding-bottom: 3px;
-  color: ${Colors.black};
-`;
-
-const ViewAccountWrapper = styled.TouchableOpacity``;
-
-const ViewAccount = styled.Text`
-  font-size: 12px;
-  font-weight: bold;
-  color: ${Colors.blue};
-`;
-
-const PhoneNumberWrapper = styled.View``;
-
-const PhoneNumber = styled.Text`
-  font-size: 13px;
-  font-weight: 700;
-  color: ${Colors.black};
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    flexDirection: 'row',
+    paddingVertical: 7,
+    paddingHorizontal: 16,
+    borderBottomLeftRadius: 17,
+    borderBottomRightRadius: 17,
+    justifyContent: 'space-between',
+    backgroundColor: utils.colors.yellow,
+  },
+  profileWrapper: {
+    flexDirection: 'row',
+  },
+  image: {
+    width: 40,
+    height: 40,
+    borderRadius: 50,
+  },
+  nameWrapper: {
+    marginLeft: 10,
+  },
+  text: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+});
 
 export default class Header extends React.PureComponent {
   render() {
@@ -61,24 +41,28 @@ export default class Header extends React.PureComponent {
     const phoneNumber = user && user.phone_number;
 
     return (
-      <Wrapper>
-        <AccountWrapper>
+      <View style={styles.wrapper}>
+        <View style={styles.profileWrapper}>
           <Image
+            style={styles.image}
             source={require('../../../assets/images/user_placeholder.jpg')}
           />
-          <UserInfoWrapper>
-            <UserName>{userName}</UserName>
-            <ViewAccountWrapper
+          <View style={styles.nameWrapper}>
+            <Text style={styles.text}>{userName}</Text>
+            <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => goToViewAccount(componentId)}>
-              <ViewAccount>View Account</ViewAccount>
-            </ViewAccountWrapper>
-          </UserInfoWrapper>
-        </AccountWrapper>
-        <PhoneNumberWrapper>
-          <PhoneNumber>{phoneNumber}</PhoneNumber>
-        </PhoneNumberWrapper>
-      </Wrapper>
+              onPress={() => Navigator.goToViewAccount(componentId)}>
+              <Text
+                style={[styles.text, {fontSize: 14, color: utils.colors.blue}]}>
+                View Account
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+        <View>
+          <Text style={styles.text}>{phoneNumber}</Text>
+        </View>
+      </View>
     );
   }
 }

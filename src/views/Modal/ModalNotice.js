@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import * as Animatable from 'react-native-animatable';
@@ -86,7 +87,11 @@ export default class ModalNotice extends React.PureComponent {
               style={styles.button}
               activeOpacity={0.5}
               onPress={this.onCancelButton}>
-              <Text style={[styles.text, {color: utils.colors.black}]}>
+              <Text
+                style={[
+                  styles.text,
+                  {fontSize: 14, color: utils.colors.black},
+                ]}>
                 {buttonName}
               </Text>
             </TouchableOpacity>

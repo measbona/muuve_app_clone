@@ -3,6 +3,9 @@ import styled from 'styled-components/native';
 import NavigationBack from '../../lib/NavigationBack';
 import {goToOrderDetails} from '../../navigation/screen';
 
+import utils from '../../utils';
+
+import NavBar from '../../lib/NavBar';
 import OrderRow from './components/Order';
 
 const Container = styled.View`
@@ -26,16 +29,24 @@ const ScrollView = styled.ScrollView`
 export default class Order extends React.Component {
   onOrderPress = () => {
     const {componentId} = this.props;
+
     goToOrderDetails(componentId);
   };
 
   render() {
+    const {componentId} = this.props;
     return (
       <Container>
-        <NavigationBack title="My Order" />
+        <NavBar
+          title="Order"
+          componentId={componentId}
+          style={{backgroundColor: utils.colors.yellow}}
+        />
+
         <HeadlineWrapper>
           <Headline>Pending Orders</Headline>
         </HeadlineWrapper>
+
         <ScrollView showVerticalScrollIndicator={false}>
           <OrderRow onPress={this.onOrderPress} />
         </ScrollView>

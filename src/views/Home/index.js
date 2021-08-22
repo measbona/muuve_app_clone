@@ -12,7 +12,7 @@ import {showModalNotice, goToMerchant} from '../../navigation/screen';
 import utils from '../../utils';
 
 import Header from './components/Header';
-import MerchantCard from './components/Card';
+import Restaurant from './components/Restaurant';
 
 import RestaurantActions from '../../redux/RestaurantRedux';
 
@@ -72,7 +72,7 @@ class Home extends React.PureComponent {
   renderRestaurant = ({item}) => {
     return (
       <React.Fragment key={item.key}>
-        <MerchantCard
+        <Restaurant
           restaurant={item}
           onPress={() => this.onMerchantPress(item)}
         />

@@ -1,56 +1,53 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import styled from 'styled-components/native';
+import {View, Text, TextInput, StyleSheet} from 'react-native';
 
 import utils from '../../../utils';
 
-const Wrapper = styled.View`
-  margin-top: 15px;
-`;
-
-const TitleWrapper = styled.View`
-  flex-direction: row;
-`;
-
-const Title = styled.Text`
-  font-size: 14px;
-  color: ${utils.colors.black};
-`;
-
-const Require = styled.Text`
-  color: red;
-  margin-left: 7px;
-`;
-
-const TextInputWrapper = styled.View`
-  height: 40px;
-  margin-top: 10px;
-  border-radius: 17px;
-  margin-horizontal: 2px;
-  background-color: ${utils.colors.grey};
-`;
-
-const TextInput = styled.TextInput`
-  flex: 1;
-  font-size: 13px;
-  font-weight: bold;
-  margin-left: 15px;
-  color: ${utils.colors.black};
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    marginBottom: 10,
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+  textInputWrapper: {
+    minHeight: 40,
+    borderRadius: 17,
+    marginVertical: 10,
+    backgroundColor: utils.colors.grey,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    marginLeft: 15,
+    fontWeight: 'bold',
+  },
+});
 
 export default ({name, placeholder, onChange, value}) => {
   return (
-    <Wrapper>
-      <TitleWrapper>
-        <Title>{name}</Title>
-        <Require>*</Require>
-      </TitleWrapper>
-      <TextInputWrapper>
+    <View style={styles.wrapper}>
+      <View style={styles.titleWrapper}>
+        <Text style={styles.text}>{name}</Text>
+        <Text style={[styles.text, {color: utils.colors.red, marginLeft: 5}]}>
+          *
+        </Text>
+      </View>
+
+      <View style={styles.textInputWrapper}>
         <TextInput
+          style={styles.textInput}
           value={value}
           placeholder={placeholder}
           onChangeText={(text) => onChange(text)}
         />
-      </TextInputWrapper>
-    </Wrapper>
+      </View>
+    </View>
   );
 };

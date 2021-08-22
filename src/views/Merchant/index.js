@@ -65,9 +65,9 @@ class Merchant extends React.PureComponent {
   }
 
   onCheckoutPress = () => {
-    const {componentId} = this.props;
+    const {componentId, restaurant} = this.props;
 
-    Navigator.goToCheckout(componentId);
+    Navigator.goToCheckout(componentId, {restaurant});
   };
 
   onEndSession = () => {

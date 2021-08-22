@@ -1,76 +1,84 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import styled from 'styled-components/native';
+import {View, Text, Image, StyleSheet} from 'react-native';
 
-import Device from '../../utils/device';
-import Colors from '../../utils/colors';
+import utils from '../../utils';
 
 import Content from './components/Content';
 
-const Container = styled.View`
-  flex: 1;
-  justify-content: space-between;
-`;
-
-const HeaderWrapper = styled.View`
-  padding-top: ${Device.hasNotch ? 40 : 15}px;
-  align-items: center;
-  justify-content: center;
-  background-color: ${Colors.yellow};
-  border-bottom-left-radius: 17px;
-  border-bottom-right-radius: 17px;
-`;
-
-const Image = styled.Image``;
-
-const Row = styled.View`
-  flex-direction: row;
-`;
-
-const FooterWrapper = styled.View`
-  align-items: center;
-  padding-bottom: 10px;
-  padding-top: 20px;
-  justify-content: center;
-  border-top-left-radius: 17px;
-  border-top-right-radius: 17px;
-  background-color: ${Colors.yellow};
-  padding-bottom: ${Device.isIphoneX ? 30 : 20}px;
-`;
-
-const Text = styled.Text`
-  font-size: 11px;
-  font-weight: bold;
-  color: ${Colors.black};
-  ${(props) => props.color && 'color: blue; text-decoration: underline'}
-`;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  headerWrapper: {
+    paddingTop: 20,
+    alignItems: 'center',
+    borderBottomLeftRadius: 17,
+    borderBottomRightRadius: 17,
+    backgroundColor: utils.colors.yellow,
+  },
+  row: {
+    flexDirection: 'row',
+  },
+  footerWrapper: {
+    paddingVertical: 20,
+    alignItems: 'center',
+    borderTopLeftRadius: 17,
+    borderTopRightRadius: 17,
+    backgroundColor: utils.colors.yellow,
+  },
+  text: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+  image: {
+    width: 120,
+    height: 120,
+  },
+});
 
 export default class PhoneLogin extends React.PureComponent {
   render() {
     const {componentId} = this.props;
 
     return (
-      <Container>
-        <HeaderWrapper>
+      <View style={styles.container}>
+        <View style={[styles.headerWrapper, utils.shadows.lightShadow]}>
           <Image
-            style={{width: 120, height: 120}}
+            style={styles.image}
             source={require('../../assets/images/muuve_logo.png')}
           />
-        </HeaderWrapper>
+        </View>
+
         <Content componentId={componentId} />
-        <FooterWrapper>
-          <Text>By continuing your agree to our</Text>
-          <Row>
-            <Text color onPress={() => {}}>
+
+        <View style={[styles.footerWrapper, utils.shadows.bottomBar]}>
+          <Text style={styles.text}>By continuing your agree to our</Text>
+          <View style={styles.row}>
+            <Text
+              style={[
+                styles.text,
+                {color: utils.colors.blue, textDecorationLine: 'underline'},
+              ]}
+              activeOpacity={0.7}
+              onPress={() => {}}>
               Terms of Service
             </Text>
-            <Text> and</Text>
-            <Text color onPress={() => {}}>
+            <Text style={styles.text}> and</Text>
+            <Text
+              style={[
+                styles.text,
+                {color: utils.colors.blue, textDecorationLine: 'underline'},
+              ]}
+              activeOpacity={0.7}
+              onPress={() => {}}>
               {' '}
               Privacy Policy
             </Text>
-          </Row>
-        </FooterWrapper>
-      </Container>
+          </View>
+        </View>
+      </View>
     );
   }
 }

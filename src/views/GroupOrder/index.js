@@ -1,62 +1,50 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
-import {Share} from 'react-native';
-import styled from 'styled-components';
+import {
+  View,
+  Text,
+  Image,
+  Share,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import firebase from '@react-native-firebase/app';
 
-import Modules from '../../modules';
 import utils from '../../utils';
+import Modules from '../../modules';
 
-import NavigationBack from '../../lib/NavigationBack';
+import NavBar from '../../lib/NavBar';
 import LinkBox from './components/LinkBox';
 
-const Container = styled.View`
-  flex: 1;
-`;
-
-const ContentWrapper = styled.View`
-  margin-top: 30px;
-  margin-horizontal: 25px;
-`;
-
-const HeadlineWrapper = styled.View``;
-
-const Headline = styled.Text`
-  color: ${utils.colors.yellow};
-  font-size: 17px;
-  font-weight: bold;
-`;
-
-const Info = styled.Text`
-  font-size: 13px;
-  margin-top: 5px;
-  font-weight: 300;
-`;
-
-const ImageWrapper = styled.View`
-  align-items: center;
-`;
-
-const Image = styled.Image`
-  width: 250px;
-  height: 250px;
-`;
-
-const ShareLinkWrapper = styled.TouchableOpacity`
-  height: 35px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-  border-radius: 10px;
-  flex-direction: row;
-  background-color: ${utils.colors.blue};
-`;
-
-const ShareLink = styled.Text`
-  color: white;
-  font-size: 13px;
-  font-weight: bold;
-`;
+const styles = StyleSheet.create({
+  conatiner: {
+    flex: 1,
+    backgroundColor: utils.colors.white,
+  },
+  contentWrapper: {
+    marginTop: 15,
+    marginHorizontal: 16,
+  },
+  text: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: utils.colors.yellow,
+  },
+  imageWrapper: {
+    alignItems: 'center',
+  },
+  image: {
+    width: 220,
+    height: 220,
+  },
+  button: {
+    borderRadius: 15,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: utils.colors.blue,
+  },
+});
 
 class GroupOrder extends React.PureComponent {
   state = {
@@ -112,29 +100,44 @@ class GroupOrder extends React.PureComponent {
     const {componentId} = this.props;
 
     return (
-      <Container>
-        <NavigationBack
+      <View style={styles.conatiner}>
+        <NavBar
           title="Group Order"
-          navigate
           componentId={componentId}
+          style={{backgroundColor: utils.colors.yellow}}
         />
-        <ContentWrapper>
-          <HeadlineWrapper>
-            <Headline>Start a group order</Headline>
-            <Info>
+
+        <View style={styles.contentWrapper}>
+          <View>
+            <Text style={[styles.text, {marginBottom: 10}]}>
+              Start a group order
+            </Text>
+            <Text
+              style={[styles.text, {fontSize: 14, color: utils.colors.black}]}>
               Allow participants to add items to your order. Large orders many
               take longer to prepare.
-            </Info>
-          </HeadlineWrapper>
-          <ImageWrapper>
-            <Image source={require('../../assets/images/friends.png')} />
-          </ImageWrapper>
+            </Text>
+          </View>
+          <View style={styles.imageWrapper}>
+            <Image
+              style={styles.image}
+              source={require('../../assets/images/friends.png')}
+            />
+          </View>
+
           <LinkBox url={url} />
-          <ShareLinkWrapper activeOpacity={0.7} onPress={this.onSharePress}>
-            <ShareLink>SHARE LINK</ShareLink>
-          </ShareLinkWrapper>
-        </ContentWrapper>
-      </Container>
+
+          <TouchableOpacity
+            style={styles.button}
+            activeOpacity={0.7}
+            onPress={this.onSharePress}>
+            <Text
+              style={[styles.text, {fontSize: 14, color: utils.colors.white}]}>
+              SHARE LINK
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </View>
     );
   }
 }

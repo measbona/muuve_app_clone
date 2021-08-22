@@ -22,7 +22,11 @@ export default (props) => {
   return (
     <View>
       <Animatable.View style={[{opacity}, styles.primaryNavBarWrapper]}>
-        <NavBar componentId={componentId} />
+        <NavBar
+          shadow={false}
+          navigateColor={utils.colors.white}
+          componentId={componentId}
+        />
       </Animatable.View>
 
       <Animatable.View

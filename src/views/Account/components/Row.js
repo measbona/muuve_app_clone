@@ -1,55 +1,59 @@
 import React from 'react';
-import styled from 'styled-components/native';
+import {View, Text, StyleSheet, TouchableOpacity} from 'react-native';
 
 import utils from '../../../utils';
 
-const Wrapper = styled.TouchableOpacity`
-  height: 50px;
-  align-items: center;
-  flex-direction: row;
-  padding-horizontal: 20px;
-  justify-content: space-between;
-`;
-
-const IconWrapper = styled.View`
-  width: 20px;
-  height: 20px;
-  align-items: center;
-  justify-content: center;
-`;
-
-const IconAndName = styled.View`
-  align-items: center;
-  flex-direction: row;
-`;
-
-const Text = styled.Text`
-  margin-left: 20px;
-  font-weight: 600;
-  color: ${utils.colors.black};
-`;
-
-const Value = styled.Text`
-  font-weight: bold;
-  color: ${utils.colors.blue};
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    paddingVertical: 15,
+    alignItems: 'center',
+    flexDirection: 'row',
+    paddingHorizontal: 16,
+    justifyContent: 'space-between',
+    backgroundColor: utils.colors.white,
+  },
+  iconWrapper: {
+    width: 20,
+    height: 20,
+    marginRight: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  rowWrapper: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  text: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+});
 
 export default ({name, icon, iconName, iconSize, value, onPress, logout}) => {
   const Icon = icon;
 
   return (
-    <Wrapper activeOpacity={1} onPress={onPress}>
-      <IconAndName>
-        <IconWrapper>
+    <TouchableOpacity
+      style={styles.wrapper}
+      activeOpacity={0.7}
+      onPress={onPress}>
+      <View style={styles.rowWrapper}>
+        <View style={styles.iconWrapper}>
           <Icon
             name={iconName}
             size={iconSize}
-            color={logout ? 'red' : utils.colors.black}
+            color={logout && utils.colors.red}
           />
-        </IconWrapper>
-        <Text style={logout && {color: 'red'}}>{name}</Text>
-      </IconAndName>
-      {value && <Value>{value}</Value>}
-    </Wrapper>
+        </View>
+        <Text style={[styles.text, logout && {color: utils.colors.red}]}>
+          {name}
+        </Text>
+      </View>
+
+      {value && (
+        <Text style={[styles.text, {color: utils.colors.blue}]}>{value}</Text>
+      )}
+    </TouchableOpacity>
   );
 };

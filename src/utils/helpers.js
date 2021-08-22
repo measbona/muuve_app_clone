@@ -1,4 +1,4 @@
-import {reduce} from 'lodash';
+import {reduce, forEach} from 'lodash';
 
 const convertObjectToArray = (data) => {
   return reduce(
@@ -11,4 +11,21 @@ const convertObjectToArray = (data) => {
   );
 };
 
-export default {convertObjectToArray};
+const removeWhiteSpace = (string) => string.replace(/^ /g, '');
+
+const removeLeadZeroNumber = (number) => number.replace(/^0(?:0:0?)?/, '');
+
+const sumCartTotal = (cart) => {
+  let total = 0;
+
+  forEach(cart, (item) => (total += item.price));
+
+  return total;
+};
+
+export default {
+  convertObjectToArray,
+  removeWhiteSpace,
+  removeLeadZeroNumber,
+  sumCartTotal,
+};

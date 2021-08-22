@@ -17,4 +17,7 @@ export default class Profile {
   };
 
   static signOut = () => auth().signOut();
+
+  static phoneAuth = async (phoneNumber) =>
+    auth().signInWithPhoneNumber(phoneNumber);
 }

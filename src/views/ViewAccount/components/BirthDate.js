@@ -1,83 +1,90 @@
 import React from 'react';
-import styled from 'styled-components/native';
+import {View, Text, TextInput, StyleSheet} from 'react-native';
 
 import utils from '../../../utils';
 
-const Wrapper = styled.View`
-  margin-top: 15px;
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    marginBottom: 20,
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+  dateBirthWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  textInputWrapper: {
+    flex: 1,
+    minHeight: 40,
+    borderRadius: 17,
+    marginVertical: 10,
+    backgroundColor: utils.colors.grey,
+  },
+  skeleton: {
+    marginHorizontal: 3,
+  },
+  textInput: {
+    flex: 1,
+    fontSize: 14,
+    fontWeight: 'bold',
+  },
+});
 
-const TitleWrapper = styled.View`
-  flex-direction: row;
-`;
-
-const Title = styled.Text`
-  font-size: 14px;
-`;
-
-const DateBirthWrapper = styled.View`
-  flex-direction: row;
-  justify-content: space-between;
-`;
-
-const TextInputWrapper = styled.View`
-  flex: 1;
-  height: 40px;
-  margin-top: 10px;
-  border-radius: 17px;
-  margin-horizontal: 2px;
-  background-color: ${utils.colors.grey};
-`;
-
-const Skeleton = styled.View`
-  margin-horizontal: 3px;
-`;
-
-const TextInput = styled.TextInput`
-  flex: 1;
-  font-size: 13px;
-  font-weight: bold;
-  align-self: center;
-  color: ${utils.colors.black};
-`;
-
-export default ({name, onDayChange, onMonthChange, onYearChange, day, month, year}) => {
+export default ({
+  name,
+  onDayChange,
+  onMonthChange,
+  onYearChange,
+  day,
+  month,
+  year,
+}) => {
   return (
-    <Wrapper>
-      <TitleWrapper>
-        <Title>{name}</Title>
-      </TitleWrapper>
-      <DateBirthWrapper>
-        <TextInputWrapper>
+    <View style={styles.wrapper}>
+      <View>
+        <Text style={styles.text}>{name}</Text>
+      </View>
+      <View style={styles.dateBirthWrapper}>
+        <View style={styles.textInputWrapper}>
           <TextInput
-            keyboardType="number-pad"
             value={day}
-            textAlign="right"
+            textAlign="center"
             placeholder="Day"
+            style={styles.textInput}
+            keyboardType="number-pad"
             onChangeText={(text) => onDayChange(text)}
           />
-        </TextInputWrapper>
-        <Skeleton />
-        <TextInputWrapper>
+        </View>
+
+        <View style={styles.skeleton} />
+
+        <View style={styles.textInputWrapper}>
           <TextInput
-            keyboardType="default"
             value={month}
-            textAlign="right"
+            textAlign="center"
             placeholder="Month"
+            style={styles.textInput}
+            keyboardType="default"
             onChangeText={(text) => onMonthChange(text)}
           />
-        </TextInputWrapper>
-        <Skeleton />
-        <TextInputWrapper>
+        </View>
+
+        <View style={styles.skeleton} />
+
+        <View style={styles.textInputWrapper}>
           <TextInput
-            keyboardType="number-pad"
             value={year}
-            textAlign="right"
+            textAlign="center"
             placeholder="Year"
+            style={styles.textInput}
+            keyboardType="number-pad"
             onChangeText={(text) => onYearChange(text)}
           />
-        </TextInputWrapper>
-      </DateBirthWrapper>
-    </Wrapper>
+        </View>
+      </View>
+    </View>
   );
 };

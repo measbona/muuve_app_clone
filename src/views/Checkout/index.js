@@ -1,34 +1,43 @@
 import React from 'react';
-import styled from 'styled-components/native';
-import {showModalChoice, goToGroupOrderCart} from '../../navigation/screen';
+import {connect} from 'react-redux';
+import {View, ScrollView, StyleSheet} from 'react-native';
+import * as Navigator from '../../navigation/screen';
+import * as Animatable from 'react-native-animatable';
 
-import Colors from '../../utils/colors';
+import utils from '../../utils';
 
-import NavigationBack from '../../lib/NavigationBack';
-import Merchant from './components/Merchant';
-import GroupOrder from './components/GroupOrder';
+import NavBar from '../../lib/NavBar';
+import PaymentSection from './components/PaymentSection';
+import MerchantSection from './components/MerchantSection';
+import PromocodeSection from './components/PromocodeSection';
+import ItemSection from './components/ItemSection';
 import PlaceOrder from './components/PlaceOrder';
-import DeliveryLocation from './components/DeliveryLocation';
-import PaymentOptions from './components/PaymentOption';
-import Promocode from './components/Promocode';
-import Payment from './components/Payment';
+import PaymentOptionSection from './components/PaymentOptionSection';
+import DeliveryLocationSection from './components/DeliveryLocationSection';
 
-const Container = styled.View`
-  flex: 1;
-`;
-
-const ScrollView = styled.ScrollView`
-  flex: 1;
-`;
-
-const Divider = styled.View`
-  padding-vertical: 4px;
-  background-color: ${Colors.lightGrey};
-`;
+const styles = StyleSheet.create({
+  conatiner: {
+    flex: 1,
+    backgroundColor: utils.colors.lightGrey,
+  },
+  content: {flex: 1},
+});
 
 class Checkout extends React.PureComponent {
+  state = {
+    mounted: false,
+  };
+
+  componentDidMount() {
+    Navigator.bindComponent(this);
+  }
+
+  componentDidAppear() {
+    this.setState({mounted: true});
+  }
+
   onPlaceOrderPress = () => {
-    showModalChoice({
+    Navigator.showModalChoice({
       headline: 'Confirmation',
       description:
         'We notice that some participants not yet ready to order.Do you want to continue?',
@@ -41,33 +50,49 @@ class Checkout extends React.PureComponent {
   onGroupOrderPress = () => {
     const {componentId} = this.props;
 
-    goToGroupOrderCart(componentId);
+    Navigator.goToGroupOrderCart(componentId);
   };
 
   render() {
-    const {componentId} = this.props;
+    const {mounted} = this.state;
+    const {componentId, restaurant, isStartGroupOrder, cart} = this.props;
 
     return (
-      <Container>
-        <NavigationBack title="Checkout" navigate componentId={componentId} />
-        <ScrollView showsVerticalScrollIndicator={false}>
-          <Merchant />
-          <Divider />
-          <DeliveryLocation />
-          <Divider />
-          <GroupOrder onPress={this.onGroupOrderPress} />
-          <Divider />
-          <PaymentOptions />
-          <Divider />
-          <Promocode />
-          <Divider />
-          <Payment />
-          <Divider />
-        </ScrollView>
-        <PlaceOrder onPress={this.onPlaceOrderPress} />
-      </Container>
+      <View style={styles.conatiner}>
+        <NavBar
+          title="Checkout"
+          componentId={componentId}
+          style={{backgroundColor: utils.colors.yellow}}
+        />
+
+        {mounted ? (
+          <Animatable.View
+            style={styles.content}
+            animation="fadeIn"
+            duration={300}>
+            <ScrollView showsVerticalScrollIndicator={false}>
+              <MerchantSection restaurant={restaurant} />
+              <DeliveryLocationSection />
+              <ItemSection
+                cart={cart}
+                isStartGroupOrder={isStartGroupOrder}
+                onPress={this.onGroupOrderPress}
+              />
+              <PaymentOptionSection />
+              <PromocodeSection />
+              <PaymentSection cart={cart} />
+            </ScrollView>
+            <PlaceOrder onPress={this.onPlaceOrderPress} />
+          </Animatable.View>
+        ) : null}
+      </View>
     );
   }
 }
 
-export default Checkout;
+const mapState = ({cart}) => ({
+  cart: cart.data,
+  isStartGroupOrder: cart.enableGroupOrderSession,
+});
+
+export default connect(mapState)(Checkout);

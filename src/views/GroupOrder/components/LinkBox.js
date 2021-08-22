@@ -1,58 +1,60 @@
 import React from 'react';
-import styled from 'styled-components/native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {showToast} from '../../../navigation/screen';
 import Clipboard from '@react-native-community/clipboard';
 
-import Colors from '../../../utils/colors';
+import utils from '../../../utils';
 
-const Wrapper = styled.View`
-  height: 35px;
-  border-radius: 10px;
-  flex-direction: row;
-  background-color: ${Colors.grey};
-`;
-
-const LinkWrapper = styled.View`
-  flex: 4;
-  margin-left: 10px;
-  justify-content: center;
-`;
-
-const Link = styled.Text`
-  font-size: 13px;
-  font-weight: 600;
-`;
-
-const CopyButton = styled.TouchableOpacity`
-  flex: 1;
-  width: 50px;
-  align-items: center;
-  justify-content: center;
-  background-color: ${Colors.yellow};
-  border-top-right-radius: 10px;
-  border-bottom-right-radius: 10px;
-`;
-
-const Copy = styled.Text`
-  font-size: 13px;
-  font-weight: bold;
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    minHeight: 40,
+    borderRadius: 17,
+    marginBottom: 15,
+    flexDirection: 'row',
+    backgroundColor: utils.colors.grey,
+  },
+  linkWrapper: {
+    flex: 7,
+    paddingLeft: 15,
+    justifyContent: 'center',
+  },
+  text: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+  button: {
+    flex: 1,
+    alignItems: 'center',
+    paddingHorizontal: 10,
+    borderTopRightRadius: 17,
+    justifyContent: 'center',
+    borderBottomRightRadius: 17,
+    backgroundColor: utils.colors.yellow,
+  },
+});
 
 export default ({url}) => {
-  const copyToClipboard = () => {
+  const linkCopy = () => {
     Clipboard.setString(url);
 
     showToast({message: 'Copied'});
   };
 
   return (
-    <Wrapper>
-      <LinkWrapper>
-        <Link numberOfLines={1}>{url}</Link>
-      </LinkWrapper>
-      <CopyButton activeOpacity={0.5} onPress={() => copyToClipboard()}>
-        <Copy>COPY</Copy>
-      </CopyButton>
-    </Wrapper>
+    <View style={styles.wrapper}>
+      <View style={styles.linkWrapper}>
+        <Text style={[styles.text]} numberOfLines={1}>
+          {url}
+        </Text>
+      </View>
+
+      <TouchableOpacity
+        style={styles.button}
+        activeOpacity={0.7}
+        onPress={() => linkCopy()}>
+        <Text style={styles.text}>COPY</Text>
+      </TouchableOpacity>
+    </View>
   );
 };

@@ -1,26 +1,29 @@
+/* eslint-disable react/no-did-update-set-state */
 import React from 'react';
 import {connect} from 'react-redux';
-import styled from 'styled-components/native';
-import IOIcon from 'react-native-vector-icons/Ionicons';
-import ATIcon from 'react-native-vector-icons/AntDesign';
-import FTOIcon from 'react-native-vector-icons/Fontisto';
+import {View, StyleSheet} from 'react-native';
+import * as Navigator from '../../navigation/screen';
+import ADIcon from 'react-native-vector-icons/AntDesign';
+import FIcon from 'react-native-vector-icons/Fontisto';
 import MDICon from 'react-native-vector-icons/MaterialIcons';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import {showModalChoice} from '../../navigation/screen';
-
-import Header from './components/Header';
 import Row from './components/Row';
+import Header from './components/Header';
 
-import Modules from '../../modules';
 import utils from '../../utils';
+import Modules from '../../modules';
 
-const Container = styled.View``;
-
-const Divider = styled.View`
-  height: 5px;
-  background-color: ${utils.colors.lightGrey};
-`;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: utils.colors.lightGrey,
+  },
+  divider: {
+    paddingVertical: 4,
+    backgroundColor: utils.colors.lightGrey,
+  },
+});
 
 class Account extends React.Component {
   constructor(props) {
@@ -43,7 +46,7 @@ class Account extends React.Component {
   }
 
   onLogOutPress = () => {
-    return showModalChoice({
+    return Navigator.showModalChoice({
       headline: 'LOG OUT',
       description: 'Are you sure you want to logout?',
       no: 'Cancel',
@@ -57,48 +60,42 @@ class Account extends React.Component {
     const {componentId} = this.props;
 
     return (
-      <Container>
+      <View style={styles.container}>
         <Header user={user} componentId={componentId} />
+
         <Row
           name="Language"
-          icon={ATIcon}
+          icon={ADIcon}
           iconName="earth"
-          iconSize={16}
+          iconSize={18}
           value="EN"
           onPress={() => {}}
         />
         <Row
           name="Currency"
-          icon={FTOIcon}
+          icon={FIcon}
           iconName="dollar"
-          iconSize={16}
+          iconSize={18}
           value="USD"
-          onPress={() => {}}
-        />
-        <Row
-          name="Help Center"
-          icon={IOIcon}
-          iconName="help-circle-outline"
-          iconSize={19}
           onPress={() => {}}
         />
         <Row
           name="Notification"
           icon={MCIcon}
           iconName="bell"
-          iconSize={18}
+          iconSize={20}
           onPress={() => {}}
         />
-        <Divider />
+        <View style={styles.divider} />
         <Row
           logout
           name="Log out"
           icon={MDICon}
           iconName="exit-to-app"
-          iconSize={18}
+          iconSize={20}
           onPress={this.onLogOutPress}
         />
-      </Container>
+      </View>
     );
   }
 }

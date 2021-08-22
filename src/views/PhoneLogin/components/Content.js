@@ -1,83 +1,55 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {Keyboard} from 'react-native';
-import styled from 'styled-components/native';
+import {
+  View,
+  Text,
+  Keyboard,
+  TextInput,
+  StyleSheet,
+  TouchableOpacity,
+  ActivityIndicator,
+} from 'react-native';
+import * as Navigator from '../../../navigation/screen';
 
-import Auth from '@react-native-firebase/auth';
-
+import Modules from '../../../modules';
 import utils from '../../../utils';
+
 import PhoneInput from './PhoneInput';
 
-import {
-  setRootHome,
-  showModalChoice,
-  showModalNotice,
-} from '../../../navigation/screen';
-
-const Wrapper = styled.TouchableOpacity`
-  flex: 1;
-  padding-top: 40px;
-  margin-horizontal: 20px;
-`;
-
-const HeadTextWrapper = styled.View``;
-
-const HeadText = styled.Text`
-  font-weight: bold;
-  color: ${utils.colors.black};
-`;
-
-const ButtonWrapper = styled.TouchableOpacity`
-  height: 40px;
-  align-items: center;
-  border-radius: 17px;
-  justify-content: center;
-  background-color: ${utils.colors.yellow};
-`;
-
-const ButtonText = styled.Text`
-  font-size: 13px;
-  font-weight: bold;
-  color: ${utils.colors.black};
-`;
-
-const CodeWrapper = styled.View`
-  flex-direction: row;
-  margin-vertical: 10px;
-  justify-content: space-between;
-`;
-
-const CodeBoxWrapper = styled.View`
-  width: 50px;
-  height: 50px;
-  justify-content: center;
-  border-radius: 15px;
-  background-color: ${utils.colors.grey};
-`;
-
-const CodeBox = styled.TextInput`
-  flex: 1;
-  font-size: 17px;
-  font-weight: bold;
-  text-align: center;
-`;
-
-const Code = styled.Text`
-  font-size: 17px;
-  font-weight: bold;
-  align-self: center;
-`;
-
-const DidNotReceiveCode = styled.TouchableOpacity`
-  margin-top: 20px;
-`;
-
-const Text = styled.Text`
-  font-size: 13px;
-  font-weight: bold;
-  align-self: center;
-`;
-
-const ActivityIndicator = styled.ActivityIndicator``;
+const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+    paddingTop: 40,
+    marginHorizontal: 20,
+  },
+  text: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: utils.colors.black,
+  },
+  buttonWrapper: {
+    borderRadius: 15,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: utils.colors.yellow,
+  },
+  boxesWrapper: {
+    marginVertical: 15,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  boxWrapper: {
+    width: 55,
+    height: 55,
+    borderRadius: 17,
+    justifyContent: 'center',
+    backgroundColor: utils.colors.grey,
+  },
+  didNotReceiveCode: {
+    marginTop: 20,
+    alignSelf: 'center',
+  },
+});
 
 export default class Content extends React.PureComponent {
   state = {
@@ -92,48 +64,64 @@ export default class Content extends React.PureComponent {
     const {code} = this.state;
 
     return (
-      <CodeWrapper>
-        <CodeBoxWrapper>
-          <CodeBox
+      <View style={styles.boxesWrapper}>
+        <View style={styles.boxWrapper}>
+          <TextInput
+            style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}
             autoFocus
             caretHidden
             defaultValue={code[0]}
+            textAlign="center"
             maxLength={6}
             keyboardType="number-pad"
-            onChangeText={(code) => this.setState({code})}
+            onChangeText={(val) => this.setState({code: val})}
           />
-        </CodeBoxWrapper>
-        <CodeBoxWrapper>
-          <Code>{code[1]}</Code>
-        </CodeBoxWrapper>
-        <CodeBoxWrapper>
-          <Code>{code[2]}</Code>
-        </CodeBoxWrapper>
-        <CodeBoxWrapper>
-          <Code>{code[3]}</Code>
-        </CodeBoxWrapper>
-        <CodeBoxWrapper>
-          <Code>{code[4]}</Code>
-        </CodeBoxWrapper>
-        <CodeBoxWrapper>
-          <Code>{code[5]}</Code>
-        </CodeBoxWrapper>
-      </CodeWrapper>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[1]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[2]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[3]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[4]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[5]}
+          </Text>
+        </View>
+      </View>
     );
   };
 
-  handleVerifyCode = () => {
+  onPress = () => {
     const {mounted, phoneNumber} = this.state;
 
     Keyboard.dismiss();
 
     if (mounted) {
-      return showModalChoice({
+      return Navigator.showModalChoice({
         headline: 'Confirmation',
         description: `A confirmation code will send to your via SMS or Notification. Please check your number is correct.\n\n+855${phoneNumber}`,
         no: 'NO',
         yes: 'YES',
-        onPress: this.onPhoneAuth,
+        onPress: () => {
+          this.setState({loading: true}, () => {
+            this.onPhoneAuth();
+          });
+        },
       });
     } else {
       this.codeVerification();
@@ -144,15 +132,15 @@ export default class Content extends React.PureComponent {
     const {phoneNumber} = this.state;
 
     try {
-      const confirmation = await Auth().signInWithPhoneNumber(
+      const confirmation = await Modules.Profile.phoneAuth(
         `+855${phoneNumber}`,
       );
 
       if (confirmation) {
-        this.setState({confirm: confirmation, mounted: false});
+        this.setState({confirm: confirmation, loading: false, mounted: false});
       }
     } catch (error) {
-      //
+      this.setState({loading: false});
     }
   };
 
@@ -167,12 +155,12 @@ export default class Content extends React.PureComponent {
       if (isCorrect) {
         this.setState({loading: false});
 
-        return setRootHome();
+        return Navigator.setRootHome();
       }
     } catch (error) {
       this.setState({loading: false});
 
-      showModalNotice({
+      Navigator.showModalNotice({
         headline: 'Invalid Code',
         description: 'Your code is invalid. Please try again.',
         buttonName: 'Confirm',
@@ -187,10 +175,13 @@ export default class Content extends React.PureComponent {
     const disabled = mounted ? phoneNumber.length <= 7 : code.length !== 6;
 
     return (
-      <Wrapper activeOpacity={1} onPress={() => Keyboard.dismiss()}>
-        <HeadTextWrapper>
-          <HeadText>Login with your phone number</HeadText>
-        </HeadTextWrapper>
+      <TouchableOpacity
+        style={styles.wrapper}
+        activeOpacity={1}
+        onPress={() => Keyboard.dismiss()}>
+        <View>
+          <Text style={styles.text}>Login with your phone number</Text>
+        </View>
 
         {mounted ? (
           <PhoneInput
@@ -200,27 +191,29 @@ export default class Content extends React.PureComponent {
           this.renderVerificationInput()
         )}
 
-        <ButtonWrapper
-          disabled={disabled}
-          activeOpacity={0.8}
-          onPress={this.handleVerifyCode}>
+        <TouchableOpacity
+          style={styles.buttonWrapper}
+          disabled={disabled || loading}
+          activeOpacity={0.7}
+          onPress={this.onPress}>
           {loading ? (
             <ActivityIndicator size="small" color="black" />
           ) : (
-            <ButtonText>{buttonText}</ButtonText>
+            <Text style={[styles.text, {fontSize: 14}]}>{buttonText}</Text>
           )}
-        </ButtonWrapper>
+        </TouchableOpacity>
 
         {!mounted ? (
-          <DidNotReceiveCode
-            activeOpacity={0.5}
+          <TouchableOpacity
+            style={styles.didNotReceiveCode}
+            activeOpacity={0.7}
             onPress={() =>
               this.setState({mounted: true, confirm: null, code: ''})
             }>
-            <Text>Did not receiver a code?</Text>
-          </DidNotReceiveCode>
+            <Text style={styles.text}>Did not receiver a code?</Text>
+          </TouchableOpacity>
         ) : null}
-      </Wrapper>
+      </TouchableOpacity>
     );
   }
 }

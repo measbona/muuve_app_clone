@@ -1,51 +1,45 @@
 import React from 'react';
 import {connect} from 'react-redux';
-import {Keyboard} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Keyboard,
+  ActivityIndicator,
+  StyleSheet,
+} from 'react-native';
 import moment from 'moment';
-import styled from 'styled-components/native';
+import * as Navigator from '../../navigation/screen';
 import firebase from '@react-native-firebase/app';
-import {showModalNotice, popBack} from '../../navigation/screen';
 
 import utils from '../../utils';
 
+import NavBar from '../../lib/NavBar';
 import NameInput from './components/NameInput';
 import DateBirthInput from './components/BirthDate';
-import NavigationBack from '../../lib/NavigationBack';
 
 import ProfileActions from '../../redux/ProfileRedux';
 
-const Container = styled.View`
-  flex: 1;
-`;
-
-const HeadlineWrapper = styled.View`
-  margin-top: 25px;
-`;
-
-const ContentWrapper = styled.TouchableOpacity`
-  margin-horizontal: 20px;
-`;
-
-const Headline = styled.Text`
-  font-size: 17px;
-  font-weight: bold;
-  color: ${utils.colors.blue};
-`;
-
-const ButtonWrapper = styled.TouchableOpacity`
-  height: 40px;
-  margin-top: 15px;
-  align-items: center;
-  border-radius: 17px;
-  justify-content: center;
-  background-color: ${utils.colors.yellow};
-`;
-
-const ButtonText = styled.Text`
-  font-size: 12px;
-  font-weight: bold;
-  color: ${utils.colors.black};
-`;
+const styles = StyleSheet.create({
+  conatiner: {flex: 1},
+  headlineWrapper: {
+    marginVertical: 15,
+  },
+  contentWrapper: {
+    marginHorizontal: 16,
+  },
+  text: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: utils.colors.blue,
+  },
+  button: {
+    borderRadius: 15,
+    paddingVertical: 10,
+    alignItems: 'center',
+    backgroundColor: utils.colors.yellow,
+  },
+});
 
 class ViewAccount extends React.Component {
   constructor(props) {
@@ -63,6 +57,7 @@ class ViewAccount extends React.Component {
       month: month || '',
       firstName: profile.first_name || '',
       familyName: profile.family_name || '',
+      loading: false,
     };
   }
 
@@ -73,7 +68,7 @@ class ViewAccount extends React.Component {
       if (familyName.length === 0 || firstName.length === 0) {
         const isFamilyNameError = familyName.length === 0;
 
-        return showModalNotice({
+        return Navigator.showModalNotice({
           headline: 'Invalid Input',
           description: `${
             isFamilyNameError ? 'Family Name' : 'Frist Name'
@@ -101,6 +96,7 @@ class ViewAccount extends React.Component {
 
     try {
       await this.validationData();
+      this.setState({loading: true});
 
       const updates = {};
       const data = {
@@ -118,24 +114,35 @@ class ViewAccount extends React.Component {
 
       setProfile(data);
       await firebase.database().ref().update(updates);
+      this.setState({loading: false});
 
-      return popBack(componentId);
+      return Navigator.popBack(componentId);
     } catch (error) {
+      this.setState({loading: false});
       alert(`Error: ${error.message}`);
     }
   };
 
   render() {
-    const {day, year, month, firstName, familyName} = this.state;
+    const {day, year, month, firstName, familyName, loading} = this.state;
     const {componentId} = this.props;
 
     return (
-      <Container>
-        <NavigationBack title="Profile" navigate componentId={componentId} />
-        <ContentWrapper activeOpacity={1} onPress={() => Keyboard.dismiss()}>
-          <HeadlineWrapper>
-            <Headline>Edit your profile</Headline>
-          </HeadlineWrapper>
+      <View style={styles.conatiner}>
+        <NavBar
+          title="Profile"
+          componentId={componentId}
+          style={{backgroundColor: utils.colors.yellow}}
+        />
+
+        <TouchableOpacity
+          style={styles.contentWrapper}
+          activeOpacity={1}
+          onPress={() => Keyboard.dismiss()}>
+          <View style={styles.headlineWrapper}>
+            <Text style={styles.text}>Edit your profile</Text>
+          </View>
+
           <NameInput
             name="Family Name"
             placeholder="Enter Family Name"
@@ -154,14 +161,29 @@ class ViewAccount extends React.Component {
             month={month}
             year={year}
             onDayChange={(val) => this.setState({day: val})}
-            onMonthChange={(val) => this.setState({month: val})}
             onYearChange={(val) => this.setState({year: val})}
+            onMonthChange={(val) => this.setState({month: val})}
           />
-          <ButtonWrapper activeOpacity={0.7} onPress={this.onSavePress}>
-            <ButtonText>SAVE</ButtonText>
-          </ButtonWrapper>
-        </ContentWrapper>
-      </Container>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            disabled={loading}
+            style={styles.button}
+            onPress={this.onSavePress}>
+            {loading ? (
+              <ActivityIndicator size="small" color="black" />
+            ) : (
+              <Text
+                style={[
+                  styles.text,
+                  {fontSize: 14, color: utils.colors.black},
+                ]}>
+                SAVE
+              </Text>
+            )}
+          </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
     );
   }
 }

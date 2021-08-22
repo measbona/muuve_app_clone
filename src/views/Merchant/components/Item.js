@@ -27,7 +27,12 @@ const styles = StyleSheet.create({
     height: 70,
   },
   selectedBadge: {
+    top: -10,
+    padding: 5,
+    right: -10,
+    borderRadius: 5,
     position: 'absolute',
+    backgroundColor: utils.colors.blue,
   },
 });
 
@@ -55,11 +60,7 @@ export default (props) => {
         <Image style={styles.itemImage} source={itemImageSource} />
         {isSelectedItem ? (
           <View style={styles.selectedBadge}>
-            <MCIcon
-              name="checkbox-marked-circle"
-              size={20}
-              color={utils.colors.blue}
-            />
+            <MCIcon name="check" size={15} color={utils.colors.white} />
           </View>
         ) : null}
       </View>

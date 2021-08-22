@@ -7,13 +7,13 @@ import utils from '../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingVertical: 20,
+    paddingVertical: 15,
     flexDirection: 'row',
     borderBottomLeftRadius: 17,
     borderBottomRightRadius: 17,
   },
   title: {
-    fontSize: 18,
+    fontSize: 17,
     marginLeft: 10,
     fontWeight: 'bold',
   },
@@ -21,14 +21,20 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {style, title, componentId} = props;
+  const {
+    shadow = true,
+    navigateColor = utils.colors.black,
+    style,
+    title,
+    componentId,
+  } = props;
 
   return (
-    <View style={[styles.wrapper, style]}>
+    <View style={[styles.wrapper, style, shadow && utils.shadows.lightShadow]}>
       <MTIcon
         name="arrow-back"
         size={25}
-        color={utils.colors.white}
+        color={navigateColor}
         onPress={() => Navigator.popBack(componentId)}
         style={styles.icon}
       />

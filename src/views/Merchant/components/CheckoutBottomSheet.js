@@ -1,6 +1,7 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
-import {size, forEach} from 'lodash';
+import {size} from 'lodash';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 import utils from '../../../utils';
@@ -44,22 +45,14 @@ const styles = StyleSheet.create({
   },
 });
 
-const sumCartTotal = (cart) => {
-  let total = 0;
-
-  forEach(cart, (item) => (total += item.price));
-
-  return total;
-};
-
 export default (props) => {
   const {cart, onPress} = props;
   const itemCount = size(cart);
 
   return (
     <TouchableOpacity
-      style={[styles.wrapper, utils.shadows.lightShadow]}
-      activeOpacity={0.5}
+      style={[styles.wrapper, utils.shadows.bottomBar]}
+      activeOpacity={0.7}
       onPress={onPress}>
       <View style={styles.itemCountWrapper}>
         <View style={styles.priceWrapper}>
@@ -68,7 +61,9 @@ export default (props) => {
           </Text>
           <Text style={styles.text}>Total Price</Text>
         </View>
-        <Text style={styles.price}>{`$ ${sumCartTotal(cart)}`}</Text>
+        <Text style={styles.price}>{`$${utils.helpers.sumCartTotal(
+          cart,
+        )}`}</Text>
       </View>
       <View style={styles.checkoutWrapper}>
         <Text style={[styles.checkout, {fontSize: 17}]}>Checkout</Text>

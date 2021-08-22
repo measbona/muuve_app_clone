@@ -1,131 +1,127 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import styled from 'styled-components/native';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import * as Animatable from 'react-native-animatable';
-
 import {dismissOverLay} from '../../navigation/screen';
 
-import Colors from '../../utils/colors';
-import Device from '../../utils/device';
+import utils from '../../utils';
 
-const Container = styled.View`
-  flex: 1;
-  align-items: center;
-  justify-content: center;
-  background-color: rgba(0, 0, 0, 0.2);
-`;
-
-const AnimateContainer = Animatable.createAnimatableComponent(Container);
-
-const Modal = styled.View`
-  align-items: center;
-  border-radius: 15px;
-  padding-vertical: 15px;
-  background-color: white;
-  width: ${Device.screenWidth - 32}px;
-`;
-
-const Headline = styled.View`
-  padding-bottom: 15px;
-  align-items: center;
-`;
-
-const HeadlineText = styled.Text`
-  font-weight: bold;
-  font-size: 15px;
-  color: ${Colors.yellow};
-`;
-
-const Border = styled.View`
-  border-width: 1px;
-  border-color: ${Colors.grey};
-  width: ${Device.screenWidth - 64}px;
-`;
-
-const Content = styled.View`
-  padding-top: 10px;
-  align-items: center;
-  padding-bottom: 25px;
-  margin-horizontal: 20px;
-`;
-
-const ContentText = styled.Text`
-  font-size: 12px;
-  font-weight: bold;
-  text-align: center;
-`;
-
-const Action = styled.View`
-  flex-direction: row;
-  margin-horizontal: 15px;
-  justify-content: space-between;
-`;
-
-const Button = styled.TouchableOpacity`
-  align-items: center;
-  border-radius: 15px;
-  padding-vertical: 10px;
-  ${(props) =>
-    props.primary
-      ? `flex: 1.5; margin-left: 10px; background-color: ${Colors.yellow};`
-      : `flex: 1; background-color: ${Colors.blue};`}
-`;
-
-const ButtonText = styled.Text`
-  font-size: 13px;
-  font-weight: bold;
-  color: ${(props) => (props.primary ? Colors.black : Colors.white)};
-`;
+const styles = StyleSheet.create({
+  conatiner: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.2)',
+  },
+  modal: {
+    borderRadius: 17,
+    paddingVertical: 15,
+    backgroundColor: utils.colors.white,
+    width: utils.device.screenWidth - 32,
+  },
+  headline: {alignItems: 'center'},
+  text: {
+    fontSize: 17,
+    fontWeight: 'bold',
+  },
+  border: {
+    borderWidth: 1,
+    marginVertical: 10,
+    alignSelf: 'center',
+    borderColor: utils.colors.grey,
+    width: utils.device.screenWidth - 64,
+  },
+  content: {
+    alignItems: 'center',
+    paddingBottom: 25,
+    marginHorizontal: 20,
+  },
+  buttonWrapper: {
+    flexDirection: 'row',
+    marginHorizontal: 15,
+    justifyContent: 'space-between',
+  },
+  button: {
+    flex: 1,
+    alignItems: 'center',
+    borderRadius: 15,
+    paddingVertical: 10,
+    backgroundColor: utils.colors.yellow,
+  },
+});
 
 export default class ModalChoice extends React.PureComponent {
   containerRef = React.createRef();
 
   onCancelButton = async () => {
-    try {
-      await this.containerRef.fadeOut(300);
-      await dismissOverLay();
-    } catch (err) {
-      //
-    }
+    await this.containerRef.fadeOut(300);
+    await dismissOverLay();
   };
 
   onConfirm = async () => {
     const {onPress} = this.props;
 
-    try {
-      await this.containerRef.fadeOut(300);
-      await dismissOverLay();
-      onPress();
-    } catch (err) {
-      //
-    }
+    await this.containerRef.fadeOut(300);
+    await dismissOverLay();
+
+    onPress();
   };
 
   render() {
     const {headline, description, no, yes} = this.props;
 
     return (
-      <AnimateContainer
+      <Animatable.View
+        style={styles.conatiner}
         ref={(ref) => (this.containerRef = ref)}
         animation="fadeIn"
         duration={300}>
-        <Modal>
-          <Headline>
-            <HeadlineText>{headline}</HeadlineText>
-          </Headline>
-          <Border />
-          <Content>
-            <ContentText>{description}</ContentText>
-          </Content>
-          <Action>
-            <Button activeOpacity={0.5} onPress={this.onCancelButton}>
-              <ButtonText>{no}</ButtonText>
-            </Button>
-            <Button primary activeOpacity={0.5} onPress={this.onConfirm}>
-              <ButtonText primary>{yes}</ButtonText>
-            </Button>
-          </Action>
-        </Modal>
-      </AnimateContainer>
+        <View style={styles.modal}>
+          <View style={styles.headline}>
+            <Text style={[styles.text, {color: utils.colors.yellow}]}>
+              {headline}
+            </Text>
+          </View>
+
+          <View style={styles.border} />
+
+          <View style={styles.content}>
+            <Text style={[styles.text, {fontSize: 14, textAlign: 'center'}]}>
+              {description}
+            </Text>
+          </View>
+
+          <View style={styles.buttonWrapper}>
+            <TouchableOpacity
+              style={[
+                styles.button,
+                {backgroundColor: utils.colors.blue, marginRight: 10},
+              ]}
+              activeOpacity={0.5}
+              onPress={this.onCancelButton}>
+              <Text
+                style={[
+                  styles.text,
+                  {fontSize: 14, color: utils.colors.white},
+                ]}>
+                {no}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.button, {flex: 2}]}
+              activeOpacity={0.5}
+              onPress={this.onConfirm}>
+              <Text
+                style={[
+                  styles.text,
+                  {fontSize: 14, color: utils.colors.black},
+                ]}>
+                {yes}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Animatable.View>
     );
   }
 }

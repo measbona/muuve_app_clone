@@ -45,7 +45,7 @@ const styles = StyleSheet.create({
   space: {marginHorizontal: 4},
 });
 
-export default class Card extends React.PureComponent {
+export default class Restaurant extends React.PureComponent {
   render() {
     const {onPress, restaurant} = this.props;
 
@@ -67,7 +67,7 @@ export default class Card extends React.PureComponent {
           <View style={styles.row}>
             <View>
               <Text style={[styles.text, {fontSize: 14}]}>
-                {restaurant.name.replace(/^ /g, '')}
+                {utils.helpers.removeWhiteSpace(restaurant.name)}
               </Text>
               <Text style={[styles.text, {color: utils.colors.border}]}>
                 Snack, Juice, Noodle, Tea
