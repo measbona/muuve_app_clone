@@ -27,17 +27,20 @@ export default (props) => {
     style,
     title,
     componentId,
+    noneNavigate = false,
   } = props;
 
   return (
     <View style={[styles.wrapper, style, shadow && utils.shadows.lightShadow]}>
-      <MTIcon
-        name="arrow-back"
-        size={25}
-        color={navigateColor}
-        onPress={() => Navigator.popBack(componentId)}
-        style={styles.icon}
-      />
+      {!noneNavigate ? (
+        <MTIcon
+          name="arrow-back"
+          size={25}
+          color={navigateColor}
+          onPress={() => Navigator.popBack(componentId)}
+          style={styles.icon}
+        />
+      ) : null}
       {title ? <Text style={styles.title}>{title}</Text> : null}
     </View>
   );

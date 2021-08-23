@@ -8,6 +8,9 @@ target 'muuve_app_clone' do
 
   use_react_native!(:path => config["reactNativePath"])
 
+  rn_maps_path = '../node_modules/react-native-maps'
+  pod 'react-native-google-maps', :path => rn_maps_path
+
   pod 'Firebase/Auth'
   pod 'Firebase/Analytics'
 

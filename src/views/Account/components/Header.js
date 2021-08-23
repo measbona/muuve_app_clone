@@ -8,7 +8,7 @@ import utils from '../../../utils';
 const styles = StyleSheet.create({
   wrapper: {
     flexDirection: 'row',
-    paddingVertical: 7,
+    paddingVertical: 5.5,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 17,
     borderBottomRightRadius: 17,

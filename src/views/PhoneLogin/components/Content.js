@@ -112,9 +112,11 @@ export default class Content extends React.PureComponent {
     Keyboard.dismiss();
 
     if (mounted) {
+      const number = utils.helpers.removeLeadZeroNumber(phoneNumber);
+
       return Navigator.showModalChoice({
         headline: 'Confirmation',
-        description: `A confirmation code will send to your via SMS or Notification. Please check your number is correct.\n\n+855${phoneNumber}`,
+        description: `A confirmation code will send to your via SMS or Notification. Please check your number is correct.\n\n+855${number}`,
         no: 'NO',
         yes: 'YES',
         onPress: () => {
@@ -132,9 +134,8 @@ export default class Content extends React.PureComponent {
     const {phoneNumber} = this.state;
 
     try {
-      const confirmation = await Modules.Profile.phoneAuth(
-        `+855${phoneNumber}`,
-      );
+      const number = utils.helpers.removeLeadZeroNumber(phoneNumber);
+      const confirmation = await Modules.Profile.phoneAuth(`+855${number}`);
 
       if (confirmation) {
         this.setState({confirm: confirmation, loading: false, mounted: false});

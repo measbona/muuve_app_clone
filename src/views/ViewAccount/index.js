@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
 import {
@@ -23,6 +24,7 @@ import ProfileActions from '../../redux/ProfileRedux';
 const styles = StyleSheet.create({
   conatiner: {flex: 1},
   headlineWrapper: {
+    marginBottom: 25,
     marginVertical: 15,
   },
   contentWrapper: {

@@ -1,45 +1,65 @@
 import React from 'react';
-import styled from 'styled-components/native';
-import NavigationBack from '../../lib/NavigationBack';
+import {connect} from 'react-redux';
+import {View, ScrollView, StyleSheet} from 'react-native';
+import * as Navigator from '../../navigation/screen';
+import * as Animatable from 'react-native-animatable';
 
-import Colors from '../../utils/colors';
+import utils from '../../utils';
 
-import MerchantInfo from './components/MerchantInfo';
-import OrderInfo from './components/OrderInfo';
-import Payment from './components/Payment';
+import NavBar from '../../lib/NavBar';
+import ItemSection from '../Checkout/components/ItemSection';
+import PaymentSection from '../Checkout/components/PaymentSection';
+import MerchantSection from '../Checkout/components/MerchantSection';
+import DeliveryLocationSection from '../Checkout/components/DeliveryLocationSection';
 
-const Container = styled.View`
-  flex: 1;
-`;
+const styles = StyleSheet.create({
+  conatiner: {
+    flex: 1,
+    backgroundColor: utils.colors.lightGrey,
+  },
+  content: {flex: 1},
+});
 
-const ScrollView = styled.ScrollView`
-  flex: 1;
-`;
+class OrderDetails extends React.PureComponent {
+  state = {
+    mounted: false,
+  };
 
-const Divider = styled.View`
-  border-width: 3px;
-  border-color: ${Colors.lightGrey};
-`;
+  componentDidMount() {
+    Navigator.bindComponent(this);
+  }
 
-export default class OrderDetails extends React.PureComponent {
+  componentDidAppear() {
+    this.setState({mounted: true});
+  }
+
   render() {
     const {componentId} = this.props;
 
     return (
-      <Container>
-        <NavigationBack
+      <View style={styles.conatiner}>
+        <NavBar
           title="Order Details"
-          navigate
           componentId={componentId}
+          style={{backgroundColor: utils.colors.yellow}}
         />
-        <ScrollView showVerticalScrollIndicator={false}>
-          <MerchantInfo />
-          <Divider />
-          <OrderInfo />
-          <Divider />
-          <Payment />
-        </ScrollView>
-      </Container>
+
+        <Animatable.View
+          style={styles.content}
+          animation="fadeIn"
+          duration={300}>
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <MerchantSection orderType="order-details" />
+            <DeliveryLocationSection orderType="order-details" />
+            <ItemSection orderType="order-details" />
+            <PaymentSection />
+          </ScrollView>
+        </Animatable.View>
+      </View>
     );
   }
 }
+
+const mapState = ({}) => ({});
+
+export default connect(mapState)(OrderDetails);

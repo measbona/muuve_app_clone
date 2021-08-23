@@ -18,6 +18,7 @@ import GroupOrderCart from '../views/GroupOrderCart';
 import Toast from '../lib/Toast';
 import ModalChoice from '../views/Modal/ModalChoice';
 import ModalNotice from '../views/Modal/ModalNotice';
+import ModalSuccess from '../views/Modal/ModalSuccess';
 
 export const HOME = 'MuuveAppClone.Home';
 export const ORDER = 'MuuveAppClone.Order';
@@ -34,6 +35,7 @@ export const GROUP_ORDER_CART = 'MuuveAppClone.GroupOrderCart';
 export const TOAST = 'MuuveAppClone.Toast';
 export const MODAL_CHOICE = 'MuuveAppClone.ModalChoice';
 export const MODAL_NOTICE = 'MuuveAppClone.ModalNotice';
+export const MODAL_SUCCESS = 'MuuveAppClone.ModalSuccess';
 
 export const Screens = new Map();
 
@@ -52,6 +54,7 @@ Screens.set(GROUP_ORDER_CART, GroupOrderCart);
 Screens.set(TOAST, Toast);
 Screens.set(MODAL_CHOICE, ModalChoice);
 Screens.set(MODAL_NOTICE, ModalNotice);
+Screens.set(MODAL_SUCCESS, ModalSuccess);
 
 const hideBottomTabs = {
   bottomTabs: {
@@ -268,5 +271,23 @@ export const goToGroupOrderCart = (componentId, passProps) => {
         ...hideBottomTabs,
       },
     },
+  });
+};
+
+export const showModalSuccess = (passProps) => {
+  return new Promise((resolve) => {
+    Navigation.showOverlay({
+      component: {
+        name: MODAL_SUCCESS,
+        passProps: {...passProps, resolve},
+        options: {
+          layout: {
+            backgroundColor: utils.colors.dimmer,
+            componentBackgroundColor: utils.colors.dimmer,
+          },
+          modalPresentationStyle: 'overCurrentContext',
+        },
+      },
+    });
   });
 };

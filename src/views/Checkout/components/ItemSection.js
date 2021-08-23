@@ -42,25 +42,40 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {onPress, cart, isStartGroupOrder} = props;
+  const {onPress, cart, isStartGroupOrder, orderType} = props;
 
+  const isOrderDetails = orderType === 'order-details';
   const headline = isStartGroupOrder ? 'Group Order' : 'Your Order';
 
   const Item = () => {
+    let index = 0;
+
     return map(cart, (item, key) => {
+      index += 1;
       return (
         <TouchableOpacity
           key={key}
           style={styles.groupInfo}
-          activeOpacity={0.7}>
+          activeOpacity={0.7}
+          disabled>
           <View style={styles.row}>
             <View style={styles.icon}>
-              <MCIcon
-                name="playlist-edit"
-                size={20}
-                color={utils.colors.blue}
-                style={{marginLeft: 5}}
-              />
+              {isOrderDetails ? (
+                <Text
+                  style={[
+                    styles.text,
+                    {color: utils.colors.black, paddingHorizontal: 5},
+                  ]}>
+                  {index}
+                </Text>
+              ) : (
+                <MCIcon
+                  name="playlist-edit"
+                  size={20}
+                  color={utils.colors.blue}
+                  style={{marginLeft: 5}}
+                />
+              )}
             </View>
 
             <View style={styles.column}>
@@ -140,19 +155,22 @@ export default (props) => {
       </Text>
 
       {isStartGroupOrder ? GroupOrder() : Item()}
-
-      <Text
-        style={[
-          styles.text,
-          {fontSize: 14, color: utils.colors.black, marginBottom: 10},
-        ]}>
-        What if any items of your order are unavailable?
-      </Text>
-      <TouchableOpacity style={styles.button} activeOpacity={0.7}>
-        <Text style={[styles.text, {fontSize: 12}]}>
-          Replace with similiar item
-        </Text>
-      </TouchableOpacity>
+      {!isOrderDetails ? (
+        <React.Fragment>
+          <Text
+            style={[
+              styles.text,
+              {fontSize: 14, color: utils.colors.black, marginBottom: 10},
+            ]}>
+            What if any items of your order are unavailable?
+          </Text>
+          <TouchableOpacity style={styles.button} activeOpacity={0.7}>
+            <Text style={[styles.text, {fontSize: 12}]}>
+              Replace with similiar item
+            </Text>
+          </TouchableOpacity>
+        </React.Fragment>
+      ) : null}
     </View>
   );
 };

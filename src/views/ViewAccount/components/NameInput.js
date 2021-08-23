@@ -6,7 +6,7 @@ import utils from '../../../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 10,
+    marginBottom: 5,
   },
   titleWrapper: {
     flexDirection: 'row',

@@ -81,6 +81,7 @@ class GroupOrder extends React.PureComponent {
       const result = await Share.share({
         url,
       });
+
       if (result.action === Share.sharedAction) {
         if (result.activityType) {
           // shared with activity type of result.activityType

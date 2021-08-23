@@ -2,6 +2,8 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
+import MapView, {Marker} from 'react-native-maps';
+import * as Animatable from 'react-native-animatable';
 
 import utils from '../../../utils';
 
@@ -30,17 +32,33 @@ const styles = StyleSheet.create({
     color: utils.colors.blue,
   },
   location: {flexDirection: 'row'},
+  mapWrapper: {
+    marginTop: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  map: {
+    height: 100,
+    alignSelf: 'center',
+    width: utils.device.screenWidth - 32,
+  },
 });
 
-export default ({}) => {
+export default ({orderType}) => {
+  const ASPECT_RATIO = utils.device.screenWidth / 100;
+  const isOrderDetails = orderType === 'order-details';
+
   return (
     <View style={styles.wrapper}>
       <View style={styles.headlineWrapper}>
         <Text style={[styles.text, {fontSize: 17}]}>Delivery Location</Text>
-        <TouchableOpacity style={styles.button} activeOpacity={0.7}>
-          <Text style={[styles.text, {fontSize: 12}]}>Change</Text>
-        </TouchableOpacity>
+        {!isOrderDetails ? (
+          <TouchableOpacity style={styles.button} activeOpacity={0.7}>
+            <Text style={[styles.text, {fontSize: 12}]}>Change</Text>
+          </TouchableOpacity>
+        ) : null}
       </View>
+
       <View style={styles.location}>
         <MIcon
           name="my-location"
@@ -58,6 +76,38 @@ export default ({}) => {
           </Text>
         </View>
       </View>
+
+      {isOrderDetails ? (
+        <Animatable.View
+          style={styles.mapWrapper}
+          animation="fadeIn"
+          delay={500}
+          duration={300}>
+          <MapView
+            provider="google"
+            initialRegion={{
+              latitude: 11.543443,
+              longitude: 104.893875,
+              latitudeDelta: 0.00015 * ASPECT_RATIO,
+              longitudeDelta: 0.0021 * ASPECT_RATIO,
+            }}
+            style={styles.map}
+            zoomEnabled={false}
+            pitchEnabled={false}
+            showsCompass={false}
+            showsTraffic={false}
+            showsIndoors={false}
+            scrollEnabled={false}
+            showsBuildings={false}
+            showsMyLocationButton={false}
+            showsIndoorLevelPicker={false}>
+            <Marker
+              coordinate={{latitude: 11.543443, longitude: 104.893875}}
+              image={require('../../../assets/images/delivery-pin.png')}
+            />
+          </MapView>
+        </Animatable.View>
+      ) : null}
     </View>
   );
 };

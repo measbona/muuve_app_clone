@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     backgroundColor: utils.colors.yellow,
   },
   text: {
+    fontSize: 14,
     fontWeight: 'bold',
   },
 });

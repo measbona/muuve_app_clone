@@ -43,8 +43,19 @@ class Checkout extends React.PureComponent {
         'We notice that some participants not yet ready to order.Do you want to continue?',
       no: 'CANCEL',
       yes: 'CONTINUE',
-      onPress: () => {},
+      onPress: this.onPlaceOrder,
     });
+  };
+
+  onPlaceOrder = async () => {
+    const {componentId} = this.props;
+
+    try {
+      await Navigator.showModalSuccess();
+      // await Navigator.popBack(componentId);
+    } catch (error) {
+      //
+    }
   };
 
   onGroupOrderPress = () => {
@@ -82,7 +93,7 @@ class Checkout extends React.PureComponent {
               <PromocodeSection />
               <PaymentSection cart={cart} />
             </ScrollView>
-            <PlaceOrder onPress={this.onPlaceOrderPress} />
+            <PlaceOrder onPress={this.onPlaceOrder} />
           </Animatable.View>
         ) : null}
       </View>

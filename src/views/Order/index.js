@@ -1,56 +1,48 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import styled from 'styled-components/native';
-import NavigationBack from '../../lib/NavigationBack';
-import {goToOrderDetails} from '../../navigation/screen';
+import {View, ScrollView, StyleSheet} from 'react-native';
+import * as Navigator from '../../navigation/screen';
 
 import utils from '../../utils';
 
 import NavBar from '../../lib/NavBar';
-import OrderRow from './components/Order';
+import OrderListItem from './components/OrderListItem';
 
-const Container = styled.View`
-  flex: 1;
-`;
-
-const HeadlineWrapper = styled.View`
-  margin-left: 20px;
-  margin-vertical: 15px;
-`;
-
-const Headline = styled.Text`
-  font-size: 16px;
-  font-weight: 500;
-`;
-
-const ScrollView = styled.ScrollView`
-  flex: 1;
-`;
+const styles = StyleSheet.create({
+  conatiner: {
+    flex: 1,
+    backgroundColor: utils.colors.lightGrey,
+  },
+  scrollView: {
+    flex: 1,
+  },
+});
 
 export default class Order extends React.Component {
   onOrderPress = () => {
     const {componentId} = this.props;
 
-    goToOrderDetails(componentId);
+    Navigator.goToOrderDetails(componentId);
   };
 
   render() {
     const {componentId} = this.props;
+
     return (
-      <Container>
+      <View style={styles.conatiner}>
         <NavBar
+          noneNavigate
           title="Order"
           componentId={componentId}
-          style={{backgroundColor: utils.colors.yellow}}
+          style={{backgroundColor: utils.colors.yellow, paddingLeft: 10}}
         />
 
-        <HeadlineWrapper>
-          <Headline>Pending Orders</Headline>
-        </HeadlineWrapper>
-
-        <ScrollView showVerticalScrollIndicator={false}>
-          <OrderRow onPress={this.onOrderPress} />
+        <ScrollView
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}>
+          <OrderListItem onPress={this.onOrderPress} />
         </ScrollView>
-      </Container>
+      </View>
     );
   }
 }

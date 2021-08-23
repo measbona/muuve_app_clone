@@ -49,6 +49,7 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Muuve App Clone will use your location information to help connect between customers, drivers, and restaurants.</string>
 	<string></string>
 	<key>UIAppFonts</key>
 	<array>

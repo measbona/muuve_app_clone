@@ -5,7 +5,7 @@ import utils from '../../../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginBottom: 20,
+    marginBottom: 10,
   },
   text: {
     fontSize: 14,
