@@ -110,7 +110,7 @@ class AccountForm extends React.Component {
         family_name: familyName,
         first_name: firstName,
         dob,
-        UUID: uid,
+        uid,
         region: 'pnh',
         language: 'kh',
         phone_number: phoneNumber,

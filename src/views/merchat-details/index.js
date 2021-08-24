@@ -2,8 +2,10 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, FlatList, Animated, StyleSheet} from 'react-native';
+import moment from 'moment';
 import {get, filter, reduce, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
+import * as Animatable from 'react-native-animatable';
 
 import utils from '../../utils';
 
@@ -44,10 +46,22 @@ class MerchantDetails extends React.PureComponent {
     const {cart} = props;
 
     this.state = {
+      mounted: false,
       selectedItems: cart || {},
     };
 
     this.scrollY = new Animated.Value(0);
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    const {selectedItems} = state;
+    const {cart} = props;
+
+    if (selectedItems !== cart) {
+      return {selectedItems: cart};
+    }
+
+    return null;
   }
 
   componentDidMount() {
@@ -57,6 +71,12 @@ class MerchantDetails extends React.PureComponent {
     if (!items[merchantKey]) {
       getItem(merchantKey);
     }
+
+    Navigator.bindComponent(this);
+  }
+
+  componentDidAppear() {
+    this.setState({mounted: true});
   }
 
   onCheckoutPress = () => {
@@ -121,6 +141,8 @@ class MerchantDetails extends React.PureComponent {
             key: remainItem.key,
             name: remainItem.name,
             price: remainItem.price,
+            quantity: remainItem.quantity,
+            added_at: remainItem.added_at,
           };
 
           return result;
@@ -137,7 +159,13 @@ class MerchantDetails extends React.PureComponent {
     } else {
       const newSelectedItems = {
         ...selectedItems,
-        [itemKey]: {key: itemKey, name: item.name, price: item.current_price},
+        [itemKey]: {
+          quantity: 1,
+          key: itemKey,
+          name: item.name,
+          price: item.current_price,
+          added_at: Number(moment().format('x')),
+        },
       };
 
       this.setState({selectedItems: newSelectedItems});
@@ -152,7 +180,7 @@ class MerchantDetails extends React.PureComponent {
     const merchantName = get(restaurant, 'name', 'N/A');
 
     return (
-      <React.Fragment>
+      <Animatable.View animation="fadeIn" duration={300}>
         <MerchantInfoSection merchantName={merchantName} />
         <GroupOrder
           onEndSession={this.onEndSession}
@@ -161,7 +189,7 @@ class MerchantDetails extends React.PureComponent {
         />
         <ListCategories />
         <SearchBar placeholder="Search" style={{marginVertical: 15}} />
-      </React.Fragment>
+      </Animatable.View>
     );
   };
 
@@ -196,6 +224,7 @@ class MerchantDetails extends React.PureComponent {
   };
 
   render() {
+    const {mounted} = this.state;
     const {componentId, restaurant, items, cart, loaded} = this.props;
 
     const itemsData = utils.helpers.convertObjectToArray(items[restaurant.key]);
@@ -231,7 +260,7 @@ class MerchantDetails extends React.PureComponent {
           reverseOpacity={reverseOpacity}
         />
 
-        {!loaded ? (
+        {!loaded && mounted ? (
           <FlatList
             data={itemsData}
             contentContainerStyle={styles.flatList}
@@ -251,7 +280,7 @@ class MerchantDetails extends React.PureComponent {
           </View>
         )}
 
-        {size(cart) > 0 ? (
+        {mounted && size(cart) > 0 ? (
           <CheckoutBottomSheet cart={cart} onPress={this.onCheckoutPress} />
         ) : null}
       </View>

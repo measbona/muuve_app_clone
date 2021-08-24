@@ -7,10 +7,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 if (__DEV__) {
   Reactotron.configure({
     name: 'Muuve',
+    // host: '192.168.1.131',
     host: '192.168.1.9',
-    // host: '0.0.0.0',
-    // host: '192.168.1.244',
-    // host: '172.20.10.9',
   })
     .setAsyncStorageHandler(AsyncStorage)
     .useReactNative()

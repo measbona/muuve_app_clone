@@ -17,7 +17,8 @@ export function* appInitial() {
 
 export function* handleDynamicLink() {
   try {
-    const hasDynamicLink = yield call(Modules.DynamicLinks.getInitialLink);
+    const dynamicLink = yield call(Modules.DynamicLinks.getInitialLink);
+    const hasDynamicLink = dynamicLink;
 
     if (hasDynamicLink) {
       //get group order key and join user to that collection

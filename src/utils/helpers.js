@@ -18,9 +18,9 @@ const removeLeadZeroNumber = (number) => number.replace(/^0(?:0:0?)?/, '');
 const sumCartTotal = (cart) => {
   let total = 0;
 
-  forEach(cart, (item) => (total += item.price));
+  forEach(cart, (item) => (total += Number(item.price)));
 
-  return total;
+  return total.toFixed(2);
 };
 
 export default {

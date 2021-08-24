@@ -51,7 +51,7 @@ export default class Header extends React.PureComponent {
             <Text style={styles.text}>{userName}</Text>
             <TouchableOpacity
               activeOpacity={0.7}
-              onPress={() => Navigator.goToViewAccount(componentId)}>
+              onPress={() => Navigator.goToAccountForm(componentId)}>
               <Text
                 style={[styles.text, {fontSize: 14, color: utils.colors.blue}]}>
                 View Account

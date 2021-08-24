@@ -10,8 +10,8 @@ import utils from '../../../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
+    paddingTop: 15,
     marginBottom: 7,
-    paddingVertical: 15,
     paddingHorizontal: 16,
     backgroundColor: utils.colors.white,
   },
@@ -77,13 +77,24 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ({restaurant, orderType}) => {
+export default ({restaurant, orderType, order}) => {
   const isOrderDetails = orderType === 'order-details';
-  // const merchantName = utils.helpers.removeWhiteSpace(restaurant.name);
-  // const branchName = Object.values(restaurant.branches)[0].name;
 
-  const etaTime = moment().add(25, 'minutes').format('hh:mm');
-  const timePeriod = moment().add(25, 'minutes').format('A');
+  const merchant = isOrderDetails ? order.restaurant : restaurant;
+  const merchantName = utils.helpers.removeWhiteSpace(merchant.name);
+
+  const branchName = isOrderDetails
+    ? order.restaurant.branch.name
+    : Object.values(restaurant.branches)[0].name;
+
+  const time = isOrderDetails ? order.created_at : Number(moment().format('x'));
+
+  const deliveryTime = isOrderDetails
+    ? order.cooking_duration + 15
+    : restaurant.cooking_duration;
+
+  const etaTime = moment(time).add(deliveryTime, 'minutes').format('hh:mm');
+  const timePeriod = moment(time).add(deliveryTime, 'minutes').format('A');
 
   const renderRightSide = () => {
     if (isOrderDetails) {
@@ -121,21 +132,17 @@ export default ({restaurant, orderType}) => {
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, isOrderDetails && {paddingBottom: 15}]}>
       <View style={styles.sectionWrapper}>
         <View>
           <View style={styles.headlineWrapper}>
-            {/* <Text style={[styles.text]}>{merchantName}</Text> */}
-            <Text style={[styles.text]}>Fire Tiger</Text>
-            {/* <Text
-              style={[styles.text, {fontSize: 14, color: utils.colors.black}]}>
-              {branchName}
-            </Text> */}
+            <Text style={[styles.text]}>{merchantName}</Text>
             <Text
               style={[styles.text, {fontSize: 14, color: utils.colors.black}]}>
-              Toul Tom Poung
+              {branchName}
             </Text>
           </View>
+
           <View>
             <View style={styles.row}>
               <Text
@@ -147,9 +154,9 @@ export default ({restaurant, orderType}) => {
                   styles.text,
                   {
                     fontSize: 17,
-                    alignSelf: 'flex-end',
-                    marginBottom: 2,
                     marginLeft: 4,
+                    marginBottom: 2,
+                    alignSelf: 'flex-end',
                   },
                 ]}>
                 {timePeriod}
@@ -161,6 +168,7 @@ export default ({restaurant, orderType}) => {
             </Text>
           </View>
         </View>
+
         {renderRightSide()}
       </View>
 

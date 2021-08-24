@@ -42,16 +42,19 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {onPress, cart, isStartGroupOrder, orderType} = props;
+  const {onPress, cart, isStartGroupOrder, orderType, order} = props;
 
   const isOrderDetails = orderType === 'order-details';
   const headline = isStartGroupOrder ? 'Group Order' : 'Your Order';
 
+  const items = isOrderDetails ? order.items : cart;
+
   const Item = () => {
     let index = 0;
 
-    return map(cart, (item, key) => {
+    return map(items, (item, key) => {
       index += 1;
+
       return (
         <TouchableOpacity
           key={key}
@@ -99,7 +102,7 @@ export default (props) => {
           <View style={[styles.row, {alignSelf: 'center'}]}>
             <Text
               style={[styles.text, {fontSize: 15, color: utils.colors.black}]}>
-              1 x{' '}
+              {`${item.quantity} x `}
             </Text>
             <Text
               style={[styles.text, {fontSize: 15}]}>{`$${item.price}`}</Text>
@@ -155,6 +158,7 @@ export default (props) => {
       </Text>
 
       {isStartGroupOrder ? GroupOrder() : Item()}
+
       {!isOrderDetails ? (
         <React.Fragment>
           <Text

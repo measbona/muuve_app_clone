@@ -22,12 +22,13 @@ const styles = StyleSheet.create({
 
 export default (props) => {
   const {
-    shadow = true,
-    navigateColor = utils.colors.black,
     style,
     title,
     componentId,
+    shadow = true,
+    popToRoot = false,
     noneNavigate = false,
+    navigateColor = utils.colors.black,
   } = props;
 
   return (
@@ -37,7 +38,11 @@ export default (props) => {
           name="arrow-back"
           size={25}
           color={navigateColor}
-          onPress={() => Navigator.popBack(componentId)}
+          onPress={() =>
+            popToRoot
+              ? Navigator.popToRoot(componentId)
+              : Navigator.popBack(componentId)
+          }
           style={styles.icon}
         />
       ) : null}

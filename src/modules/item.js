@@ -1,3 +1,4 @@
+import {reduce} from 'lodash';
 import firebase from '@react-native-firebase/app';
 
 export default class Item {
@@ -17,5 +18,22 @@ export default class Item {
     newItems[merchantKey] = merchantItem;
 
     return newItems;
+  };
+
+  static serializeItems = (items) => {
+    return reduce(
+      items,
+      (result, item, key) => {
+      result[item.added_at] = {
+          item_key: key,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+        };
+
+        return result;
+      },
+      {},
+    );
   };
 }

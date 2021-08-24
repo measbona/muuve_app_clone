@@ -1,6 +1,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import {startCase} from 'lodash';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import MapView, {Marker} from 'react-native-maps';
 import * as Animatable from 'react-native-animatable';
@@ -44,9 +45,24 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ({orderType}) => {
+export default ({orderType, order}) => {
   const ASPECT_RATIO = utils.device.screenWidth / 100;
   const isOrderDetails = orderType === 'order-details';
+
+  const deliveryAddress = isOrderDetails
+    ? order.delivery_address
+    : 'Current Address';
+
+  const deliveryPlaceName = isOrderDetails
+    ? order.delivery_place_name
+    : 'Street 67 5A, 120020 Doun Penh, Cambodia';
+
+  const {latitude, longitude} = isOrderDetails
+    ? order.requestCoords
+    : {
+        latitude: 11.543443,
+        longitude: 104.893875,
+      };
 
   return (
     <View style={styles.wrapper}>
@@ -68,11 +84,11 @@ export default ({orderType}) => {
         <View>
           <Text
             style={[styles.text, {fontSize: 15, color: utils.colors.black}]}>
-            Current Location
+            {startCase(deliveryAddress)}
           </Text>
           <Text
             style={[styles.text, {fontSize: 12, color: utils.colors.border}]}>
-            Street 67 5A, 120020 Doun Penh, Cambodia
+            {deliveryPlaceName}
           </Text>
         </View>
       </View>
@@ -86,8 +102,8 @@ export default ({orderType}) => {
           <MapView
             provider="google"
             initialRegion={{
-              latitude: 11.543443,
-              longitude: 104.893875,
+              latitude,
+              longitude,
               latitudeDelta: 0.00015 * ASPECT_RATIO,
               longitudeDelta: 0.0021 * ASPECT_RATIO,
             }}
@@ -102,7 +118,7 @@ export default ({orderType}) => {
             showsMyLocationButton={false}
             showsIndoorLevelPicker={false}>
             <Marker
-              coordinate={{latitude: 11.543443, longitude: 104.893875}}
+              coordinate={{latitude, longitude}}
               image={require('../../../assets/images/delivery-pin.png')}
             />
           </MapView>

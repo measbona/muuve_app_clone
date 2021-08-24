@@ -2,6 +2,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import moment from 'moment';
+import {size} from 'lodash';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -44,19 +45,27 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {onPress} = props;
+  const {onPress, order} = props;
 
-  const merchantName = 'Fire Tiger';
-  const subtotal = '7 Items - $14.43';
-  const deliveredDate = moment().format('DD-MMMM-YYYY');
+  const merchantName = utils.helpers.removeWhiteSpace(order.restaurant.name);
+  const itemCount = size(order.items);
 
-  const time = moment().format('hh:mm');
-  const period = moment().format('A');
+  const subtotal = `${
+    itemCount > 0 ? itemCount + ' Items' : itemCount + ' Item'
+  } - $${order.sub_total}`;
+
+  const orderDate = order.created_at;
+  const deliveryTime = order.cooking_duration + 15;
+
+  const time = moment(orderDate).add(deliveryTime, 'minutes').format('hh:mm');
+  const period = moment(orderDate).add(deliveryTime, 'minutes').format('A');
+
+  const deliveredDate = moment(orderDate).format('DD-MMMM-YYYY');
   const deliveredTime = `Delivered - ${utils.helpers.removeLeadZeroNumber(
     time,
   )} ${period}`;
 
-  const isGroupOrder = false;
+  const isGroupOrder = order.is_group_order;
   const iconName = isGroupOrder ? 'account-group' : 'food';
 
   return (

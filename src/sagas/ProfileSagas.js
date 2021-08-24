@@ -30,7 +30,7 @@ export function* handleUserProfile({payload}) {
       yield put(ProfileActions.setProfile(userProfile));
       yield put(AppActions.handleDynamicLink());
     } else {
-      yield call(Navigator.goToViewAccount, componentId, {
+      yield call(Navigator.goToAccountForm, componentId, {
         profile: null,
         isNewUser: true,
       });

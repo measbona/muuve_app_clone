@@ -2,7 +2,8 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
-import {showModalNotice, goToMerchant} from '../../navigation/screen';
+import * as Navigator from '../../navigation/screen';
+import * as Animatable from 'react-native-animatable';
 
 import utils from '../../utils';
 
@@ -35,26 +36,28 @@ const styles = StyleSheet.create({
 });
 
 class Home extends React.PureComponent {
+  state = {
+    mounted: false,
+  };
+
   componentDidMount() {
     const {loaded, fetchRestaurants} = this.props;
 
     if (!loaded) {
       fetchRestaurants();
     }
+
+    Navigator.bindComponent(this);
   }
 
-  onCartPress = () => {
-    showModalNotice({
-      headline: 'Noticed',
-      description: 'Your cart is empty.',
-      buttonName: 'Cancel',
-    });
-  };
+  componentDidAppear() {
+    this.setState({mounted: true});
+  }
 
   onMerchantPress = (restaurant) => {
     const {componentId} = this.props;
 
-    goToMerchant(componentId, {restaurant});
+    Navigator.goToMerchantDetails(componentId, {restaurant});
   };
 
   renderHeaderComponent = () => {
@@ -67,25 +70,26 @@ class Home extends React.PureComponent {
 
   renderRestaurant = ({item}) => {
     return (
-      <React.Fragment key={item.key}>
+      <Animatable.View key={item.key} animation="fadeIn" duration={300}>
         <Restaurant
           restaurant={item}
           onPress={() => this.onMerchantPress(item)}
         />
-      </React.Fragment>
+      </Animatable.View>
     );
   };
 
   render() {
+    const {mounted} = this.state;
     const {restaurants, loaded} = this.props;
 
     const restaurantData = utils.helpers.convertObjectToArray(restaurants);
 
     return (
       <View style={styles.conatiner}>
-        <Header onCartPress={this.onCartPress} />
+        <Header onCartPress={() => {}} />
 
-        {loaded ? (
+        {loaded && mounted ? (
           <FlatList
             data={restaurantData}
             contentContainerStyle={styles.flatList}

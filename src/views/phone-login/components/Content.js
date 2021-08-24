@@ -64,51 +64,13 @@ class Content extends React.PureComponent {
     phoneNumber: '',
   };
 
-  renderVerificationInput = () => {
+  componentDidUpdate() {
     const {code} = this.state;
 
-    return (
-      <View style={styles.boxesWrapper}>
-        <View style={styles.boxWrapper}>
-          <TextInput
-            style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}
-            autoFocus
-            caretHidden
-            defaultValue={code[0]}
-            textAlign="center"
-            maxLength={6}
-            keyboardType="number-pad"
-            onChangeText={(val) => this.setState({code: val})}
-          />
-        </View>
-        <View style={styles.boxWrapper}>
-          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[1]}
-          </Text>
-        </View>
-        <View style={styles.boxWrapper}>
-          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[2]}
-          </Text>
-        </View>
-        <View style={styles.boxWrapper}>
-          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[3]}
-          </Text>
-        </View>
-        <View style={styles.boxWrapper}>
-          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[4]}
-          </Text>
-        </View>
-        <View style={styles.boxWrapper}>
-          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[5]}
-          </Text>
-        </View>
-      </View>
-    );
-  };
+    if (code.length === 6) {
+      Keyboard.dismiss();
+    }
+  }
 
   onPress = () => {
     const {mounted, phoneNumber} = this.state;
@@ -172,6 +134,52 @@ class Content extends React.PureComponent {
         buttonName: 'Confirm',
       });
     }
+  };
+
+  renderVerificationInput = () => {
+    const {code} = this.state;
+
+    return (
+      <View style={styles.boxesWrapper}>
+        <View style={styles.boxWrapper}>
+          <TextInput
+            style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}
+            autoFocus
+            caretHidden
+            defaultValue={code[0]}
+            textAlign="center"
+            maxLength={6}
+            keyboardType="number-pad"
+            onChangeText={(val) => this.setState({code: val})}
+          />
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[1]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[2]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[3]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[4]}
+          </Text>
+        </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {code[5]}
+          </Text>
+        </View>
+      </View>
+    );
   };
 
   render() {
