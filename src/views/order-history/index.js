@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class Order extends React.Component {
+export default class OrderHistory extends React.Component {
   onOrderPress = () => {
     const {componentId} = this.props;
 

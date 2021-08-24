@@ -1,19 +1,14 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
-import {
-  View,
-  FlatList,
-  Animated,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import {View, FlatList, Animated, StyleSheet} from 'react-native';
 import {get, filter, reduce, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 
 import utils from '../../utils';
 
 import Item from './components/Item';
+import Loading from '../../lib/Loading';
 import SearchBar from '../../lib/SearchBar';
 import TopBanner from './components/TopBanner';
 import TopNavBar from './components/TopNavBar';
@@ -42,7 +37,7 @@ const styles = StyleSheet.create({
   },
 });
 
-class Merchant extends React.PureComponent {
+class MerchantDetails extends React.PureComponent {
   constructor(props) {
     super(props);
 
@@ -252,11 +247,7 @@ class Merchant extends React.PureComponent {
           />
         ) : (
           <View style={styles.loading}>
-            <ActivityIndicator
-              size="large"
-              color={utils.colors.yellow}
-              animating
-            />
+            <Loading style={{alignSelf: 'center'}} />
           </View>
         )}
 
@@ -283,4 +274,4 @@ const mapDispatch = {
   setEnableGroupOrderSession: CartActions.setEnableGroupOrderSession,
 };
 
-export default connect(mapState, mapDispatch)(Merchant);
+export default connect(mapState, mapDispatch)(MerchantDetails);

@@ -1,10 +1,10 @@
 import React, {useEffect} from 'react';
 import {useDispatch} from 'react-redux';
-import {View, ActivityIndicator, StyleSheet} from 'react-native';
+import {View, StyleSheet} from 'react-native';
 import {delay} from 'lodash';
 
 import utils from '../../utils';
-
+import Loading from '../../lib/Loading';
 import AppActions from '../../redux/AppRedux';
 
 const styles = StyleSheet.create({
@@ -27,7 +27,7 @@ export default () => {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="black" animating />
+      <Loading />
     </View>
   );
 };

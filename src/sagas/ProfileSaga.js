@@ -8,20 +8,34 @@ import ProfileActions from '../redux/ProfileRedux';
 export function* initialProfile() {
   const userSignedIn = yield call(Modules.Profile.getCurrentUser);
 
-  if (!userSignedIn) {
-    return yield call(Navigator.showPhoneLogin);
-  }
+  try {
+    if (!userSignedIn) {
+      yield call(Navigator.showPhoneLogin);
+    }
 
-  return yield call(handleUserProfile);
+    yield put(ProfileActions.handleUserProfile({}));
+  } catch (error) {
+    alert(`initialProfile: ${error.message || error}`)
+  }
 }
 
-function* handleUserProfile() {
+export function* handleUserProfile({payload}) {
+  const {componentId} = payload;
+
   try {
     const userProfile = yield call(Modules.Profile.fetch);
+    const hasUserProfile = userProfile;
 
-    yield put(ProfileActions.setProfile(userProfile));
-    yield put(AppActions.handleDynamicLink());
+    if (hasUserProfile) {
+      yield put(ProfileActions.setProfile(userProfile));
+      yield put(AppActions.handleDynamicLink());
+    } else {
+      yield call(Navigator.goToViewAccount, componentId, {
+        profile: null,
+        isNewUser: true,
+      });
+    }
   } catch (error) {
-    alert(error.message || error);
+    //
   }
 }

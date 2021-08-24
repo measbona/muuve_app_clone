@@ -1,6 +1,12 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Text, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  KeyboardAvoidingView,
+  StyleSheet,
+} from 'react-native';
 
 import utils from '../../utils';
 
@@ -41,6 +47,14 @@ const styles = StyleSheet.create({
 export default class PhoneLogin extends React.PureComponent {
   render() {
     const {componentId} = this.props;
+    const avoidProps = utils.device.isIOS
+      ? {
+          behavior: 'padding',
+          style: {flex: 1},
+        }
+      : {
+          behavior: 'height',
+        };
 
     return (
       <View style={styles.container}>
@@ -51,7 +65,9 @@ export default class PhoneLogin extends React.PureComponent {
           />
         </View>
 
-        <Content componentId={componentId} />
+        <KeyboardAvoidingView style={{flex: 1}} {...avoidProps}>
+          <Content componentId={componentId} />
+        </KeyboardAvoidingView>
 
         <View style={[styles.footerWrapper, utils.shadows.bottomBar]}>
           <Text style={styles.text}>By continuing your agree to our</Text>

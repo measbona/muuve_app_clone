@@ -7,14 +7,17 @@ import {
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  ActivityIndicator,
 } from 'react-native';
+import {connect} from 'react-redux';
 import * as Navigator from '../../../navigation/screen';
 
 import Modules from '../../../modules';
 import utils from '../../../utils';
 
+import Loading from '../../../lib/Loading';
 import PhoneInput from './PhoneInput';
+
+import ProfileActions from '../../../redux/ProfileRedux';
 
 const styles = StyleSheet.create({
   wrapper: {
@@ -23,14 +26,15 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
   },
   text: {
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: 'bold',
     color: utils.colors.black,
   },
-  buttonWrapper: {
+  button: {
+    minHeight: 40,
     borderRadius: 15,
-    paddingVertical: 10,
     alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: utils.colors.yellow,
   },
   boxesWrapper: {
@@ -51,7 +55,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default class Content extends React.PureComponent {
+class Content extends React.PureComponent {
   state = {
     code: [],
     confirm: null,
@@ -147,6 +151,7 @@ export default class Content extends React.PureComponent {
 
   codeVerification = async () => {
     const {confirm, code} = this.state;
+    const {handleUserProfile, componentId} = this.props;
 
     try {
       this.setState({loading: true});
@@ -156,7 +161,7 @@ export default class Content extends React.PureComponent {
       if (isCorrect) {
         this.setState({loading: false});
 
-        return Navigator.setRootHome();
+        return handleUserProfile({componentId});
       }
     } catch (error) {
       this.setState({loading: false});
@@ -193,12 +198,12 @@ export default class Content extends React.PureComponent {
         )}
 
         <TouchableOpacity
-          style={styles.buttonWrapper}
+          style={styles.button}
           disabled={disabled || loading}
           activeOpacity={0.7}
           onPress={this.onPress}>
           {loading ? (
-            <ActivityIndicator size="small" color="black" />
+            <Loading style={{width: 40, height: 40}} />
           ) : (
             <Text style={[styles.text, {fontSize: 14}]}>{buttonText}</Text>
           )}
@@ -218,3 +223,9 @@ export default class Content extends React.PureComponent {
     );
   }
 }
+
+const mapDispatch = {
+  handleUserProfile: ProfileActions.handleUserProfile,
+};
+
+export default connect(null, mapDispatch)(Content);

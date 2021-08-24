@@ -14,6 +14,8 @@ import Header from './components/Header';
 import utils from '../../utils';
 import Modules from '../../modules';
 
+import ProfileActions from '../../redux/ProfileRedux';
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -46,12 +48,19 @@ class Account extends React.Component {
   }
 
   onLogOutPress = () => {
+    const {setProfile} = this.props;
+
     return Navigator.showModalChoice({
       headline: 'LOG OUT',
       description: 'Are you sure you want to logout?',
       no: 'Cancel',
       yes: 'Log out',
-      onPress: () => Modules.Profile.signOut(),
+      onPress: () => {
+        Modules.Profile.signOut();
+        setProfile(null);
+
+        Navigator.showPhoneLogin();
+      },
     });
   };
 
@@ -104,4 +113,8 @@ const mapState = ({profile}) => ({
   profile: profile.data,
 });
 
-export default connect(mapState)(Account);
+const mapDispatch = {
+  setProfile: ProfileActions.setProfile,
+};
+
+export default connect(mapState, mapDispatch)(Account);

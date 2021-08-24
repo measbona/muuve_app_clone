@@ -7,10 +7,10 @@ import * as Animatable from 'react-native-animatable';
 import utils from '../../utils';
 
 import NavBar from '../../lib/NavBar';
-import ItemSection from '../Checkout/components/ItemSection';
-import PaymentSection from '../Checkout/components/PaymentSection';
-import MerchantSection from '../Checkout/components/MerchantSection';
-import DeliveryLocationSection from '../Checkout/components/DeliveryLocationSection';
+import ItemSection from '../checkout/components/ItemSection';
+import PaymentSection from '../checkout/components/PaymentSection';
+import MerchantSection from '../checkout/components/MerchantSection';
+import DeliveryLocationSection from '../checkout/components/DeliveryLocationSection';
 
 const styles = StyleSheet.create({
   conatiner: {

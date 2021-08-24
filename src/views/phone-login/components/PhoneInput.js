@@ -5,7 +5,7 @@ import utils from '../../../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
-    minHeight: 40,
+    height: 45,
     borderRadius: 17,
     marginVertical: 10,
     flexDirection: 'row',
@@ -47,9 +47,9 @@ export default (props) => {
       </View>
 
       <TextInput
-        style={styles.textInput}
         caretHidden
         maxLength={10}
+        style={styles.textInput}
         keyboardType="number-pad"
         placeholder="Enter phone number"
         onChangeText={(num) => onChangeText(num)}

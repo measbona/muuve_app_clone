@@ -3,22 +3,22 @@ import FontIcon from 'react-native-vector-icons/Fontisto';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import utils from '../utils';
-import Home from '../views/Home';
-import Order from '../views/Order';
-import Account from '../views/Account';
-import ViewAccount from '../views/ViewAccount';
-import GroupOrder from '../views/GroupOrder';
-import Initialize from '../views/Initialize';
-import PhoneLogin from '../views/PhoneLogin';
-import OrderDetails from '../views/OrderDetails';
-import Merchant from '../views/Merchant';
-import Checkout from '../views/Checkout';
-import GroupOrderCart from '../views/GroupOrderCart';
+import Home from '../views/home';
+import Order from '../views/order-history';
+import Account from '../views/account';
+import ViewAccount from '../views/account-form';
+import GroupOrder from '../views/group-order';
+import Initialize from '../views/initialize';
+import PhoneLogin from '../views/phone-login';
+import OrderDetails from '../views/order-details';
+import Merchant from '../views/merchat-details';
+import Checkout from '../views/checkout';
+import GroupOrderCart from '../views/group-order-cart';
 
 import Toast from '../lib/Toast';
-import ModalChoice from '../views/Modal/ModalChoice';
-import ModalNotice from '../views/Modal/ModalNotice';
-import ModalSuccess from '../views/Modal/ModalSuccess';
+import ModalChoice from '../views/modal/ModalChoice';
+import ModalNotice from '../views/modal/ModalNotice';
+import ModalSuccess from '../views/modal/ModalSuccess';
 
 export const HOME = 'MuuveAppClone.Home';
 export const ORDER = 'MuuveAppClone.Order';
@@ -171,8 +171,14 @@ export const rootInitial = () => {
 export const showPhoneLogin = () => {
   Navigation.setRoot({
     root: {
-      component: {
-        name: PHONE_LOGIN,
+      stack: {
+        children: [
+          {
+            component: {
+              name: PHONE_LOGIN,
+            },
+          },
+        ],
       },
     },
   });

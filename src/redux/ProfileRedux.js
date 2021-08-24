@@ -4,13 +4,15 @@ import Immutable from 'seamless-immutable';
 const {Types, Creators} = createActions(
   {
     initialProfile: null,
+    handleUserProfile: ['payload'],
+
     setProfile: ['payload'],
   },
   {prefix: 'PROFILE_REDUX_'},
 );
 
 const INITIAL_STATE = Immutable({
-  data: {},
+  data: null,
   loaded: false,
 });
 

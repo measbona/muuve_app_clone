@@ -1,16 +1,12 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
-import {
-  View,
-  Text,
-  FlatList,
-  ActivityIndicator,
-  StyleSheet,
-} from 'react-native';
+import {View, Text, FlatList, StyleSheet} from 'react-native';
 import {showModalNotice, goToMerchant} from '../../navigation/screen';
 
 import utils from '../../utils';
 
+import Loading from '../../lib/Loading';
 import Header from './components/Header';
 import Restaurant from './components/Restaurant';
 
@@ -88,6 +84,7 @@ class Home extends React.PureComponent {
     return (
       <View style={styles.conatiner}>
         <Header onCartPress={this.onCartPress} />
+
         {loaded ? (
           <FlatList
             data={restaurantData}
@@ -99,11 +96,7 @@ class Home extends React.PureComponent {
           />
         ) : (
           <View style={styles.loading}>
-            <ActivityIndicator
-              size="large"
-              color={utils.colors.yellow}
-              animating
-            />
+            <Loading style={{alignSelf: 'center'}} />
           </View>
         )}
       </View>
