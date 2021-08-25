@@ -27,7 +27,6 @@ export function* handleDynamicLink() {
 
     yield call(Navigator.setRootHome);
   } catch (error) {
-    console.tron.log(error.message);
     alert('error handledynamiclink')
   }
 }

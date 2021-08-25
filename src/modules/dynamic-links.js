@@ -62,7 +62,7 @@ export default class DynamicLinks {
         },
         'UNGUESSABLE',
       );
-      console.tron.log({url});
+
       return url;
     } catch (error) {
       return null;

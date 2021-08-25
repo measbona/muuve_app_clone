@@ -107,7 +107,6 @@ class Checkout extends React.PureComponent {
       await Navigator.showModalSuccess();
       Navigator.goToOrderDetails(componentId, {order: data});
     } catch (error) {
-      console.tron.log(error.message);
       this.setState({loading: false});
 
       Navigator.showModalNotice({
