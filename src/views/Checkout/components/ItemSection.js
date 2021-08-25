@@ -42,7 +42,14 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {onPress, cart, isStartGroupOrder, orderType, order} = props;
+  const {
+    onDecrease,
+    onGroupOrderPress,
+    cart,
+    isStartGroupOrder,
+    orderType,
+    order,
+  } = props;
 
   const isOrderDetails = orderType === 'order-details';
   const headline = isStartGroupOrder ? 'Group Order' : 'Your Order';
@@ -53,6 +60,8 @@ export default (props) => {
     let index = 0;
 
     return map(items, (item, key) => {
+      const itemPrice = item.quantity * parseFloat(item.price);
+
       index += 1;
 
       return (
@@ -60,7 +69,7 @@ export default (props) => {
           key={key}
           style={styles.groupInfo}
           activeOpacity={0.7}
-          disabled>
+          onPress={() => onDecrease(item)}>
           <View style={styles.row}>
             <View style={styles.icon}>
               {isOrderDetails ? (
@@ -104,8 +113,7 @@ export default (props) => {
               style={[styles.text, {fontSize: 15, color: utils.colors.black}]}>
               {`${item.quantity} x `}
             </Text>
-            <Text
-              style={[styles.text, {fontSize: 15}]}>{`$${item.price}`}</Text>
+            <Text style={[styles.text, {fontSize: 15}]}>{`$${itemPrice}`}</Text>
           </View>
         </TouchableOpacity>
       );
@@ -117,7 +125,7 @@ export default (props) => {
       <TouchableOpacity
         style={styles.groupInfo}
         activeOpacity={0.7}
-        onPress={onPress}>
+        onPress={onGroupOrderPress}>
         <View style={styles.row}>
           <View style={styles.icon}>
             <MCIcon

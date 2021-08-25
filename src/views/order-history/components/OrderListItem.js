@@ -52,7 +52,7 @@ export default (props) => {
 
   const subtotal = `${
     itemCount > 0 ? itemCount + ' Items' : itemCount + ' Item'
-  } - $${order.sub_total}`;
+  } - $${parseFloat(order.sub_total)}`;
 
   const orderDate = order.created_at;
   const deliveryTime = order.cooking_duration + 15;

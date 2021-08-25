@@ -2,6 +2,7 @@
 import React from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import {size} from 'lodash';
+import * as Animatable from 'react-native-animatable';
 import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 import utils from '../../../utils';
@@ -50,25 +51,27 @@ export default (props) => {
   const itemCount = size(cart);
 
   return (
-    <TouchableOpacity
-      style={[styles.wrapper, utils.shadows.bottomBar]}
-      activeOpacity={0.7}
-      onPress={onPress}>
-      <View style={styles.itemCountWrapper}>
-        <View style={styles.priceWrapper}>
-          <Text style={styles.text}>
-            {itemCount === 1 ? `${itemCount} Item` : `${itemCount} Items`}
-          </Text>
-          <Text style={styles.text}>Total Price</Text>
+    <TouchableOpacity activeOpacity={0.7} onPress={onPress} hitSlop={{top: 70}}>
+      <Animatable.View
+        duration={300}
+        animation="slideInUp"
+        style={[styles.wrapper, utils.shadows.bottomBar]}>
+        <View style={styles.itemCountWrapper}>
+          <View style={styles.priceWrapper}>
+            <Text style={styles.text}>
+              {itemCount === 1 ? `${itemCount} Item` : `${itemCount} Items`}
+            </Text>
+            <Text style={styles.text}>Total Price</Text>
+          </View>
+          <Text style={styles.price}>{`$${utils.helpers.sumCartTotal(
+            cart,
+          )}`}</Text>
         </View>
-        <Text style={styles.price}>{`$${utils.helpers.sumCartTotal(
-          cart,
-        )}`}</Text>
-      </View>
-      <View style={styles.checkoutWrapper}>
-        <Text style={[styles.checkout, {fontSize: 17}]}>Checkout</Text>
-        <MIcon name="arrow-forward" size={18} style={{marginLeft: 5}} />
-      </View>
+        <View style={styles.checkoutWrapper}>
+          <Text style={[styles.checkout, {fontSize: 17}]}>Checkout</Text>
+          <MIcon name="arrow-forward" size={18} style={{marginLeft: 5}} />
+        </View>
+      </Animatable.View>
     </TouchableOpacity>
   );
 };

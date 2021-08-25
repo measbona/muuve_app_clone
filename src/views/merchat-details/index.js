@@ -3,7 +3,7 @@ import React from 'react';
 import {connect} from 'react-redux';
 import {View, FlatList, Animated, StyleSheet} from 'react-native';
 import moment from 'moment';
-import {get, filter, reduce, size} from 'lodash';
+import {get, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 
@@ -119,7 +119,7 @@ class MerchantDetails extends React.PureComponent {
     const {setCartItem, restaurant, setCartKey, cartKey} = this.props;
 
     const restaurantKey = restaurant.key;
-    const removeItem = Boolean(selectedItems[itemKey]);
+    const isIncrease = Boolean(selectedItems[itemKey]);
 
     if (cartKey && cartKey !== restaurant.key) {
       return Navigator.showModalNotice({
@@ -129,33 +129,18 @@ class MerchantDetails extends React.PureComponent {
       });
     }
 
-    if (removeItem) {
-      const remainItems = filter(
-        selectedItems,
-        (selectedItem) => selectedItem.key !== itemKey,
-      );
-      const newSelectedItems = reduce(
-        remainItems,
-        (result, remainItem) => {
-          result[remainItem.key] = {
-            key: remainItem.key,
-            name: remainItem.name,
-            price: remainItem.price,
-            quantity: remainItem.quantity,
-            added_at: remainItem.added_at,
-          };
-
-          return result;
+    if (isIncrease) {
+      const selectedItem = selectedItems[item.key];
+      const newSelectedItems = {
+        ...selectedItems,
+        [selectedItem.key]: {
+          ...selectedItem,
+          quantity: selectedItem.quantity + 1,
         },
-        {},
-      );
+      };
 
       this.setState({selectedItems: newSelectedItems});
       setCartItem(newSelectedItems);
-
-      if (size(newSelectedItems) === 0) {
-        setCartKey(null);
-      }
     } else {
       const newSelectedItems = {
         ...selectedItems,
@@ -205,7 +190,7 @@ class MerchantDetails extends React.PureComponent {
 
   renderItem = ({item, key, index}) => {
     const {selectedItems} = this.state;
-    const {restaurant, items} = this.props;
+    const {restaurant, items, cart} = this.props;
 
     const itemsCount = size(items[restaurant.key]);
     const isSelectedItem = selectedItems[item.key];
@@ -214,6 +199,7 @@ class MerchantDetails extends React.PureComponent {
     return (
       <React.Fragment key={item.key}>
         <Item
+          cart={cart}
           item={item}
           isSelectedItem={isSelectedItem}
           onPress={() => this.onItemPress(item, item.key)}

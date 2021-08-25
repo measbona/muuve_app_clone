@@ -27,7 +27,7 @@ export default ({cart, orderType, order}) => {
   const isOrderDetails = orderType === 'order-details';
 
   const total = isOrderDetails
-    ? order.sub_total
+    ? parseFloat(order.sub_total)
     : utils.helpers.sumCartTotal(cart);
 
   const deliveryFee = isOrderDetails ? `$${order.delivery_fee}` : 'FREE';

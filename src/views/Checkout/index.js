@@ -1,7 +1,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
-import moment from 'moment';
+import {reduce, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 import firebase from '@react-native-firebase/app';
@@ -18,6 +18,7 @@ import PlaceOrder from './components/PlaceOrder';
 import PaymentOptionSection from './components/PaymentOptionSection';
 import DeliveryLocationSection from './components/DeliveryLocationSection';
 
+import CartActions from '../../redux/CartRedux';
 import OrderActions from '../../redux/OrderRedux';
 
 const styles = StyleSheet.create({
@@ -54,58 +55,29 @@ class Checkout extends React.PureComponent {
   };
 
   onPlaceOrder = async () => {
-    const {
-      componentId,
-      orders,
-      profile,
-      cart,
-      restaurant,
-      setOrder,
-    } = this.props;
+    const {componentId, orders, profile, setOrder} = this.props;
 
     const orderRef = firebase
       .database()
       .ref(`/deliveree_orders/${profile.phone_number}`);
-    const orderKey = orderRef.push().key;
 
-    const items = Modules.Item.serializeItems(cart);
+    const orderKey = orderRef.push().key;
 
     try {
       this.setState({loading: true});
 
-      const data = {
-        items,
-        key: orderKey,
-        delivery_fee: 3,
-        status: 'delivered',
-        is_group_order: false,
-        region: profile.region,
-        deliveree: profile.uid,
-        tel: profile.phone_number,
-        delivery_address: 'current_address',
-        delivery_place_name: 'Toul Tom pong',
-        created_at: Number(moment().format('x')),
-        sub_total: utils.helpers.sumCartTotal(cart),
-        deliveree_name: `${profile.family_name} ${profile.first_name}`,
-        requestCoords: {
-          latitude: 11.612735616803565,
-          longitude: 104.90922453012595,
-        },
-        restaurant: {
-          key: restaurant.key,
-          name: restaurant.name,
-          branch: Object.values(restaurant.branches)[0],
-          cooking_duration: restaurant.cooking_duration,
-        },
-      };
+      const order = await Modules.Order.createCheckOutOrder({
+        ...this,
+        orderKey,
+      });
 
-      await orderRef.update({[orderKey]: data});
-      setOrder({...orders, [orderKey]: data});
+      await orderRef.update({[orderKey]: order});
+      setOrder({...orders, [orderKey]: order});
 
       this.setState({loading: false});
 
       await Navigator.showModalSuccess();
-      Navigator.goToOrderDetails(componentId, {order: data});
+      Navigator.goToOrderDetails(componentId, {order: order});
     } catch (error) {
       this.setState({loading: false});
 
@@ -122,6 +94,73 @@ class Checkout extends React.PureComponent {
     const {componentId} = this.props;
 
     Navigator.goToGroupOrderCart(componentId);
+  };
+
+  onDecrease = (item) => {
+    const {componentId, cart, setCartKey, setCartItem} = this.props;
+    let newSelectedItems = null;
+
+    if (item.quantity === 1) {
+      newSelectedItems = reduce(
+        cart,
+        (result, remainItem) => {
+          if (remainItem.key !== item.key) {
+            result[remainItem.key] = {
+              key: remainItem.key,
+              name: remainItem.name,
+              price: remainItem.price,
+              added_at: remainItem.added_at,
+              quantity: remainItem.quantity,
+            };
+          }
+
+          return result;
+        },
+        {},
+      );
+    } else {
+      newSelectedItems = reduce(
+        cart,
+        (result, remainItem) => {
+          if (remainItem.key === item.key) {
+            result[remainItem.key] = {
+              key: remainItem.key,
+              name: remainItem.name,
+              price: remainItem.price,
+              added_at: remainItem.added_at,
+              quantity: remainItem.quantity - 1,
+            };
+          } else {
+            result[remainItem.key] = {
+              key: remainItem.key,
+              name: remainItem.name,
+              price: remainItem.price,
+              added_at: remainItem.added_at,
+              quantity: remainItem.quantity,
+            };
+          }
+
+          return result;
+        },
+        {},
+      );
+    }
+
+    if (size(newSelectedItems) === 0) {
+      setCartKey(null);
+
+      return Navigator.showModalNotice({
+        headline: 'Noticed',
+        description: 'Your cart is empty',
+        buttonName: 'Back',
+        onPress: () => {
+          setCartItem(newSelectedItems);
+          Navigator.popBack(componentId);
+        },
+      });
+    }
+
+    setCartItem(newSelectedItems);
   };
 
   render() {
@@ -146,7 +185,8 @@ class Checkout extends React.PureComponent {
               <DeliveryLocationSection />
               <ItemSection
                 cart={cart}
-                onPress={this.onGroupOrderPress}
+                onDecrease={this.onDecrease}
+                onGroupOrderPress={this.onGroupOrderPress}
                 isStartGroupOrder={isStartGroupOrder}
               />
               <PaymentOptionSection />
@@ -169,6 +209,8 @@ const mapState = ({order, cart, profile}) => ({
 });
 
 const mapDispatch = {
+  setCartKey: CartActions.setCartKey,
+  setCartItem: CartActions.setCartItem,
   setOrder: OrderActions.setOrderHistory,
 };
 

@@ -1,7 +1,7 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
 import {get} from 'lodash';
-import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import utils from '../../../utils';
 
@@ -28,20 +28,24 @@ const styles = StyleSheet.create({
   },
   selectedBadge: {
     top: -10,
-    padding: 5,
+    width: 25,
+    height: 25,
     right: -10,
     borderRadius: 5,
     position: 'absolute',
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: utils.colors.blue,
   },
 });
 
 export default (props) => {
-  const {item, onPress, isSelectedItem} = props;
+  const {item, cart, onPress, isSelectedItem} = props;
 
   const name = get(item, 'name', 'N/A');
   const logo = get(item, 'images.thumb', null);
   const price = get(item, 'current_price', 'N/A');
+  const quantity = (isSelectedItem && cart[item.key].quantity) || null;
 
   const itemImageSource = logo
     ? {uri: logo}
@@ -58,9 +62,12 @@ export default (props) => {
       </View>
       <View style={styles.imageWrapper}>
         <Image style={styles.itemImage} source={itemImageSource} />
+
         {isSelectedItem ? (
           <View style={styles.selectedBadge}>
-            <MCIcon name="check" size={15} color={utils.colors.white} />
+            <Text style={[styles.text, {color: utils.colors.white}]}>
+              {quantity}
+            </Text>
           </View>
         ) : null}
       </View>

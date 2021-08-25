@@ -54,8 +54,14 @@ export default class ModalNotice extends React.PureComponent {
   containerRef = React.createRef();
 
   onCancelButton = async () => {
+    const {onPress} = this.props;
+
     await this.containerRef.fadeOut(300);
     await dismissOverLay();
+
+    if (onPress) {
+      onPress();
+    }
   };
 
   render() {
