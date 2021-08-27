@@ -22,6 +22,7 @@ export default store => {
       takeEvery(ProfileTypes.INITIAL_PROFILE, ProfileSagas.initialProfile),
       takeEvery(ProfileTypes.HANDLE_USER_PROFILE, ProfileSagas.handleUserProfile,),
 
+      takeLatest(OrderTypes.SYNC_GROUP_ORDER, OrderSagas.syncGroupOrder),
       takeLatest(OrderTypes.GET_ORDER_HISTORY, OrderSagas.getOrderHistory),
       takeLatest(OrderTypes.SET_GROUP_ORDER_DATA, OrderSagas.setGroupOrderData),
       takeLatest(OrderTypes.UPDATE_GROUP_ORDER_DATA, OrderSagas.updateGroupOrderData),

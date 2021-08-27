@@ -5,12 +5,15 @@ const {Types, Creators} = createActions(
   {
     getOrderHistory: null,
 
+    syncGroupOrder: ['groupKey'],
+    unSyncGroupOrder: null,
+
     setLoaded: ['bool'],
     setLoading: ['bool'],
     setOrderHistory: ['payload'],
 
     setUrl: ['val', 'bool'],
-    setGroupOrderEnabled: ['val'],
+
     setGroupOrderData: ['payload'],
     updateGroupOrderData: ['payload'],
     removeGroupOrderData: ['groupKey'],
@@ -50,8 +53,18 @@ const updateGroupOrderDataHandler = (state = INITIAL_STATE, {payload}) =>
 const removeGroupOrderDataHandler = (state = INITIAL_STATE, {groupKey}) =>
   state.set('groupOrderData', {});
 
+const syncGroupOrderHandler = (state = INITIAL_STATE, {groupKey}) =>
+  state.set('loading', true);
+
+const unSyncGroupOrderHandler = (state = INITIAL_STATE) =>
+  state.set('loading', false);
+
 const HANDLERS = {
   [Types.SET_URL]: setUrlHandler,
+
+  [Types.SYNC_GROUP_ORDER]: syncGroupOrderHandler,
+  [Types.UN_SYNC_GROUP_ORDER]: unSyncGroupOrderHandler,
+
   [Types.SET_GROUP_ORDER_DATA]: setGroupOrderDataHandler,
   [Types.UPDATE_GROUP_ORDER_DATA]: updateGroupOrderDataHandler,
   [Types.REMOVE_GROUP_ORDER_DATA]: removeGroupOrderDataHandler,

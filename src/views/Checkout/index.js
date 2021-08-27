@@ -46,34 +46,50 @@ class Checkout extends React.PureComponent {
   }
 
   componentDidAppear() {
+    const {isStartGroupOrder, groupOrder, syncGroupOrder} = this.props;
+
     this.setState({mounted: true});
+
+    if (isStartGroupOrder) {
+      const {group_key: groupKey} = groupOrder;
+
+      syncGroupOrder(groupKey);
+    }
+  }
+
+  componentDidDisappear() {
+    const {isStartGroupOrder, unSyncGroupOrder} = this.props;
+
+    if (isStartGroupOrder) {
+      unSyncGroupOrder();
+    }
   }
 
   validate = () => {
-    const {groupOrder, profile} = this.props;
+    const {isStartGroupOrder, groupOrder, profile} = this.props;
 
     const participants = filter(
       groupOrder.joined_users,
       (user, key) => profile.uid !== key,
     );
 
-    const isOrderReady = every(participants, ['ready', true]);
+    const isOrderNotReady = every(participants, ['ready', false]);
 
     return new Promise((resolve, reject) => {
-      if (!isOrderReady) {
-        return reject(
-          Navigator.showModalChoice({
-            headline: 'Confirmation',
-            description:
-              'We notice that some participants not yet ready to order.Do you want to continue?',
-            no: 'CANCEL',
-            yes: 'CONTINUE',
-            onPress: this.onPlaceOrder,
-          }),
-        );
+      if (isStartGroupOrder && isOrderNotReady) {
+        return Navigator.showModalChoice({
+          headline: 'Confirmation',
+          description:
+            'We notice that some participants not yet ready to order. Do you want to continue?',
+          no: 'CANCEL',
+          yes: 'CONTINUE',
+          onPress: () => resolve(true),
+        });
+      } else if (!isStartGroupOrder) {
+        return resolve(true);
       }
 
-      return resolve(true);
+      return reject(false);
     });
   };
 
@@ -95,25 +111,28 @@ class Checkout extends React.PureComponent {
     const orderKey = orderRef.push().key;
 
     try {
-      await this.validate();
-      this.setState({loading: true});
+      const validated = await this.validate();
 
-      const order = await Modules.Order.createCheckOutOrder({
-        ...this,
-        orderKey,
-      });
+      if (validated) {
+        this.setState({loading: true});
 
-      await orderRef.update({[orderKey]: order});
-      setOrder({...orders, [orderKey]: order});
+        const order = await Modules.Order.createCheckOutOrder({
+          ...this,
+          orderKey,
+        });
 
-      if (isStartGroupOrder) {
-        removeGroupOrderData(groupOrder.group_key);
+        await orderRef.update({[orderKey]: order});
+        setOrder({...orders, [orderKey]: order});
+
+        if (isStartGroupOrder) {
+          removeGroupOrderData(groupOrder.group_key);
+        }
+
+        this.setState({loading: false});
+
+        await Navigator.showModalSuccess();
+        Navigator.goToOrderDetails(componentId, {order: order});
       }
-
-      this.setState({loading: false});
-
-      await Navigator.showModalSuccess();
-      Navigator.goToOrderDetails(componentId, {order: order});
     } catch (error) {
       this.setState({loading: false});
 
@@ -259,6 +278,8 @@ const mapDispatch = {
   setCartKey: CartActions.setCartKey,
   setCartItem: CartActions.setCartItem,
   setOrder: OrderActions.setOrderHistory,
+  syncGroupOrder: OrderActions.syncGroupOrder,
+  unSyncGroupOrder: OrderActions.unSyncGroupOrder,
   removeGroupOrderData: OrderActions.removeGroupOrderData,
 };
 

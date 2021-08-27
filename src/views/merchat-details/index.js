@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, FlatList, Animated, StyleSheet} from 'react-native';
-import {get, size} from 'lodash';
+import {get, size, find} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 
@@ -260,7 +260,20 @@ class MerchantDetails extends React.PureComponent {
 
   render() {
     const {mounted} = this.state;
-    const {componentId, restaurant, items, cart, loaded} = this.props;
+    const {
+      cart,
+      items,
+      loaded,
+      groupOrder,
+      restaurant,
+      componentId,
+      isStartGroupOrder,
+    } = this.props;
+
+    const isHoster = find(
+      groupOrder.joined_users,
+      (user) => user.host === true,
+    );
 
     const itemsData = utils.helpers.convertObjectToArray(items[restaurant.key]);
     const opacity = this.scrollY.interpolate({
@@ -315,7 +328,7 @@ class MerchantDetails extends React.PureComponent {
           </View>
         )}
 
-        {mounted && size(cart) > 0 ? (
+        {(mounted && size(cart) > 0) || (isStartGroupOrder && isHoster) ? (
           <CheckoutBottomSheet cart={cart} onPress={this.onCheckoutPress} />
         ) : null}
       </View>

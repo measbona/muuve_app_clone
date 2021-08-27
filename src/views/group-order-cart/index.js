@@ -49,7 +49,18 @@ class GroupOrderCart extends React.PureComponent {
   }
 
   componentDidAppear() {
+    const {groupOrder, syncGroupOrder} = this.props;
+    const {group_key: groupKey} = groupOrder;
+
     this.setState({mounted: true});
+
+    syncGroupOrder(groupKey);
+  }
+
+  componentDidDisappear() {
+    const {unSyncGroupOrder} = this.props;
+
+    unSyncGroupOrder();
   }
 
   onInvite = async () => {
@@ -274,6 +285,8 @@ const mapState = ({profile, order, item}) => ({
 const mapDispatch = {
   getItem: ItemActions.getItem,
   setCartItem: CartActions.setCartItem,
+  syncGroupOrder: OrderActions.syncGroupOrder,
+  unSyncGroupOrder: OrderActions.unSyncGroupOrder,
   updateGroupOrderData: OrderActions.updateGroupOrderData,
   removeGroupOrderData: OrderActions.removeGroupOrderData,
 };
