@@ -23,23 +23,26 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 14,
     fontWeight: 'bold',
+    color: utils.colors.black,
   },
 });
 
 export default (props) => {
-  const {loading, onPress} = props;
+  const {isReady, loading, onPress} = props;
 
   return (
     <View style={[styles.wrapper, utils.shadows.bottomBar]}>
       <TouchableOpacity
         disabled={loading}
-        style={styles.button}
+        style={[styles.button, isReady && {backgroundColor: utils.colors.grey}]}
         activeOpacity={0.7}
         onPress={onPress}>
         {loading ? (
           <Loading style={{width: 40, height: 40}} />
         ) : (
-          <Text style={styles.text}>Ready to Checkout</Text>
+          <Text style={[styles.text, isReady && {color: utils.colors.border}]}>
+            Ready to Checkout
+          </Text>
         )}
       </TouchableOpacity>
     </View>

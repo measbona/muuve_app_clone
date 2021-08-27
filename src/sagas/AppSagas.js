@@ -1,8 +1,9 @@
-import {call, put} from 'redux-saga/effects';
+import {call, put, fork} from 'redux-saga/effects';
 import * as Navigator from '../navigation/screen';
 
 import Modules from '../modules';
 
+import OrderActions from '../redux/OrderRedux';
 import ProfileActions from '../redux/ProfileRedux';
 import RestaurantsActions from '../redux/RestaurantRedux';
 
@@ -21,12 +22,14 @@ export function* handleDynamicLink() {
     const hasDynamicLink = dynamicLink;
 
     if (hasDynamicLink) {
-      //get group order key and join user to that collection
-      alert('get group order key and join user to that collection');
-    }
+      const groupOrderKey = dynamicLink.split('=')[1];
 
-    yield call(Navigator.setRootHome);
+      yield put(OrderActions.getGroupOrderData(groupOrderKey));
+    } else {
+      yield call(Navigator.setRootHome);
+    }
   } catch (error) {
-    alert('error handledynamiclink')
+    console.tron.log(error);
+    alert('error handledynamiclink');
   }
 }

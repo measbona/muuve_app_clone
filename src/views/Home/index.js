@@ -2,6 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
+import {get} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 
@@ -38,13 +39,18 @@ const styles = StyleSheet.create({
 class Home extends React.PureComponent {
   state = {
     mounted: false,
+    loading: false,
   };
 
   componentDidMount() {
-    const {loaded, fetchRestaurants} = this.props;
+    const {loaded, fetchRestaurants, isStartGroupOrder} = this.props;
 
     if (!loaded) {
       fetchRestaurants();
+    }
+
+    if (isStartGroupOrder) {
+      this.handleParticipant();
     }
 
     Navigator.bindComponent(this);
@@ -54,10 +60,32 @@ class Home extends React.PureComponent {
     this.setState({mounted: true});
   }
 
+  handleParticipant = () => {
+    const {profile, groupOrder, restaurants, componentId} = this.props;
+    const {uid} = profile;
+
+    this.setState({loading: true});
+
+    const isParticipant = !get(
+      groupOrder,
+      ['joined_users', uid, 'host'],
+      false,
+    );
+
+    const restaurantKey = get(groupOrder, 'restaurant.key', '');
+    const restaurant = restaurants[restaurantKey];
+
+    if (isParticipant) {
+      this.setState({loading: false});
+
+      return Navigator.goToMerchantDetails(componentId, {restaurant});
+    }
+  };
+
   onMerchantPress = (restaurant) => {
     const {componentId} = this.props;
 
-    Navigator.goToMerchantDetails(componentId, {restaurant});
+    return Navigator.goToMerchantDetails(componentId, {restaurant});
   };
 
   renderHeaderComponent = () => {
@@ -80,7 +108,7 @@ class Home extends React.PureComponent {
   };
 
   render() {
-    const {mounted} = this.state;
+    const {mounted, loading} = this.state;
     const {restaurants, loaded} = this.props;
 
     const restaurantData = utils.helpers.convertObjectToArray(restaurants);
@@ -89,7 +117,7 @@ class Home extends React.PureComponent {
       <View style={styles.conatiner}>
         <Header onCartPress={() => {}} />
 
-        {loaded && mounted ? (
+        {(loaded && mounted) || loading ? (
           <FlatList
             data={restaurantData}
             contentContainerStyle={styles.flatList}
@@ -108,9 +136,12 @@ class Home extends React.PureComponent {
   }
 }
 
-const mapState = ({restaurant}) => ({
+const mapState = ({profile, restaurant, order}) => ({
+  profile: profile.data,
   loaded: restaurant.loaded,
   restaurants: restaurant.data,
+  groupOrder: order.groupOrderData,
+  isStartGroupOrder: order.groupOrderEnabled,
 });
 
 const mapDispatch = {

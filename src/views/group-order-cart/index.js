@@ -64,13 +64,11 @@ class GroupOrderCart extends React.PureComponent {
   }
 
   onInvite = async () => {
-    const {groupOrderLink, profile} = this.props;
-
-    const {link} = groupOrderLink;
+    const {groupOrder, profile} = this.props;
 
     try {
       await Share.share({
-        message: `${profile.family_name} ${profile.first_name} would like to invite you to join the order.\n${link}`,
+        message: `${profile.family_name} ${profile.first_name} would like to invite you to join the order.\n${groupOrder.link}`,
       });
     } catch (error) {
       alert(error.message);
@@ -90,13 +88,47 @@ class GroupOrderCart extends React.PureComponent {
 
   endSession = async () => {
     const {
+      cart,
+      profile,
+      groupOrder,
       componentId,
+      setCartItem,
       removeGroupOrderData,
-      groupOrder: {group_key},
+      updateGroupOrderData,
+      participantLeaveSession,
     } = this.props;
 
+    const {uid} = profile;
+    const {group_key} = groupOrder;
+    const isParticipant = !get(
+      groupOrder,
+      ['joined_users', uid, 'host'],
+      false,
+    );
+
     this.setState({loading: true});
-    await removeGroupOrderData(group_key);
+
+    if (isParticipant) {
+      const newGroupOrderData = {
+        ...groupOrder,
+        items: {
+          ...groupOrder.items,
+          [uid]: {},
+        },
+        joined_users: {
+          ...groupOrder.joined_users,
+          [uid]: {},
+        },
+        sub_total: groupOrder.sub_total - utils.helpers.sumCartTotal(cart),
+      };
+
+      await updateGroupOrderData(newGroupOrderData);
+      await participantLeaveSession();
+      await setCartItem({});
+    } else {
+      await removeGroupOrderData(group_key);
+    }
+
     this.setState({loading: false});
 
     Navigator.popToRoot(componentId);
@@ -194,13 +226,15 @@ class GroupOrderCart extends React.PureComponent {
     const {groupOrder, profile, updateGroupOrderData} = this.props;
     const {uid} = profile;
 
+    const isReady = get(groupOrder, ['joined_users', uid, 'ready'], false);
+
     const newGroupOrderData = {
       ...groupOrder,
       joined_users: {
         ...groupOrder.joined_users,
         [uid]: {
           ...groupOrder.joined_users[uid],
-          ready: true,
+          ready: !isReady,
         },
       },
     };
@@ -221,6 +255,20 @@ class GroupOrderCart extends React.PureComponent {
       false,
     );
 
+    const isReady = get(groupOrder, ['joined_users', uuid, 'ready'], false);
+    const itemData = itemReducer[restaurantKey];
+
+    const participantItems = reduce(
+      groupOrderItems,
+      (result, items, key) => {
+        if (key !== uuid) {
+          result[key] = items;
+        }
+        return result;
+      },
+      {},
+    );
+
     return (
       <View style={styles.container}>
         <NavBar
@@ -237,23 +285,32 @@ class GroupOrderCart extends React.PureComponent {
 
         {!loading && mounted ? (
           <ScrollView showsVerticalScrollIndicator={false}>
-            {map(groupOrderItems, (items, uid) => {
-              const itemData = itemReducer[restaurantKey];
-              const isHoster = groupOrder.joined_users[uid].host;
+            <Animatable.View animation="fadeIn" duration={300}>
+              <ListParticipantItem
+                uuid={uuid}
+                items={groupOrder.items[uuid]}
+                groupOrderUid={uuid}
+                itemData={itemData}
+                isHoster={groupOrder.joined_users[uuid].host}
+                groupOrder={groupOrder}
+                onPress={this.onDecrease}
+                participantName="Your Order"
+              />
+            </Animatable.View>
 
-              const participantName =
-                !isHoster && groupOrder.joined_users[uid].name;
-              const isReady = !isHoster && groupOrder.joined_users[uid].ready;
+            {map(participantItems, (items, uid) => {
+              const isHoster = groupOrder.joined_users[uid].host;
+              const participantName = groupOrder.joined_users[uid].name;
 
               return (
                 <Animatable.View key={uid} animation="fadeIn" duration={300}>
                   <ListParticipantItem
                     uuid={uuid}
                     items={items}
-                    isReady={isReady}
                     groupOrderUid={uid}
                     itemData={itemData}
                     isHoster={isHoster}
+                    groupOrder={groupOrder}
                     onPress={this.onDecrease}
                     participantName={participantName}
                   />
@@ -268,14 +325,19 @@ class GroupOrderCart extends React.PureComponent {
         )}
 
         {isParticipant ? (
-          <ReadyToCheckout loading={false} onPress={this.onReadyPress} />
+          <ReadyToCheckout
+            loading={false}
+            isReady={isReady}
+            onPress={this.onReadyPress}
+          />
         ) : null}
       </View>
     );
   }
 }
 
-const mapState = ({profile, order, item}) => ({
+const mapState = ({cart, profile, order, item}) => ({
+  cart: cart.data,
   profile: profile.data,
   itemReducer: item.data,
   groupOrderLink: order.url,
@@ -285,10 +347,13 @@ const mapState = ({profile, order, item}) => ({
 const mapDispatch = {
   getItem: ItemActions.getItem,
   setCartItem: CartActions.setCartItem,
+
   syncGroupOrder: OrderActions.syncGroupOrder,
   unSyncGroupOrder: OrderActions.unSyncGroupOrder,
+
   updateGroupOrderData: OrderActions.updateGroupOrderData,
   removeGroupOrderData: OrderActions.removeGroupOrderData,
+  participantLeaveSession: OrderActions.participantLeaveSession,
 };
 
 export default connect(mapState, mapDispatch)(GroupOrderCart);

@@ -47,9 +47,9 @@ export default ({
   uuid,
   items,
   onPress,
-  isReady,
   itemData,
   isHoster,
+  groupOrder,
   groupOrderUid,
   participantName,
 }) => {
@@ -57,14 +57,13 @@ export default ({
   const subTotal = utils.helpers.sumCartTotal(items);
 
   const lastItem = Object.values(items).pop();
+  const isReady = !isHoster && groupOrder.joined_users[uuid].ready;
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.headlineWrapper}>
         <View style={styles.nameWrapper}>
-          <Text style={styles.text}>
-            {isHoster ? 'Your Order' : participantName}
-          </Text>
+          <Text style={styles.text}>{participantName}</Text>
           {isReady ? (
             <MCIcon
               size={18}
@@ -96,7 +95,7 @@ export default ({
               isGroupOrderListing
               itemImage={itemImage}
               onPress={() => onPress(item)}
-              disabled={groupOrderUid !== uuid}
+              disabled={groupOrderUid !== uuid || isReady}
             />
             {!isLastItem && <View style={styles.divider} />}
           </View>

@@ -36,6 +36,6 @@ export function* handleUserProfile({payload}) {
       });
     }
   } catch (error) {
-    //
+    alert('error handleUserProfile');
   }
 }

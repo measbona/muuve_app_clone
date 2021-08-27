@@ -14,7 +14,10 @@ const {Types, Creators} = createActions(
 
     setUrl: ['val', 'bool'],
 
+    participantLeaveSession: null,
     setGroupOrderData: ['payload'],
+    getGroupOrderData: ['groupKey'],
+
     updateGroupOrderData: ['payload'],
     removeGroupOrderData: ['groupKey'],
   },
@@ -59,6 +62,12 @@ const syncGroupOrderHandler = (state = INITIAL_STATE, {groupKey}) =>
 const unSyncGroupOrderHandler = (state = INITIAL_STATE) =>
   state.set('loading', false);
 
+const participantLeaveSessionHandler = (state = INITIAL_STATE) =>
+  state
+    .set('url', '')
+    .set('groupOrderData', {})
+    .set('groupOrderEnabled', false);
+
 const HANDLERS = {
   [Types.SET_URL]: setUrlHandler,
 
@@ -68,6 +77,7 @@ const HANDLERS = {
   [Types.SET_GROUP_ORDER_DATA]: setGroupOrderDataHandler,
   [Types.UPDATE_GROUP_ORDER_DATA]: updateGroupOrderDataHandler,
   [Types.REMOVE_GROUP_ORDER_DATA]: removeGroupOrderDataHandler,
+  [Types.PARTICIPANT_LEAVE_SESSION]: participantLeaveSessionHandler,
 
   [Types.SET_LOADED]: setLoadedHandler,
   [Types.SET_LOADING]: setLoadingHandler,

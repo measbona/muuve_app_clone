@@ -24,6 +24,7 @@ export default store => {
 
       takeLatest(OrderTypes.SYNC_GROUP_ORDER, OrderSagas.syncGroupOrder),
       takeLatest(OrderTypes.GET_ORDER_HISTORY, OrderSagas.getOrderHistory),
+      takeEvery(OrderTypes.GET_GROUP_ORDER_DATA, OrderSagas.getGroupOrderData),
       takeLatest(OrderTypes.SET_GROUP_ORDER_DATA, OrderSagas.setGroupOrderData),
       takeLatest(OrderTypes.UPDATE_GROUP_ORDER_DATA, OrderSagas.updateGroupOrderData),
       takeLatest(OrderTypes.REMOVE_GROUP_ORDER_DATA, OrderSagas.removeGroupOrderData),

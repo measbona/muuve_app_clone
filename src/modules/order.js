@@ -1,6 +1,7 @@
 import moment from 'moment';
 import {size} from 'lodash';
-import firebase from '@react-native-firebase/app';
+import Database from '@react-native-firebase/database';
+import Firestore from '@react-native-firebase/firestore';
 
 import utils from '../utils';
 
@@ -8,12 +9,21 @@ import Item from './item';
 
 export default class Order {
   static getOrderHistory = async (phoneNumber) => {
-    const ref = firebase.database().ref(`deliveree_orders/${phoneNumber}`);
+    const ref = Database().ref(`deliveree_orders/${phoneNumber}`);
 
     const snapShot = await ref.once('value');
     const orders = snapShot.val();
 
     return orders;
+  };
+
+  static getGroupOrder = async (groupKey) => {
+    const collectionRef = Firestore().collection('group_orders').doc(groupKey);
+
+    const snapshot = await collectionRef.get();
+    const data = snapshot.data();
+
+    return data;
   };
 
   static createCheckOutOrder = async ({props, orderKey}) => {

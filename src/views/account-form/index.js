@@ -12,6 +12,7 @@ import utils from '../../utils';
 
 import NavBar from '../../lib/NavBar';
 import Loading from '../../lib/Loading';
+import AppActions from '../../redux/AppRedux';
 import NameInput from './components/NameInput';
 import DateBirthInput from './components/BirthDate';
 
@@ -90,7 +91,13 @@ class AccountForm extends React.Component {
 
   onSavePress = async () => {
     const {day, year, month, firstName, familyName} = this.state;
-    const {componentId, setProfile, isNewUser} = this.props;
+    const {
+      profile,
+      isNewUser,
+      setProfile,
+      componentId,
+      handleDynamicLink,
+    } = this.props;
 
     const uid = firebase.auth().currentUser.uid;
     const phoneNumber = firebase.auth().currentUser.phoneNumber;
@@ -107,14 +114,15 @@ class AccountForm extends React.Component {
 
       const updates = {};
       const data = {
-        family_name: familyName,
-        first_name: firstName,
-        dob,
         uid,
+        dob,
         region: 'pnh',
         language: 'kh',
+        first_name: firstName,
+        family_name: familyName,
         phone_number: phoneNumber,
-        created_at: Number(moment().format('x')),
+        ...(profile && {updated_at: Number(moment().format('x'))}),
+        created_at: profile ? profile.created_at : Number(moment().format('x')),
       };
 
       updates[`users/${uid}`] = data;
@@ -124,7 +132,7 @@ class AccountForm extends React.Component {
       this.setState({loading: false});
 
       if (isNewUser) {
-        return Navigator.setRootHome();
+        return handleDynamicLink();
       } else {
         return Navigator.popBack(componentId);
       }
@@ -208,6 +216,7 @@ const mapState = ({profile}) => ({
 
 const mapDispatch = {
   setProfile: ProfileActions.setProfile,
+  handleDynamicLink: AppActions.handleDynamicLink,
 };
 
 export default connect(mapState, mapDispatch)(AccountForm);

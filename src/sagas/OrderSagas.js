@@ -8,10 +8,13 @@ import {
   cancelled,
 } from 'redux-saga/effects';
 import {eventChannel} from 'redux-saga';
+import {get} from 'lodash';
+import * as Navigator from '../navigation/screen';
 import Firestore from '@react-native-firebase/firestore';
 
 import Modules from '../modules';
 
+import CartActions from '../redux/CartRedux';
 import OrderActions, {OrderTypes} from '../redux/OrderRedux';
 
 const observer = (collection) => {
@@ -83,6 +86,42 @@ export function* getOrderHistory() {
     yield put(OrderActions.setLoading(false));
   } catch (error) {
     yield put(OrderActions.setLoading(false));
+  }
+}
+
+export function* getGroupOrderData({groupKey}) {
+  const {uid, phone_number, family_name, first_name} = yield select(
+    (state) => state.profile.data,
+  );
+
+  try {
+    const data = yield call(Modules.Order.getGroupOrder, groupKey);
+
+    const groupOrderLink = data.link;
+    const cartData = get(data, ['items', uid], {});
+
+    const newData = {
+      ...data,
+      joined_users: {
+        ...data.joined_users,
+        [uid]: {
+          key: uid,
+          host: false,
+          ready: false,
+          joined: true,
+          tel: phone_number,
+          name: `${family_name} ${first_name}`,
+        },
+      },
+    };
+
+    yield put(OrderActions.updateGroupOrderData(newData));
+    yield put(OrderActions.setUrl(groupOrderLink, true));
+    yield put(CartActions.setCartItem(cartData));
+
+    yield call(Navigator.setRootHome);
+  } catch (error) {
+    alert('Error while getting Group Order', error.message || error);
   }
 }
 

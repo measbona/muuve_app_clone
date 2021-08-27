@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   leftSideWrapper: {
-    paddingVertical: 10,
+    paddingVertical: 12,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -85,10 +85,14 @@ export default (props) => {
         </View>
 
         <View style={styles.rightSideWrapper}>
-          <View style={styles.row}>
+          <View>
             <Text
               style={[styles.text, {fontSize: 12, color: utils.colors.border}]}>
               {`${itemCount} Items | ${participantCount} Participants`}
+            </Text>
+            <Text
+              style={[styles.text, {fontSize: 12, color: utils.colors.border}]}>
+              {`Total: $${groupOrder.sub_total}`}
             </Text>
           </View>
 

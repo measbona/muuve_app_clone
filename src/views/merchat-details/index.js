@@ -151,7 +151,9 @@ class MerchantDetails extends React.PureComponent {
     if (cartKey && cartKey !== restaurant.key) {
       return Navigator.showModalNotice({
         headline: 'Noticed',
-        description: "You can't make order with multiple stores.",
+        description: isStartGroupOrder
+          ? "You can't make order with different store of your group order."
+          : "You can't make order with multiple stores.",
         buttonName: 'Cancel',
       });
     }
@@ -202,12 +204,11 @@ class MerchantDetails extends React.PureComponent {
 
   renderHeaderComponent = () => {
     const {isStartGroupOrder, restaurant, groupOrder, profile} = this.props;
-    const {uid} = profile;
 
     const merchantName = get(restaurant, 'name', 'N/A');
     const isParticipant = !get(
       groupOrder,
-      ['joined_users', uid, 'host'],
+      ['joined_users', profile.uid, 'host'],
       false,
     );
 
@@ -264,16 +265,11 @@ class MerchantDetails extends React.PureComponent {
       cart,
       items,
       loaded,
+      profile,
       groupOrder,
       restaurant,
       componentId,
-      isStartGroupOrder,
     } = this.props;
-
-    const isHoster = find(
-      groupOrder.joined_users,
-      (user) => user.host === true,
-    );
 
     const itemsData = utils.helpers.convertObjectToArray(items[restaurant.key]);
     const opacity = this.scrollY.interpolate({
@@ -293,6 +289,12 @@ class MerchantDetails extends React.PureComponent {
       outputRange: [1.2, 1, 1],
       extrapolate: 'clamp',
     });
+
+    const isParticipant = !get(
+      groupOrder,
+      ['joined_users', profile.uid, 'host'],
+      false,
+    );
 
     return (
       <View style={{flex: 1}}>
@@ -328,7 +330,7 @@ class MerchantDetails extends React.PureComponent {
           </View>
         )}
 
-        {(mounted && size(cart) > 0) || (isStartGroupOrder && isHoster) ? (
+        {mounted && size(cart) > 0 && !isParticipant ? (
           <CheckoutBottomSheet cart={cart} onPress={this.onCheckoutPress} />
         ) : null}
       </View>
