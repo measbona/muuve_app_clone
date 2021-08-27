@@ -1,19 +1,27 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {View, Text, Image, TouchableOpacity, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  Image,
+  StatusBar,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import * as Navigator from '../../../navigation/screen';
 
 import utils from '../../../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
+    paddingBottom: 5.5,
     flexDirection: 'row',
-    paddingVertical: 5.5,
     paddingHorizontal: 16,
     borderBottomLeftRadius: 17,
     borderBottomRightRadius: 17,
     justifyContent: 'space-between',
     backgroundColor: utils.colors.yellow,
+    paddingTop: StatusBar.currentHeight + 5.5,
   },
   profileWrapper: {
     flexDirection: 'row',

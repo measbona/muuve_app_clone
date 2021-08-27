@@ -9,7 +9,6 @@ import SearchBar from '../../../lib/SearchBar';
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingBottom: 15,
     borderBottomLeftRadius: 17,
     borderBottomRightRadius: 17,
     backgroundColor: utils.colors.yellow,
@@ -46,7 +45,12 @@ export default class Header extends React.PureComponent {
     const {onCartPress} = this.props;
 
     return (
-      <View style={[styles.wrapper, utils.shadows.lightShadow]}>
+      <View
+        style={[
+          styles.wrapper,
+          utils.device.statusBar,
+          utils.shadows.lightShadow,
+        ]}>
         <View style={styles.locationWrapper}>
           <View style={styles.skeleton} />
           <View style={styles.column}>

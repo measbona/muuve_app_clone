@@ -26,6 +26,7 @@ export default (props) => {
           shadow={false}
           navigateColor={utils.colors.white}
           componentId={componentId}
+          style={utils.device.statusBar}
         />
       </Animatable.View>
 
@@ -34,7 +35,10 @@ export default (props) => {
         <NavBar
           title={merchantName}
           componentId={componentId}
-          style={{backgroundColor: utils.colors.yellow}}
+          style={{
+            ...utils.device.statusBar,
+            backgroundColor: utils.colors.yellow,
+          }}
         />
       </Animatable.View>
     </View>

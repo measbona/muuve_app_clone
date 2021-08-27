@@ -1,4 +1,4 @@
-import {Dimensions, Platform} from 'react-native';
+import {Dimensions, Platform, StatusBar} from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 const screenWidth = Dimensions.get('screen').width;
@@ -16,10 +16,16 @@ const paddinngTop = () => {
   return 20;
 };
 
+const statusBar = {
+  paddingBottom: 15,
+  paddingTop: StatusBar.currentHeight + 15,
+};
+
 export default {
   screenWidth,
   screenHeight,
   hasNotch,
   paddinngTop,
   isIphoneX,
+  statusBar,
 };

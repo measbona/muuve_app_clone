@@ -2,7 +2,6 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, FlatList, Animated, StyleSheet} from 'react-native';
-import moment from 'moment';
 import {get, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';

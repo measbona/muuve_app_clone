@@ -1,14 +1,14 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
-import MTIcon from 'react-native-vector-icons/MaterialIcons';
 import * as Navigator from '../navigation/screen';
+import MTIcon from 'react-native-vector-icons/MaterialIcons';
 
 import utils from '../utils';
 
 const styles = StyleSheet.create({
   wrapper: {
-    paddingVertical: 15,
     flexDirection: 'row',
+    ...utils.device.statusBar,
     borderBottomLeftRadius: 17,
     borderBottomRightRadius: 17,
   },

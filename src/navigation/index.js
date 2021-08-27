@@ -27,5 +27,16 @@ export const setDefaultNavigation = () => {
       drawBehind: true,
       animate: false,
     },
+    statusBar: {
+      style: 'dark',
+      drawBehind: true,
+      translucent: false,
+      backgroundColor: 'transparent',
+    },
+    animations: {
+      setRoot: {
+        waitForRender: true,
+      },
+    },
   });
 };
