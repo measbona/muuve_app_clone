@@ -1,4 +1,5 @@
 import moment from 'moment';
+import {size} from 'lodash';
 import firebase from '@react-native-firebase/app';
 
 import utils from '../utils';
@@ -16,19 +17,21 @@ export default class Order {
   };
 
   static createCheckOutOrder = async ({props, orderKey}) => {
-    const {cart, profile, restaurant} = props;
+    const {cart, profile, restaurant, isStartGroupOrder, groupOrder} = props;
 
-    const items = Item.serializeItems(cart);
+    const items = isStartGroupOrder
+      ? Item.serializeGroupOrderItems(groupOrder.items)
+      : Item.serializeItems(cart);
 
     const data = {
       items,
       key: orderKey,
       delivery_fee: 3,
       status: 'delivered',
-      is_group_order: false,
       region: profile.region,
       deliveree: profile.uid,
       tel: profile.phone_number,
+      is_group_order: isStartGroupOrder,
       delivery_address: 'current_address',
       delivery_place_name: 'Toul Tom pong',
       created_at: Number(moment().format('x')),
@@ -44,6 +47,46 @@ export default class Order {
         branch: Object.values(restaurant.branches)[0],
         cooking_duration: restaurant.cooking_duration,
       },
+    };
+
+    return data;
+  };
+
+  static createGroupOrder = async ({props, url, groupKey}) => {
+    const {profile, restaurant, cart} = props;
+
+    const subTotal = utils.helpers.sumCartTotal(cart);
+
+    const data = {
+      link: url,
+      sub_total: subTotal,
+      group_key: groupKey,
+      maximum_amount: 'unlimited',
+      minimum_amount: 'unlimited',
+      created_at: Number(moment().format('x')),
+      restaurant: {
+        key: restaurant.key,
+        name: restaurant.name,
+      },
+      joined_users: {
+        [profile.uid]: {
+          key: profile.uid,
+          tel: profile.phone_number,
+          name: `${profile.family_name} ${profile.first_name}`,
+          host: true,
+          joined: true,
+          ready: false,
+        },
+      },
+      ...(size(cart) > 0
+        ? {
+            items: {
+              [profile.uid]: cart,
+            },
+          }
+        : {
+            item: {},
+          }),
     };
 
     return data;

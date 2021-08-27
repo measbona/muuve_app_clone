@@ -1,7 +1,8 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
-import {reduce, size} from 'lodash';
+import {reduce, size, filter, every} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 import firebase from '@react-native-firebase/app';
@@ -10,11 +11,12 @@ import utils from '../../utils';
 import Modules from '../../modules';
 
 import NavBar from '../../lib/NavBar';
+import Loading from '../../lib/Loading';
+import PlaceOrder from './components/PlaceOrder';
+import ItemSection from './components/ItemSection';
 import PaymentSection from './components/PaymentSection';
 import MerchantSection from './components/MerchantSection';
 import PromocodeSection from './components/PromocodeSection';
-import ItemSection from './components/ItemSection';
-import PlaceOrder from './components/PlaceOrder';
 import PaymentOptionSection from './components/PaymentOptionSection';
 import DeliveryLocationSection from './components/DeliveryLocationSection';
 
@@ -27,6 +29,10 @@ const styles = StyleSheet.create({
     backgroundColor: utils.colors.lightGrey,
   },
   content: {flex: 1},
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
 });
 
 class Checkout extends React.PureComponent {
@@ -43,19 +49,44 @@ class Checkout extends React.PureComponent {
     this.setState({mounted: true});
   }
 
-  onPlaceOrderPress = () => {
-    Navigator.showModalChoice({
-      headline: 'Confirmation',
-      description:
-        'We notice that some participants not yet ready to order.Do you want to continue?',
-      no: 'CANCEL',
-      yes: 'CONTINUE',
-      onPress: this.onPlaceOrder,
+  validate = () => {
+    const {groupOrder, profile} = this.props;
+
+    const participants = filter(
+      groupOrder.joined_users,
+      (user, key) => profile.uid !== key,
+    );
+
+    const isOrderReady = every(participants, ['ready', true]);
+
+    return new Promise((resolve, reject) => {
+      if (!isOrderReady) {
+        return reject(
+          Navigator.showModalChoice({
+            headline: 'Confirmation',
+            description:
+              'We notice that some participants not yet ready to order.Do you want to continue?',
+            no: 'CANCEL',
+            yes: 'CONTINUE',
+            onPress: this.onPlaceOrder,
+          }),
+        );
+      }
+
+      return resolve(true);
     });
   };
 
   onPlaceOrder = async () => {
-    const {componentId, orders, profile, setOrder} = this.props;
+    const {
+      orders,
+      profile,
+      setOrder,
+      groupOrder,
+      componentId,
+      isStartGroupOrder,
+      removeGroupOrderData,
+    } = this.props;
 
     const orderRef = firebase
       .database()
@@ -64,6 +95,7 @@ class Checkout extends React.PureComponent {
     const orderKey = orderRef.push().key;
 
     try {
+      await this.validate();
       this.setState({loading: true});
 
       const order = await Modules.Order.createCheckOutOrder({
@@ -73,6 +105,10 @@ class Checkout extends React.PureComponent {
 
       await orderRef.update({[orderKey]: order});
       setOrder({...orders, [orderKey]: order});
+
+      if (isStartGroupOrder) {
+        removeGroupOrderData(groupOrder.group_key);
+      }
 
       this.setState({loading: false});
 
@@ -109,7 +145,6 @@ class Checkout extends React.PureComponent {
               key: remainItem.key,
               name: remainItem.name,
               price: remainItem.price,
-              added_at: remainItem.added_at,
               quantity: remainItem.quantity,
             };
           }
@@ -127,7 +162,6 @@ class Checkout extends React.PureComponent {
               key: remainItem.key,
               name: remainItem.name,
               price: remainItem.price,
-              added_at: remainItem.added_at,
               quantity: remainItem.quantity - 1,
             };
           } else {
@@ -135,7 +169,6 @@ class Checkout extends React.PureComponent {
               key: remainItem.key,
               name: remainItem.name,
               price: remainItem.price,
-              added_at: remainItem.added_at,
               quantity: remainItem.quantity,
             };
           }
@@ -165,7 +198,14 @@ class Checkout extends React.PureComponent {
 
   render() {
     const {mounted, loading} = this.state;
-    const {componentId, restaurant, isStartGroupOrder, cart} = this.props;
+    const {
+      cart,
+      profile,
+      restaurant,
+      groupOrder,
+      componentId,
+      isStartGroupOrder,
+    } = this.props;
 
     return (
       <View style={styles.conatiner}>
@@ -185,6 +225,8 @@ class Checkout extends React.PureComponent {
               <DeliveryLocationSection />
               <ItemSection
                 cart={cart}
+                profile={profile}
+                groupOrder={groupOrder}
                 onDecrease={this.onDecrease}
                 onGroupOrderPress={this.onGroupOrderPress}
                 isStartGroupOrder={isStartGroupOrder}
@@ -195,7 +237,11 @@ class Checkout extends React.PureComponent {
             </ScrollView>
             <PlaceOrder loading={loading} onPress={this.onPlaceOrder} />
           </Animatable.View>
-        ) : null}
+        ) : (
+          <View style={styles.loading}>
+            <Loading color="yellow" style={{alignSelf: 'center'}} />
+          </View>
+        )}
       </View>
     );
   }
@@ -205,13 +251,15 @@ const mapState = ({order, cart, profile}) => ({
   cart: cart.data,
   orders: order.data,
   profile: profile.data,
-  isStartGroupOrder: cart.enableGroupOrderSession,
+  groupOrder: order.groupOrderData,
+  isStartGroupOrder: order.groupOrderEnabled,
 });
 
 const mapDispatch = {
   setCartKey: CartActions.setCartKey,
   setCartItem: CartActions.setCartItem,
   setOrder: OrderActions.setOrderHistory,
+  removeGroupOrderData: OrderActions.removeGroupOrderData,
 };
 
 export default connect(mapState, mapDispatch)(Checkout);

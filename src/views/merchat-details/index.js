@@ -19,8 +19,9 @@ import ListCategories from './components/ListCategories';
 import CheckoutBottomSheet from './components/CheckoutBottomSheet';
 import MerchantInfoSection from './components/MerchantInfoSection';
 
-import ItemActions from '../../redux/ItemRedux';
 import CartActions from '../../redux/CartRedux';
+import ItemActions from '../../redux/ItemRedux';
+import OrderActions from '../../redux/OrderRedux';
 
 const styles = StyleSheet.create({
   emptySpace: {
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     borderColor: utils.colors.grey,
   },
-  flatList: {marginTop: 30},
+  flatList: {marginTop: 40},
   loading: {
     flex: 1,
     justifyContent: 'center',
@@ -85,8 +86,14 @@ class MerchantDetails extends React.PureComponent {
     Navigator.goToCheckout(componentId, {restaurant});
   };
 
+  onPreview = () => {
+    const {componentId} = this.props;
+
+    Navigator.goToGroupOrderCart(componentId);
+  };
+
   onEndSession = () => {
-    const {setEnableGroupOrderSession} = this.props;
+    const {removeGroupOrderData, groupOrderKey} = this.props;
 
     Navigator.showModalChoice({
       headline: 'End Session',
@@ -94,32 +101,53 @@ class MerchantDetails extends React.PureComponent {
         'Your participants is ordering their items. Are you sure to terminate this session?',
       no: 'Cancel',
       yes: 'Continue',
-      onPress: () => setEnableGroupOrderSession(false),
+      onPress: () => removeGroupOrderData(groupOrderKey),
     });
   };
 
   onGroupOrderPress = () => {
-    const {componentId, setEnableGroupOrderSession, merchant} = this.props;
+    const {componentId, restaurant, cartKey} = this.props;
 
     Navigator.showModalChoice({
       headline: 'Group Order',
       description:
-        'Share your group order link with others. They can add their favorite items. Checkout and get it all delivered together.',
+        'Share your group order link with others.\nThey can add their favorite items.\nCheckout and get it all delivered together.',
       no: 'Cancel',
       yes: 'Start Group Order',
       onPress: () => {
-        setEnableGroupOrderSession(true);
-        Navigator.goToGroupOrder(componentId, {merchant});
+        if (cartKey && cartKey !== restaurant.key) {
+          Navigator.dismissOverLay();
+
+          return Navigator.showModalNotice({
+            headline: 'Noticed',
+            description:
+              'You can only make group order from the store you have already ordered in the card.',
+            buttonName: 'Cancel',
+          });
+        }
+
+        return Navigator.goToGroupOrder(componentId, {restaurant});
       },
     });
   };
 
   onItemPress = async (item, itemKey) => {
     const {selectedItems} = this.state;
-    const {setCartItem, restaurant, setCartKey, cartKey} = this.props;
+    const {
+      cartKey,
+      profile,
+      restaurant,
+      setCartKey,
+      groupOrder,
+      setCartItem,
+      isStartGroupOrder,
+      updateGroupOrderData,
+    } = this.props;
 
+    let newSelectedItems = null;
     const restaurantKey = restaurant.key;
-    const isIncrease = Boolean(selectedItems[itemKey]);
+    const isIncreaseQuantity = Boolean(selectedItems[itemKey]);
+    const {uid} = profile;
 
     if (cartKey && cartKey !== restaurant.key) {
       return Navigator.showModalNotice({
@@ -129,45 +157,67 @@ class MerchantDetails extends React.PureComponent {
       });
     }
 
-    if (isIncrease) {
+    if (isIncreaseQuantity) {
       const selectedItem = selectedItems[item.key];
-      const newSelectedItems = {
+      newSelectedItems = {
         ...selectedItems,
         [selectedItem.key]: {
           ...selectedItem,
           quantity: selectedItem.quantity + 1,
         },
       };
-
-      this.setState({selectedItems: newSelectedItems});
-      setCartItem(newSelectedItems);
     } else {
-      const newSelectedItems = {
+      newSelectedItems = {
         ...selectedItems,
         [itemKey]: {
           quantity: 1,
           key: itemKey,
           name: item.name,
           price: item.current_price,
-          added_at: Number(moment().format('x')),
         },
       };
+    }
 
-      this.setState({selectedItems: newSelectedItems});
-      setCartItem(newSelectedItems);
+    if (isStartGroupOrder) {
+      const newGroupOrderData = {
+        ...groupOrder,
+        items: {
+          ...groupOrder.items,
+          [uid]: newSelectedItems,
+        },
+        sub_total: Number(
+          parseFloat(groupOrder.sub_total + item.current_price).toFixed(2),
+        ),
+      };
+
+      updateGroupOrderData(newGroupOrderData);
+    }
+
+    if (!cartKey) {
       setCartKey(restaurantKey);
     }
+
+    this.setState({selectedItems: newSelectedItems});
+    setCartItem(newSelectedItems);
   };
 
   renderHeaderComponent = () => {
-    const {isStartGroupOrder, restaurant} = this.props;
+    const {isStartGroupOrder, restaurant, groupOrder, profile} = this.props;
+    const {uid} = profile;
 
     const merchantName = get(restaurant, 'name', 'N/A');
+    const isParticipant = !get(
+      groupOrder,
+      ['joined_users', uid, 'host'],
+      false,
+    );
 
     return (
       <Animatable.View animation="fadeIn" duration={300}>
         <MerchantInfoSection merchantName={merchantName} />
         <GroupOrder
+          onPreview={this.onPreview}
+          isParticipant={isParticipant}
           onEndSession={this.onEndSession}
           isStartGroupOrder={isStartGroupOrder}
           onGroupOrderPress={this.onGroupOrderPress}
@@ -262,7 +312,7 @@ class MerchantDetails extends React.PureComponent {
           />
         ) : (
           <View style={styles.loading}>
-            <Loading style={{alignSelf: 'center'}} />
+            <Loading color="yellow" style={{alignSelf: 'center'}} />
           </View>
         )}
 
@@ -274,19 +324,23 @@ class MerchantDetails extends React.PureComponent {
   }
 }
 
-const mapState = ({item, cart}) => ({
+const mapState = ({profile, item, cart, order}) => ({
   cart: cart.data,
   items: item.data,
   cartKey: cart.key,
   loaded: item.loading,
-  isStartGroupOrder: cart.enableGroupOrderSession,
+  profile: profile.data,
+  groupOrder: order.groupOrderData,
+  isStartGroupOrder: order.groupOrderEnabled,
+  groupOrderKey: order.groupOrderData.group_key,
 });
 
 const mapDispatch = {
   getItem: ItemActions.getItem,
   setCartKey: CartActions.setCartKey,
   setCartItem: CartActions.setCartItem,
-  setEnableGroupOrderSession: CartActions.setEnableGroupOrderSession,
+  updateGroupOrderData: OrderActions.updateGroupOrderData,
+  removeGroupOrderData: OrderActions.removeGroupOrderData,
 };
 
 export default connect(mapState, mapDispatch)(MerchantDetails);

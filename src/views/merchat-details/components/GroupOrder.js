@@ -27,11 +27,17 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {onEndSession, onGroupOrderPress, isStartGroupOrder} = props;
+  const {
+    onPreview,
+    onEndSession,
+    isParticipant,
+    onGroupOrderPress,
+    isStartGroupOrder,
+  } = props;
 
-  return (
-    <View style={styles.wrapper}>
-      {!isStartGroupOrder ? (
+  const renderButtons = () => {
+    if (!isStartGroupOrder && isParticipant) {
+      return (
         <TouchableOpacity
           style={styles.button}
           activeOpacity={0.7}
@@ -44,7 +50,9 @@ export default (props) => {
           />
           <Text style={styles.text}>Group Order</Text>
         </TouchableOpacity>
-      ) : (
+      );
+    } else if (isStartGroupOrder && !isParticipant) {
+      return (
         <TouchableOpacity
           style={styles.button}
           activeOpacity={0.7}
@@ -57,7 +65,24 @@ export default (props) => {
           />
           <Text style={styles.text}>End Session</Text>
         </TouchableOpacity>
-      )}
-    </View>
-  );
+      );
+    } else if (isParticipant) {
+      return (
+        <TouchableOpacity
+          style={styles.button}
+          activeOpacity={0.7}
+          onPress={() => onPreview()}>
+          <MIcon
+            name="format-list-bulleted"
+            size={18}
+            color={utils.colors.blue}
+            style={styles.icon}
+          />
+          <Text style={styles.text}>Preview Order</Text>
+        </TouchableOpacity>
+      );
+    }
+  };
+
+  return <View style={styles.wrapper}>{renderButtons()}</View>;
 };

@@ -17,13 +17,14 @@ const styles = StyleSheet.create({
     backgroundColor: utils.colors.white,
   },
   merchantNameWrapper: {
+    paddingBottom: 5,
     alignItems: 'center',
     flexDirection: 'row',
-    paddingBottom: 5,
     paddingHorizontal: 12,
     justifyContent: 'space-between',
   },
   text: {
+    fontSize: 15,
     fontWeight: 'bold',
     color: utils.colors.blue,
   },

@@ -8,15 +8,25 @@ const {Types, Creators} = createActions(
     setLoaded: ['bool'],
     setLoading: ['bool'],
     setOrderHistory: ['payload'],
+
+    setUrl: ['val', 'bool'],
+    setGroupOrderEnabled: ['val'],
+    setGroupOrderData: ['payload'],
+    updateGroupOrderData: ['payload'],
+    removeGroupOrderData: ['groupKey'],
   },
   {prefix: 'ORDER_REDUX_'},
 );
 
 const INITIAL_STATE = Immutable({
+  url: '',
+
   data: {},
+  groupOrderData: {},
 
   loaded: false,
   loading: false,
+  groupOrderEnabled: false,
 });
 
 const setOrderHistoryHandler = (state = INITIAL_STATE, {payload}) =>
@@ -28,9 +38,26 @@ const setLoadingHandler = (state = INITIAL_STATE, {bool}) =>
 const setLoadedHandler = (state = INITIAL_STATE, {bool}) =>
   state.set('loaded', bool);
 
+const setUrlHandler = (state = INITIAL_STATE, {val, bool}) =>
+  state.set('url', val).set('groupOrderEnabled', bool);
+
+const setGroupOrderDataHandler = (state = INITIAL_STATE, {payload}) =>
+  state.set('groupOrderData', payload);
+
+const updateGroupOrderDataHandler = (state = INITIAL_STATE, {payload}) =>
+  state.set('groupOrderData', payload);
+
+const removeGroupOrderDataHandler = (state = INITIAL_STATE, {groupKey}) =>
+  state.set('groupOrderData', {});
+
 const HANDLERS = {
-  [Types.SET_LOADING]: setLoadingHandler,
+  [Types.SET_URL]: setUrlHandler,
+  [Types.SET_GROUP_ORDER_DATA]: setGroupOrderDataHandler,
+  [Types.UPDATE_GROUP_ORDER_DATA]: updateGroupOrderDataHandler,
+  [Types.REMOVE_GROUP_ORDER_DATA]: removeGroupOrderDataHandler,
+
   [Types.SET_LOADED]: setLoadedHandler,
+  [Types.SET_LOADING]: setLoadingHandler,
   [Types.SET_ORDER_HISTORY]: setOrderHistoryHandler,
 };
 

@@ -10,12 +10,17 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import firebase from '@react-native-firebase/app';
+import * as Navigator from '../../navigation/screen';
+import * as Animatable from 'react-native-animatable';
 
 import utils from '../../utils';
 import Modules from '../../modules';
 
 import NavBar from '../../lib/NavBar';
+import Loading from '../../lib/Loading';
 import LinkBox from './components/LinkBox';
+
+import OrderActions from '../../redux/OrderRedux';
 
 const styles = StyleSheet.create({
   conatiner: {
@@ -44,60 +49,78 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: utils.colors.blue,
   },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
 });
 
 class GroupOrder extends React.PureComponent {
   state = {
     url: null,
+    mounted: false,
+    urlLoaded: false,
   };
 
   componentDidMount() {
     this.createGroupOrderLink();
+
+    Navigator.bindComponent(this);
+  }
+
+  componentDidAppear() {
+    this.setState({mounted: true});
   }
 
   createGroupOrderLink = async () => {
-    const {user} = this.props;
+    const {profile, setGroupOrderData} = this.props;
 
-    const {id: gcid} = firebase.firestore().collection('group_orders').doc();
+    try {
+      const {id: gcid} = firebase.firestore().collection('group_orders').doc();
+      const deepLink = `https://muuveclone.page.link/grouporder?gcid=${gcid}`;
 
-    const deepLink = `https://muuveclone.page.link/grouporder?gcid=${gcid}`;
+      const linkParams = {
+        deepLink,
+        domain: 'https://muuveclone.page.link',
+        title: 'Group Order',
+        description: `${profile.family_name} ${profile.first_name} would like to invite you to join the order`,
+      };
 
-    const linkParams = {
-      deepLink,
-      domain: 'https://muuveclone.page.link',
-      title: 'Group Order',
-      description: `${user.family_name} ${user.first_name} would like to invite you to join the order`,
-    };
+      const url = await Modules.DynamicLinks.buildShortLink(linkParams);
+      const groupOrderData = await Modules.Order.createGroupOrder({
+        url,
+        ...this,
+        groupKey: gcid,
+      });
 
-    const dynamicLink = await Modules.DynamicLinks.buildShortLink(linkParams);
+      await setGroupOrderData(groupOrderData);
 
-    this.setState({url: dynamicLink});
+      this.setState({url, urlLoaded: true});
+    } catch (error) {
+      Navigator.showModalNotice({
+        headline: 'Oops!!',
+        description:
+          'Something went wrong while creating group order.\nPlease try again.',
+        buttonName: 'Continue',
+      });
+    }
   };
 
   onSharePress = async () => {
     const {url} = this.state;
+    const {profile} = this.props;
 
     try {
-      const result = await Share.share({
-        url,
+      await Share.share({
+        message: `${profile.family_name} ${profile.first_name} would like to invite you to join the order.\n${url}`,
       });
-
-      if (result.action === Share.sharedAction) {
-        if (result.activityType) {
-          // shared with activity type of result.activityType
-        } else {
-          // shared
-        }
-      } else if (result.action === Share.dismissedAction) {
-        // dismissed
-      }
     } catch (error) {
       alert(error.message);
     }
   };
 
   render() {
-    const {url} = this.state;
+    const {url, mounted, urlLoaded} = this.state;
     const {componentId} = this.props;
 
     return (
@@ -108,43 +131,63 @@ class GroupOrder extends React.PureComponent {
           style={{backgroundColor: utils.colors.yellow}}
         />
 
-        <View style={styles.contentWrapper}>
-          <View>
-            <Text style={[styles.text, {marginBottom: 10}]}>
-              Start a group order
-            </Text>
-            <Text
-              style={[styles.text, {fontSize: 14, color: utils.colors.black}]}>
-              Allow participants to add items to your order. Large orders many
-              take longer to prepare.
-            </Text>
-          </View>
-          <View style={styles.imageWrapper}>
-            <Image
-              style={styles.image}
-              source={require('../../assets/images/friends.png')}
-            />
-          </View>
+        {urlLoaded && mounted ? (
+          <Animatable.View
+            style={styles.contentWrapper}
+            animation="fadeIn"
+            duration={300}>
+            <View>
+              <Text style={[styles.text, {marginBottom: 10, fontSize: 18}]}>
+                Start a group order
+              </Text>
+              <Text
+                style={[
+                  styles.text,
+                  {fontSize: 14, color: utils.colors.black},
+                ]}>
+                Allow participants to add items to your order. Large orders many
+                take longer to prepare.
+              </Text>
+            </View>
+            <View style={styles.imageWrapper}>
+              <Image
+                style={styles.image}
+                source={require('../../assets/images/friends.png')}
+              />
+            </View>
 
-          <LinkBox url={url} />
+            <LinkBox url={url} />
 
-          <TouchableOpacity
-            style={styles.button}
-            activeOpacity={0.7}
-            onPress={this.onSharePress}>
-            <Text
-              style={[styles.text, {fontSize: 14, color: utils.colors.white}]}>
-              SHARE LINK
-            </Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.button}
+              activeOpacity={0.7}
+              onPress={this.onSharePress}>
+              <Text
+                style={[
+                  styles.text,
+                  {fontSize: 14, color: utils.colors.white},
+                ]}>
+                SHARE LINK
+              </Text>
+            </TouchableOpacity>
+          </Animatable.View>
+        ) : (
+          <View style={styles.loading}>
+            <Loading color="yellow" style={{alignSelf: 'center'}} />
+          </View>
+        )}
       </View>
     );
   }
 }
 
-const mapState = ({profile}) => ({
-  user: profile.data,
+const mapState = ({profile, cart}) => ({
+  cart: cart.data,
+  profile: profile.data,
 });
 
-export default connect(mapState)(GroupOrder);
+const mapDispatch = {
+  setGroupOrderData: OrderActions.setGroupOrderData,
+};
+
+export default connect(mapState, mapDispatch)(GroupOrder);

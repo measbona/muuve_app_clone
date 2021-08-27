@@ -24,12 +24,36 @@ const sumCartTotal = (cart) => {
     total += itemPrice;
   });
 
-  return parseFloat(total);
+  return Number(parseFloat(total).toFixed(2));
+};
+
+const countGroupOrderItem = (items) => {
+  let total = 0;
+
+  forEach(items, (user) => {
+    forEach(user, (item) => {
+      total += item.quantity;
+    });
+  });
+
+  return Number(total);
+};
+
+const countParticipantItem = (items) => {
+  let total = 0;
+
+  forEach(items, (item) => {
+    total += item.quantity;
+  });
+
+  return Number(total);
 };
 
 export default {
-  convertObjectToArray,
-  removeWhiteSpace,
-  removeLeadZeroNumber,
   sumCartTotal,
+  removeWhiteSpace,
+  countGroupOrderItem,
+  convertObjectToArray,
+  countParticipantItem,
+  removeLeadZeroNumber,
 };

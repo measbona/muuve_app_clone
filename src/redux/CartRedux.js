@@ -3,19 +3,16 @@ import Immutable from 'seamless-immutable';
 
 const {Types, Creators} = createActions(
   {
-    setCartItem: ['payload'],
     setCartKey: ['key'],
-
-    setEnableGroupOrderSession: ['val'],
+    setCartItem: ['payload'],
   },
   {prefix: 'CART_REDIX_'},
 );
 
 const INITIAL_STATE = Immutable({
   data: {},
-  key: null,
 
-  enableGroupOrderSession: false,
+  key: null,
 });
 
 const setCartItemHandler = (state = INITIAL_STATE, {payload}) =>
@@ -24,14 +21,9 @@ const setCartItemHandler = (state = INITIAL_STATE, {payload}) =>
 const setCartKeyHandler = (state = INITIAL_STATE, {key}) =>
   state.set('key', key);
 
-const setEnableGroupOrderSessionHandler = (state = INITIAL_STATE, {val}) =>
-  state.set('enableGroupOrderSession', val);
-
 const HANDLERS = {
   [Types.SET_CART_ITEM]: setCartItemHandler,
   [Types.SET_CART_KEY]: setCartKeyHandler,
-
-  [Types.SET_ENABLE_GROUP_ORDER_SESSION]: setEnableGroupOrderSessionHandler,
 };
 
 export const CartTypes = Types;

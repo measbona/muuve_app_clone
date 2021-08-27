@@ -1,3 +1,4 @@
+/* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
@@ -8,6 +9,7 @@ import * as Animatable from 'react-native-animatable';
 import utils from '../../utils';
 
 import NavBar from '../../lib/NavBar';
+import Loading from '../../lib/Loading';
 import ItemSection from '../checkout/components/ItemSection';
 import PaymentSection from '../checkout/components/PaymentSection';
 import MerchantSection from '../checkout/components/MerchantSection';
@@ -21,6 +23,10 @@ const styles = StyleSheet.create({
     backgroundColor: utils.colors.lightGrey,
   },
   content: {flex: 1},
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+  },
 });
 
 class OrderDetails extends React.PureComponent {
@@ -34,6 +40,10 @@ class OrderDetails extends React.PureComponent {
     Navigator.bindComponent(this);
   }
 
+  componentDidAppear() {
+    this.setState({mounted: true});
+  }
+
   clearCart = () => {
     const {cart, setCartItem, setCartKey} = this.props;
 
@@ -44,10 +54,6 @@ class OrderDetails extends React.PureComponent {
 
     return null;
   };
-
-  componentDidAppear() {
-    this.setState({mounted: true});
-  }
 
   render() {
     const {mounted} = this.state;
@@ -77,7 +83,11 @@ class OrderDetails extends React.PureComponent {
               <PaymentSection orderType="order-details" order={order} />
             </ScrollView>
           </Animatable.View>
-        ) : null}
+        ) : (
+          <View style={styles.loading}>
+            <Loading color="yellow" style={{alignSelf: 'center'}} />
+          </View>
+        )}
       </View>
     );
   }

@@ -1,6 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {map} from 'lodash';
+import {map, size, every, filter} from 'lodash';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -43,12 +43,14 @@ const styles = StyleSheet.create({
 
 export default (props) => {
   const {
+    cart,
+    order,
+    profile,
+    orderType,
+    groupOrder,
     onDecrease,
     onGroupOrderPress,
-    cart,
     isStartGroupOrder,
-    orderType,
-    order,
   } = props;
 
   const isOrderDetails = orderType === 'order-details';
@@ -67,6 +69,7 @@ export default (props) => {
       return (
         <TouchableOpacity
           key={key}
+          disabled={isOrderDetails}
           style={styles.groupInfo}
           activeOpacity={0.7}
           onPress={() => onDecrease(item)}>
@@ -98,13 +101,6 @@ export default (props) => {
                 ]}>
                 {item.name}
               </Text>
-              <Text
-                style={[
-                  styles.text,
-                  {fontSize: 12, color: utils.colors.border},
-                ]}>
-                {''}
-              </Text>
             </View>
           </View>
 
@@ -120,7 +116,35 @@ export default (props) => {
     });
   };
 
+  const groupOrderStatus = (isWaiting, isOrderReady) => {
+    if (isWaiting) {
+      return 'Waiting Participants...';
+    }
+
+    if (!isWaiting) {
+      return 'Participants is ordering...';
+    }
+
+    if (isOrderReady) {
+      return 'Ready to Checkout';
+    }
+  };
+
   const GroupOrder = () => {
+    const subTotal = groupOrder.sub_total;
+    const participantCount = size(groupOrder.joined_users);
+    const itemCount = utils.helpers.countGroupOrderItem(groupOrder.items);
+
+    const participants = filter(
+      groupOrder.joined_users,
+      (user, key) => profile.uid !== key,
+    );
+
+    const isWaiting = participants.length === 0;
+    const isOrderReady = participants
+      ? every(participants, ['ready', true])
+      : false;
+
     return (
       <TouchableOpacity
         style={styles.groupInfo}
@@ -139,11 +163,11 @@ export default (props) => {
           <View style={styles.column}>
             <Text
               style={[styles.text, {fontSize: 14, color: utils.colors.black}]}>
-              Ready to Checkout
+              {groupOrderStatus(isWaiting, isOrderReady)}
             </Text>
             <Text
               style={[styles.text, {fontSize: 12, color: utils.colors.border}]}>
-              3 Participants
+              {`${participantCount} Participants`}
             </Text>
           </View>
         </View>
@@ -151,16 +175,16 @@ export default (props) => {
         <View style={[styles.row, {alignSelf: 'center'}]}>
           <Text
             style={[styles.text, {fontSize: 15, color: utils.colors.black}]}>
-            3 x{' '}
+            {`${itemCount} x `}
           </Text>
-          <Text style={[styles.text, {fontSize: 15}]}>$5.55</Text>
+          <Text style={[styles.text, {fontSize: 15}]}>{`$${subTotal}`}</Text>
         </View>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View style={styles.wrapper}>
+    <View style={[styles.wrapper, isOrderDetails && {paddingBottom: 5}]}>
       <Text style={[styles.text, {fontSize: 17, marginBottom: 15}]}>
         {headline}
       </Text>

@@ -40,24 +40,37 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {item, cart, onPress, isSelectedItem} = props;
+  const {
+    item,
+    cart,
+    onPress,
+    itemImage,
+    isSelectedItem,
+    disabled = false,
+    isGroupOrderListing = false,
+  } = props;
 
   const name = get(item, 'name', 'N/A');
-  const logo = get(item, 'images.thumb', null);
-  const price = get(item, 'current_price', 'N/A');
+  const logo = itemImage ? itemImage : get(item, 'images.thumb', null);
+  const price = item.current_price
+    ? get(item, 'current_price', 'N/A')
+    : get(item, 'price', 'N/A');
   const quantity = (isSelectedItem && cart[item.key].quantity) || null;
 
   const itemImageSource = logo
     ? {uri: logo}
     : require('../../../assets/images/muuve_logo.png');
 
+  const itemName = isGroupOrderListing ? `${name} x ${item.quantity}` : name;
+
   return (
     <TouchableOpacity
       style={styles.wrapper}
       activeOpacity={0.7}
+      disabled={disabled}
       onPress={onPress}>
       <View style={styles.infoWrapper}>
-        <Text style={styles.text}>{name}</Text>
+        <Text style={styles.text}>{itemName}</Text>
         <Text style={[styles.text, {fontSize: 12}]}>{`$${price}`}</Text>
       </View>
       <View style={styles.imageWrapper}>

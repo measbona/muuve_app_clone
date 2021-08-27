@@ -100,7 +100,7 @@ class Home extends React.PureComponent {
           />
         ) : (
           <View style={styles.loading}>
-            <Loading style={{alignSelf: 'center'}} />
+            <Loading color="yellow" style={{alignSelf: 'center'}} />
           </View>
         )}
       </View>

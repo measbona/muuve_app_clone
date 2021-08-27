@@ -113,7 +113,7 @@ class OrderHistory extends React.Component {
           </ScrollView>
         ) : (
           <View style={styles.loading}>
-            <Loading style={{alignSelf: 'center'}} />
+            <Loading color="yellow" style={{alignSelf: 'center'}} />
           </View>
         )}
       </View>

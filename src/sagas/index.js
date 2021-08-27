@@ -22,8 +22,12 @@ export default store => {
       takeEvery(ProfileTypes.INITIAL_PROFILE, ProfileSagas.initialProfile),
       takeEvery(ProfileTypes.HANDLE_USER_PROFILE, ProfileSagas.handleUserProfile,),
 
-      takeLatest(ItemTypes.GET_ITEM, ItemSagas.getItem),
       takeLatest(OrderTypes.GET_ORDER_HISTORY, OrderSagas.getOrderHistory),
+      takeLatest(OrderTypes.SET_GROUP_ORDER_DATA, OrderSagas.setGroupOrderData),
+      takeLatest(OrderTypes.UPDATE_GROUP_ORDER_DATA, OrderSagas.updateGroupOrderData),
+      takeLatest(OrderTypes.REMOVE_GROUP_ORDER_DATA, OrderSagas.removeGroupOrderData),
+
+      takeLatest(ItemTypes.GET_ITEM, ItemSagas.getItem),
       takeEvery(RestaurantTypes.GET_RESTAURANTS, RestaurantSagas.getRestaurants),
     ]);
   };
