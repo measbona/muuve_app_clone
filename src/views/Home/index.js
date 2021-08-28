@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, Text, FlatList, StyleSheet} from 'react-native';
-import {get} from 'lodash';
+import {get, find} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 
@@ -12,6 +12,7 @@ import Loading from '../../lib/Loading';
 import Header from './components/Header';
 import Restaurant from './components/Restaurant';
 
+import OrderActions from '../../redux/OrderRedux';
 import RestaurantActions from '../../redux/RestaurantRedux';
 
 const styles = StyleSheet.create({
@@ -57,25 +58,36 @@ class Home extends React.PureComponent {
   }
 
   componentDidAppear() {
+    const {profile, groupOrder, removeParticipant} = this.props;
+
     this.setState({mounted: true});
+
+    const isAlreadyLeft = !get(
+      groupOrder,
+      ['joined_users', profile.uid, 'joined'],
+      false,
+    );
+
+    if (isAlreadyLeft) {
+      removeParticipant();
+    }
   }
 
   handleParticipant = () => {
     const {profile, groupOrder, restaurants, componentId} = this.props;
-    const {uid} = profile;
 
     this.setState({loading: true});
 
-    const isParticipant = !get(
-      groupOrder,
-      ['joined_users', uid, 'host'],
-      false,
-    );
-
     const restaurantKey = get(groupOrder, 'restaurant.key', '');
     const restaurant = restaurants[restaurantKey];
+    const currentUser = find(
+      groupOrder.joined_users,
+      (user) => user.key === profile.uid,
+    );
 
-    if (isParticipant) {
+    const isParticipant = !get(currentUser, 'host', false);
+
+    if (!isParticipant) {
       this.setState({loading: false});
 
       return Navigator.goToMerchantDetails(componentId, {restaurant});
@@ -145,6 +157,8 @@ const mapState = ({profile, restaurant, order}) => ({
 });
 
 const mapDispatch = {
+  setUrl: OrderActions.setUrl,
+  removeParticipant: OrderActions.removeParticipant,
   fetchRestaurants: RestaurantActions.getRestaurants,
 };
 

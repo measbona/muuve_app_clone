@@ -2,14 +2,6 @@
 import dynamicLinks from '@react-native-firebase/dynamic-links';
 
 export default class DynamicLinks {
-  /**
-   *
-   * built dynamic link
-   * @param {*} deepLink
-   * @param {*} title - social title
-   * @param {*} description - social description
-   *
-   */
   static buildLink = async ({deepLink, domain, title, description}) => {
     try {
       const url = await dynamicLinks().buildLink({
@@ -34,14 +26,6 @@ export default class DynamicLinks {
     }
   };
 
-  /**
-   *
-   * built dynamic link
-   * @param {*} deepLink
-   * @param {*} title - social title
-   * @param {*} description - social description
-   *
-   */
   static buildShortLink = async ({deepLink, domain, title, description}) => {
     try {
       const url = await dynamicLinks().buildShortLink(
@@ -69,11 +53,6 @@ export default class DynamicLinks {
     }
   };
 
-  /**
-   *
-   * Retrieve initial link when app launched
-   *
-   */
   static getInitialLink = async () => {
     try {
       const initialLink = await dynamicLinks().getInitialLink();
@@ -84,11 +63,6 @@ export default class DynamicLinks {
     }
   };
 
-  /**
-   *
-   * Subscribe to Dynamic Link open events while the app is still running.
-   *
-   */
   static onLink = (callback) =>
     dynamicLinks().onLink((link) => link && link.url && callback(link.url));
 }

@@ -79,6 +79,27 @@ class MerchantDetails extends React.PureComponent {
     this.setState({mounted: true});
   }
 
+  componentDidUpdate(prevProps) {
+    const {groupOrder, componentId} = this.props;
+    const {groupOrder: prevGroupOrder} = prevProps;
+
+    if (size(groupOrder) > 0 && size(prevGroupOrder) === 0) {
+      const hoster = find(
+        groupOrder.joined_users,
+        (user) => user.host === true,
+      );
+
+      return Navigator.showModalNotice({
+        headline: 'Noticed',
+        description: `${hoster.name} has checkout your order.`,
+        buttonName: 'Continue',
+        onPress: () => {
+          Navigator.popBack(componentId);
+        },
+      });
+    }
+  }
+
   onCheckoutPress = () => {
     const {componentId, restaurant} = this.props;
 
@@ -206,10 +227,9 @@ class MerchantDetails extends React.PureComponent {
     const {isStartGroupOrder, restaurant, groupOrder, profile} = this.props;
 
     const merchantName = get(restaurant, 'name', 'N/A');
-    const isParticipant = !get(
-      groupOrder,
-      ['joined_users', profile.uid, 'host'],
-      false,
+    const currentUser = find(
+      groupOrder.joined_users,
+      (user) => user.key === profile.uid,
     );
 
     return (
@@ -217,10 +237,10 @@ class MerchantDetails extends React.PureComponent {
         <MerchantInfoSection merchantName={merchantName} />
         <GroupOrder
           onPreview={this.onPreview}
-          isParticipant={isParticipant}
           onEndSession={this.onEndSession}
           isStartGroupOrder={isStartGroupOrder}
           onGroupOrderPress={this.onGroupOrderPress}
+          isParticipant={!get(currentUser, 'host', false)}
         />
         <ListCategories />
         <SearchBar placeholder="Search" style={{marginVertical: 15}} />
@@ -269,6 +289,7 @@ class MerchantDetails extends React.PureComponent {
       groupOrder,
       restaurant,
       componentId,
+      isStartGroupOrder,
     } = this.props;
 
     const itemsData = utils.helpers.convertObjectToArray(items[restaurant.key]);
@@ -290,11 +311,13 @@ class MerchantDetails extends React.PureComponent {
       extrapolate: 'clamp',
     });
 
-    const isParticipant = !get(
-      groupOrder,
-      ['joined_users', profile.uid, 'host'],
-      false,
+    const currentUser = find(
+      groupOrder.joined_users,
+      (user) => user.key === profile.uid,
     );
+
+    const isHoster = get(currentUser, 'host', false);
+    const showCheckout = !isStartGroupOrder || isHoster;
 
     return (
       <View style={{flex: 1}}>
@@ -330,7 +353,7 @@ class MerchantDetails extends React.PureComponent {
           </View>
         )}
 
-        {mounted && size(cart) > 0 && !isParticipant ? (
+        {mounted && size(cart) > 0 && showCheckout ? (
           <CheckoutBottomSheet cart={cart} onPress={this.onCheckoutPress} />
         ) : null}
       </View>
@@ -350,9 +373,12 @@ const mapState = ({profile, item, cart, order}) => ({
 });
 
 const mapDispatch = {
+  setUrl: OrderActions.setUrl,
   getItem: ItemActions.getItem,
+
   setCartKey: CartActions.setCartKey,
   setCartItem: CartActions.setCartItem,
+
   updateGroupOrderData: OrderActions.updateGroupOrderData,
   removeGroupOrderData: OrderActions.removeGroupOrderData,
 };

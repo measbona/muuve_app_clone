@@ -8,7 +8,7 @@ import {
   cancelled,
 } from 'redux-saga/effects';
 import {eventChannel} from 'redux-saga';
-import {get} from 'lodash';
+import {get, find} from 'lodash';
 import * as Navigator from '../navigation/screen';
 import Firestore from '@react-native-firebase/firestore';
 
@@ -99,6 +99,7 @@ export function* getGroupOrderData({groupKey}) {
 
     const groupOrderLink = data.link;
     const cartData = get(data, ['items', uid], {});
+    const currentUser = find(data.joined_users, (user) => user.key === uid);
 
     const newData = {
       ...data,
@@ -115,12 +116,21 @@ export function* getGroupOrderData({groupKey}) {
       },
     };
 
-    yield put(OrderActions.updateGroupOrderData(newData));
+    if (currentUser.host) {
+      yield put(OrderActions.updateGroupOrderData(data));
+    } else {
+      yield put(OrderActions.updateGroupOrderData(newData));
+    }
+
     yield put(OrderActions.setUrl(groupOrderLink, true));
     yield put(CartActions.setCartItem(cartData));
 
     yield call(Navigator.setRootHome);
   } catch (error) {
+    if (error === 'data-not-found') {
+      return yield call(Navigator.setRootHome);
+    }
+
     alert('Error while getting Group Order', error.message || error);
   }
 }

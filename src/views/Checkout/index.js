@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
-import {reduce, size, filter, every} from 'lodash';
+import {reduce, size, every} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 import firebase from '@react-native-firebase/app';
@@ -66,17 +66,15 @@ class Checkout extends React.PureComponent {
   }
 
   validate = () => {
-    const {isStartGroupOrder, groupOrder, profile} = this.props;
+    const {isStartGroupOrder, groupOrder} = this.props;
 
-    const participants = filter(
+    const isParticipantReady = every(
       groupOrder.joined_users,
-      (user, key) => profile.uid !== key,
+      (participant) => participant.ready === true,
     );
 
-    const isOrderNotReady = every(participants, ['ready', false]);
-
     return new Promise((resolve, reject) => {
-      if (isStartGroupOrder && isOrderNotReady) {
+      if (isStartGroupOrder && !isParticipantReady) {
         return Navigator.showModalChoice({
           headline: 'Confirmation',
           description:
@@ -85,11 +83,9 @@ class Checkout extends React.PureComponent {
           yes: 'CONTINUE',
           onPress: () => resolve(true),
         });
-      } else if (!isStartGroupOrder) {
-        return resolve(true);
       }
 
-      return reject(false);
+      return resolve(true);
     });
   };
 
@@ -238,6 +234,7 @@ class Checkout extends React.PureComponent {
           <Animatable.View
             style={styles.content}
             animation="fadeIn"
+            delay={300}
             duration={300}>
             <ScrollView showsVerticalScrollIndicator={false}>
               <MerchantSection restaurant={restaurant} />

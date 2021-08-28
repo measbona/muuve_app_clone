@@ -2,7 +2,7 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
 import {connect} from 'react-redux';
-import {View, Text, TouchableOpacity, Keyboard, StyleSheet} from 'react-native';
+import {View, Text, TouchableOpacity, Keyboard, StyleSheet, ScrollView, KeyboardAvoidingView} from 'react-native';
 import moment from 'moment';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';

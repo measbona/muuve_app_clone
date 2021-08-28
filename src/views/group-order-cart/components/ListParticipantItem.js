@@ -44,27 +44,29 @@ const styles = StyleSheet.create({
 });
 
 export default ({
-  uuid,
+  uid,
+  user,
   items,
   onPress,
   itemData,
-  isHoster,
-  groupOrder,
-  groupOrderUid,
-  participantName,
+  isCurrentUser,
+  currentUserUid,
 }) => {
   const itemCount = utils.helpers.countParticipantItem(items);
   const subTotal = utils.helpers.sumCartTotal(items);
-
   const lastItem = Object.values(items).pop();
-  const isReady = !isHoster && groupOrder.joined_users[uuid].ready;
+
+  const userName = get(user, 'name', 'N/A');
+  const userReady = get(user, 'ready', false);
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.headlineWrapper}>
         <View style={styles.nameWrapper}>
-          <Text style={styles.text}>{participantName}</Text>
-          {isReady ? (
+          <Text style={styles.text}>
+            {isCurrentUser ? 'Your Order' : userName}
+          </Text>
+          {userReady ? (
             <MCIcon
               size={18}
               name="check-circle"
@@ -95,7 +97,7 @@ export default ({
               isGroupOrderListing
               itemImage={itemImage}
               onPress={() => onPress(item)}
-              disabled={groupOrderUid !== uuid || isReady}
+              disabled={currentUserUid !== uid || userReady}
             />
             {!isLastItem && <View style={styles.divider} />}
           </View>

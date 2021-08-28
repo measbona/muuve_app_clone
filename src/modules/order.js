@@ -1,5 +1,5 @@
 import moment from 'moment';
-import {size} from 'lodash';
+import {size, get} from 'lodash';
 import Database from '@react-native-firebase/database';
 import Firestore from '@react-native-firebase/firestore';
 
@@ -18,12 +18,22 @@ export default class Order {
   };
 
   static getGroupOrder = async (groupKey) => {
-    const collectionRef = Firestore().collection('group_orders').doc(groupKey);
+    try {
+      const collectionRef = Firestore()
+        .collection('group_orders')
+        .doc(groupKey);
 
-    const snapshot = await collectionRef.get();
-    const data = snapshot.data();
+      const snapshot = await collectionRef.get();
+      const data = snapshot.data();
 
-    return data;
+      if (data === undefined) {
+        throw 'data-not-found';
+      }
+
+      return data;
+    } catch (error) {
+      throw error;
+    }
   };
 
   static createCheckOutOrder = async ({props, orderKey}) => {
@@ -85,7 +95,7 @@ export default class Order {
           name: `${profile.family_name} ${profile.first_name}`,
           host: true,
           joined: true,
-          ready: false,
+          ready: true,
         },
       },
       ...(size(cart) > 0

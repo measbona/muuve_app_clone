@@ -1,4 +1,4 @@
-import {call, put, fork} from 'redux-saga/effects';
+import {call, put} from 'redux-saga/effects';
 import * as Navigator from '../navigation/screen';
 
 import Modules from '../modules';
