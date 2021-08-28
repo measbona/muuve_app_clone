@@ -99,7 +99,7 @@ export function* getGroupOrderData({groupKey}) {
 
     const groupOrderLink = data.link;
     const cartData = get(data, ['items', uid], {});
-    const currentUser = find(data.joined_users, (user) => user.key === uid);
+    const isHoster = Boolean(data.joined_users[uid]);
 
     const newData = {
       ...data,
@@ -116,7 +116,7 @@ export function* getGroupOrderData({groupKey}) {
       },
     };
 
-    if (currentUser.host) {
+    if (isHoster) {
       yield put(OrderActions.updateGroupOrderData(data));
     } else {
       yield put(OrderActions.updateGroupOrderData(newData));
@@ -130,7 +130,6 @@ export function* getGroupOrderData({groupKey}) {
     if (error === 'data-not-found') {
       return yield call(Navigator.setRootHome);
     }
-
     alert('Error while getting Group Order', error.message || error);
   }
 }

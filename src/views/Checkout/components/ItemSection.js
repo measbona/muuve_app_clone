@@ -117,16 +117,12 @@ export default (props) => {
   };
 
   const groupOrderStatus = (isWaiting, isOrderReady) => {
-    if (isOrderReady) {
-      return 'Ready to Checkout';
-    }
-
-    if (isWaiting) {
-      return 'Waiting Participants...';
-    }
-
-    if (!isWaiting) {
+    if (!isWaiting && !isOrderReady) {
       return 'Participants is ordering...';
+    } else if (isOrderReady && !isWaiting) {
+      return 'Ready to checkout';
+    } else {
+      return 'Waiting participants...';
     }
   };
 
@@ -141,7 +137,7 @@ export default (props) => {
     );
 
     const isWaiting = participants.length === 0;
-    const isOrderReady = every(groupOrder.joined_users, ['ready', true]);
+    const isOrderReady = every(participants, ['ready', true], false);
 
     return (
       <TouchableOpacity

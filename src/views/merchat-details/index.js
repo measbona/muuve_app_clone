@@ -80,21 +80,29 @@ class MerchantDetails extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const {groupOrder, componentId} = this.props;
+    const {profile, groupOrder, componentId} = this.props;
     const {groupOrder: prevGroupOrder} = prevProps;
 
-    if (size(groupOrder) > 0 && size(prevGroupOrder) === 0) {
-      const hoster = find(
-        groupOrder.joined_users,
-        (user) => user.host === true,
-      );
+    const hoster = find(
+      prevGroupOrder.joined_users,
+      (user) => user.host === true,
+    );
 
+    const hostName = get(hoster, 'name', 'N/A');
+    const currentUser = find(
+      prevGroupOrder.joined_users,
+      (user) => user.key === profile.uid,
+    );
+
+    const isParticipant = !get(currentUser, 'host', false);
+
+    if (isParticipant && size(prevGroupOrder) > 0 && size(groupOrder) === 0) {
       return Navigator.showModalNotice({
         headline: 'Noticed',
-        description: `${hoster.name} has checkout your order.`,
+        description: `${hostName} has checkout your order.`,
         buttonName: 'Continue',
         onPress: () => {
-          Navigator.popBack(componentId);
+          Navigator.popToRoot(componentId);
         },
       });
     }

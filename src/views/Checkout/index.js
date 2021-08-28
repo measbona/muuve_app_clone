@@ -51,19 +51,17 @@ class Checkout extends React.PureComponent {
     this.setState({mounted: true});
 
     if (isStartGroupOrder) {
-      const {group_key: groupKey} = groupOrder;
-
-      syncGroupOrder(groupKey);
+      syncGroupOrder(groupOrder.group_key);
     }
   }
 
-  componentDidDisappear() {
-    const {isStartGroupOrder, unSyncGroupOrder} = this.props;
+  // componentDidDisappear() {
+  //   const {isStartGroupOrder, unSyncGroupOrder} = this.props;
 
-    if (isStartGroupOrder) {
-      unSyncGroupOrder();
-    }
-  }
+  //   if (isStartGroupOrder) {
+  //     unSyncGroupOrder();
+  //   }
+  // }
 
   validate = () => {
     const {isStartGroupOrder, groupOrder} = this.props;

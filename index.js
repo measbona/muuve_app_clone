@@ -1,4 +1,5 @@
 import {Navigation} from 'react-native-navigation';
+import SplashScreen from 'react-native-splash-screen';
 
 import {registerScreen, setDefaultNavigation} from './src/navigation';
 import {rootInitial} from './src/navigation/screen';
@@ -17,5 +18,9 @@ registerScreen(Store);
 setDefaultNavigation();
 
 Navigation.events().registerAppLaunchedListener(() => {
+  setTimeout(() => {
+    SplashScreen.hide();
+  }, 1000);
+
   rootInitial();
 });

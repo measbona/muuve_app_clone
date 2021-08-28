@@ -12,6 +12,7 @@ import Loading from '../../lib/Loading';
 import Header from './components/Header';
 import Restaurant from './components/Restaurant';
 
+import CartActions from '../../redux/CartRedux';
 import OrderActions from '../../redux/OrderRedux';
 import RestaurantActions from '../../redux/RestaurantRedux';
 
@@ -58,7 +59,7 @@ class Home extends React.PureComponent {
   }
 
   componentDidAppear() {
-    const {profile, groupOrder, removeParticipant} = this.props;
+    const {profile, groupOrder, removeParticipant, setCartItem} = this.props;
 
     this.setState({mounted: true});
 
@@ -70,6 +71,7 @@ class Home extends React.PureComponent {
 
     if (isAlreadyLeft) {
       removeParticipant();
+      setCartItem({});
     }
   }
 
@@ -87,7 +89,7 @@ class Home extends React.PureComponent {
 
     const isParticipant = !get(currentUser, 'host', false);
 
-    if (!isParticipant) {
+    if (isParticipant) {
       this.setState({loading: false});
 
       return Navigator.goToMerchantDetails(componentId, {restaurant});
@@ -158,6 +160,7 @@ const mapState = ({profile, restaurant, order}) => ({
 
 const mapDispatch = {
   setUrl: OrderActions.setUrl,
+  setCartItem: CartActions.setCartItem,
   removeParticipant: OrderActions.removeParticipant,
   fetchRestaurants: RestaurantActions.getRestaurants,
 };

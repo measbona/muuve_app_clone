@@ -38,43 +38,52 @@ class GroupOrderCart extends React.PureComponent {
   };
 
   componentDidMount() {
-    const {groupOrder, itemReducer, getItem, syncGroupOrder} = this.props;
+    const {groupOrder, itemReducer, getItem} = this.props;
 
-    const {group_key: groupKey} = groupOrder;
     const merchantKey = groupOrder.restaurant.key;
 
     if (!itemReducer[merchantKey]) {
       getItem(merchantKey);
     }
 
-    syncGroupOrder(groupKey);
-
     Navigator.bindComponent(this);
   }
 
   componentDidAppear() {
+    const {groupOrder, syncGroupOrder} = this.props;
+
     this.setState({mounted: true});
+
+    syncGroupOrder(groupOrder.group_key);
   }
 
-  componentDidDisappear() {
-    const {unSyncGroupOrder} = this.props;
+  // componentDidDisappear() {
+  //   const {unSyncGroupOrder} = this.props;
 
-    unSyncGroupOrder();
-  }
+  //   unSyncGroupOrder();
+  // }
 
   componentDidUpdate(prevProps) {
-    const {groupOrder, componentId} = this.props;
+    const {profile, groupOrder, componentId} = this.props;
     const {groupOrder: prevGroupOrder} = prevProps;
 
-    if (size(groupOrder) > 0 && size(prevGroupOrder) === 0) {
-      const hoster = find(
-        groupOrder.joined_users,
-        (user) => user.host === true,
-      );
+    const hoster = find(
+      prevGroupOrder.joined_users,
+      (user) => user.host === true,
+    );
 
+    const hostName = get(hoster, 'name', 'N/A');
+    const currentUser = find(
+      prevGroupOrder.joined_users,
+      (user) => user.key === profile.uid,
+    );
+
+    const isParticipant = !get(currentUser, 'host', false);
+
+    if (isParticipant && size(prevGroupOrder) > 0 && size(groupOrder) === 0) {
       return Navigator.showModalNotice({
         headline: 'Noticed',
-        description: `${hoster.name} has checkout your order.`,
+        description: `${hostName} has checkout your order.`,
         buttonName: 'Continue',
         onPress: () => {
           Navigator.popToRoot(componentId);
@@ -271,15 +280,17 @@ class GroupOrderCart extends React.PureComponent {
     const userItems = reduce(
       groupOrderItems,
       (result, items, key) => {
-        if (key === profile.uid) {
-          result['currentUserItems'] = {
-            [key]: items,
-          };
-        } else {
-          result['participantItems'] = {
-            [key]: items,
-            ...result.participantItems,
-          };
+        if (size(items) > 0) {
+          if (key === profile.uid) {
+            result['currentUserItems'] = {
+              [key]: items,
+            };
+          } else {
+            result['participantItems'] = {
+              [key]: items,
+              ...result.participantItems,
+            };
+          }
         }
 
         return result;

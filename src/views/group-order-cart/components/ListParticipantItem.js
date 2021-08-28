@@ -58,6 +58,9 @@ export default ({
 
   const userName = get(user, 'name', 'N/A');
   const userReady = get(user, 'ready', false);
+  const isHoster = get(user, 'host', false);
+
+  const disabled = !isCurrentUser;
 
   return (
     <View style={styles.wrapper}>
@@ -66,7 +69,7 @@ export default ({
           <Text style={styles.text}>
             {isCurrentUser ? 'Your Order' : userName}
           </Text>
-          {userReady ? (
+          {!isHoster && userReady ? (
             <MCIcon
               size={18}
               name="check-circle"
@@ -97,7 +100,7 @@ export default ({
               isGroupOrderListing
               itemImage={itemImage}
               onPress={() => onPress(item)}
-              disabled={currentUserUid !== uid || userReady}
+              disabled={disabled}
             />
             {!isLastItem && <View style={styles.divider} />}
           </View>

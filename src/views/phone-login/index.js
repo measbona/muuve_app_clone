@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   StyleSheet,
 } from 'react-native';
+import * as Animatable from 'react-native-animatable';
 
 import utils from '../../utils';
 
@@ -17,7 +18,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerWrapper: {
-    paddingTop: 20,
+    paddingTop: 50,
     alignItems: 'center',
     borderBottomLeftRadius: 17,
     borderBottomRightRadius: 17,
@@ -69,7 +70,10 @@ export default class PhoneLogin extends React.PureComponent {
           <Content componentId={componentId} />
         </KeyboardAvoidingView>
 
-        <View style={[styles.footerWrapper, utils.shadows.bottomBar]}>
+        <Animatable.View
+          animation="fadeIn"
+          duration={300}
+          style={[styles.footerWrapper, utils.shadows.bottomBar]}>
           <Text style={styles.text}>By continuing your agree to our</Text>
           <View style={styles.row}>
             <Text
@@ -93,7 +97,7 @@ export default class PhoneLogin extends React.PureComponent {
               Privacy Policy
             </Text>
           </View>
-        </View>
+        </Animatable.View>
       </View>
     );
   }
