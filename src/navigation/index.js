@@ -1,9 +1,22 @@
+import React from 'react';
+import {Provider} from 'react-redux';
 import {Navigation} from 'react-native-navigation';
-import {Screens, showLoading, showPhoneLogin} from './screen';
 
-export const registerScreen = () => {
-  Screens.forEach((ScreenComponent, key) =>
-    Navigation.registerComponent(key, () => ScreenComponent),
+import {Screens} from './screen';
+
+export const registerScreen = (Store) => {
+  const ScreenProvider = (Screen, props) => (
+    <Provider store={Store}>
+      <Screen {...props} />
+    </Provider>
+  );
+
+  Screens.forEach((ScreenComponent, ScreenName) =>
+    Navigation.registerComponent(
+      ScreenName,
+      () => (props) => ScreenProvider(ScreenComponent, props),
+      () => ScreenComponent,
+    ),
   );
 };
 
@@ -14,18 +27,16 @@ export const setDefaultNavigation = () => {
       drawBehind: true,
       animate: false,
     },
-  });
-};
-
-export const startApp = () => {
-  registerScreen();
-
-  Navigation.events().registerAppLaunchedListener(() => {
-    setDefaultNavigation();
-
-    showLoading();
-    setTimeout(() => {
-      showPhoneLogin();
-    }, 3000);
+    statusBar: {
+      style: 'dark',
+      drawBehind: true,
+      translucent: false,
+      backgroundColor: 'transparent',
+    },
+    animations: {
+      setRoot: {
+        waitForRender: true,
+      },
+    },
   });
 };

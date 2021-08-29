@@ -1,43 +1,83 @@
 import React from 'react';
-import {Dimensions} from 'react-native';
-import styled from 'styled-components/native';
-import FontAwesomeIcon from 'react-native-vector-icons/FontAwesome';
+import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
+import ADIcon from 'react-native-vector-icons/AntDesign';
+import MIcon from 'react-native-vector-icons/MaterialIcons';
 
 import utils from '../../../utils';
-import SearchBar from './SearchBar';
 
-const SCREEN_WIDTH = Dimensions.get('screen').width;
+import SearchBar from '../../../lib/SearchBar';
 
-const Wrapper = styled.View`
-  height: 100px;
-  padding-top: 30px;
-  flex-direction: row;
-  background-color: ${utils.colors.yellow};
-  align-items: center;
-  justify-content: center;
-  width: ${SCREEN_WIDTH}px;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 12px;
-`;
-
-const CartButton = styled.TouchableOpacity`
-  margin-left: 12px;
-`;
+const styles = StyleSheet.create({
+  wrapper: {
+    borderBottomLeftRadius: 17,
+    borderBottomRightRadius: 17,
+    backgroundColor: utils.colors.yellow,
+  },
+  locationWrapper: {
+    paddingVertical: 12,
+    flexDirection: 'row',
+    marginHorizontal: 20,
+    justifyContent: 'space-between',
+  },
+  labelName: {
+    fontSize: 15,
+    fontWeight: 'bold',
+    color: utils.colors.blue,
+  },
+  locationName: {
+    fontSize: 12,
+    color: utils.colors.black,
+  },
+  favoriteButton: {
+    alignSelf: 'center',
+  },
+  row: {
+    alignItems: 'center',
+    flexDirection: 'row',
+  },
+  column: {alignItems: 'center'},
+  skeleton: {marginRight: 35},
+  icon: {marginRight: 3},
+});
 
 export default class Header extends React.PureComponent {
   render() {
     const {onCartPress} = this.props;
 
     return (
-      <Wrapper>
-        <SearchBar />
-        <CartButton
-          hitSlop={{top: 12, bottom: 12, left: 12, right: 12}}
-          activeOpacity={0.7}
-          onPress={() => onCartPress('PropsPress')}>
-          <FontAwesomeIcon name="shopping-basket" size={20} />
-        </CartButton>
-      </Wrapper>
+      <View
+        style={[
+          styles.wrapper,
+          utils.device.statusBar,
+          utils.shadows.lightShadow,
+        ]}>
+        <View style={styles.locationWrapper}>
+          <View style={styles.skeleton} />
+          <View style={styles.column}>
+            <View style={styles.row}>
+              <MIcon name="my-location" size={17} style={styles.icon} />
+              <Text style={styles.labelName}>Current Location</Text>
+              <MIcon
+                name="keyboard-arrow-down"
+                color={utils.colors.blue}
+                size={20}
+              />
+            </View>
+            <Text style={styles.locationName} numberOfLines={1}>
+              Phum Damnak Thum, Phnom Penh
+            </Text>
+          </View>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={onCartPress}
+            style={styles.favoriteButton}
+            hitSlop={{top: 12, bottom: 12, left: 12, right: 12}}>
+            <ADIcon name="heart" size={25} color={utils.colors.red} />
+          </TouchableOpacity>
+        </View>
+
+        <SearchBar placeholder="Search stores or dishes" />
+      </View>
     );
   }
 }
