@@ -12,6 +12,7 @@
     "android-clean": "cd ./android && ./gradlew clean && cd ..",
     "clean": "rm -rf ./node_modules && npm i",
     "build-android-debug": "cd ./android && ./gradlew clean && cd .. && npx jetifier && cd ./android && ./gradlew app:assembleDebug && ./gradlew installDebug",
+    "build-android-apk": "cd ./android && ./gradlew clean && cd .. && npx jetifier && cd ./android && ./gradlew assembleRelease",
     "start-server": "react-native start"
   },
   "dependencies": {

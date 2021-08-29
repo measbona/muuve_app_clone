@@ -52,6 +52,7 @@ export default class Restaurant extends React.PureComponent {
     const reviewer = get(restaurant, 'reviewers', 0);
     const ratingCount = get(restaurant, 'rating_count', 0);
     const rating = Math.floor(ratingCount / reviewer);
+    const deliveryFee = get(restaurant, 'delivery_fee');
 
     return (
       <TouchableOpacity
@@ -97,7 +98,7 @@ export default class Restaurant extends React.PureComponent {
                 style={{marginBottom: 2}}
               />
               <Text style={[styles.text, {color: utils.colors.blue}]}>
-                $0.75
+                {`$${deliveryFee}`}
               </Text>
               <View style={styles.space} />
               <MCIcon

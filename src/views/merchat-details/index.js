@@ -234,7 +234,6 @@ class MerchantDetails extends React.PureComponent {
   renderHeaderComponent = () => {
     const {isStartGroupOrder, restaurant, groupOrder, profile} = this.props;
 
-    const merchantName = get(restaurant, 'name', 'N/A');
     const currentUser = find(
       groupOrder.joined_users,
       (user) => user.key === profile.uid,
@@ -242,7 +241,7 @@ class MerchantDetails extends React.PureComponent {
 
     return (
       <Animatable.View animation="fadeIn" duration={300}>
-        <MerchantInfoSection merchantName={merchantName} />
+        <MerchantInfoSection restaurant={restaurant} />
         <GroupOrder
           onPreview={this.onPreview}
           onEndSession={this.onEndSession}

@@ -247,7 +247,7 @@ class Checkout extends React.PureComponent {
               />
               <PaymentOptionSection />
               <PromocodeSection />
-              <PaymentSection cart={cart} />
+              <PaymentSection cart={cart} restaurant={restaurant} />
             </ScrollView>
             <PlaceOrder loading={loading} onPress={this.onPlaceOrder} />
           </Animatable.View>

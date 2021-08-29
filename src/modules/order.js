@@ -46,7 +46,6 @@ export default class Order {
     const data = {
       items,
       key: orderKey,
-      delivery_fee: 3,
       status: 'delivered',
       region: profile.region,
       deliveree: profile.uid,
@@ -54,9 +53,11 @@ export default class Order {
       is_group_order: isStartGroupOrder,
       delivery_address: 'current_address',
       delivery_place_name: 'Toul Tom pong',
+      delivery_fee: restaurant.delivery_fee,
+      total: utils.helpers.sumCartTotal(cart),
       created_at: Number(moment().format('x')),
-      sub_total: utils.helpers.sumCartTotal(cart),
       deliveree_name: `${profile.family_name} ${profile.first_name}`,
+      sub_total: utils.helpers.sumCartTotal(cart) + restaurant.delivery_fee,
       requestCoords: {
         latitude: 11.612735616803565,
         longitude: 104.90922453012595,

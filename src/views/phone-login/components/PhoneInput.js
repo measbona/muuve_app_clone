@@ -1,5 +1,14 @@
 import React from 'react';
-import {View, Text, TextInput, Image, StyleSheet} from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  TextInput,
+  Image,
+  Keyboard,
+  StyleSheet,
+} from 'react-native';
+import * as Navigator from '../../../navigation/screen';
 
 import utils from '../../../utils';
 
@@ -34,10 +43,19 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {onChangeText} = props;
+  let {phoneNumber, onChangeText, onDelete} = props;
 
   return (
-    <View style={styles.wrapper}>
+    <TouchableOpacity
+      activeOpacity={1}
+      style={styles.wrapper}
+      onPress={() =>
+        Navigator.showNumpad({
+          onDelete,
+          type: 'phone-number',
+          onChangeText: (num) => onChangeText(num),
+        })
+      }>
       <View style={styles.headWrapper}>
         <Image
           style={styles.image}
@@ -49,11 +67,19 @@ export default (props) => {
       <TextInput
         caretHidden
         maxLength={10}
+        value={phoneNumber}
         style={styles.textInput}
-        keyboardType="number-pad"
+        showSoftInputOnFocus={false}
         placeholder="Enter phone number"
-        onChangeText={(num) => onChangeText(num)}
+        onSubmitEditing={Keyboard.dismiss}
+        onFocus={() =>
+          Navigator.showNumpad({
+            onDelete,
+            type: 'phone-number',
+            onChangeText: (num) => onChangeText(num),
+          })
+        }
       />
-    </View>
+    </TouchableOpacity>
   );
 };

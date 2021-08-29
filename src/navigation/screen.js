@@ -6,6 +6,7 @@ import utils from '../utils';
 import Home from '../views/home';
 import Account from '../views/account';
 import Checkout from '../views/checkout';
+import Numpad from '../views/modal/Numpad';
 import Initialize from '../views/initialize';
 import PhoneLogin from '../views/phone-login';
 import GroupOrder from '../views/group-order';
@@ -21,6 +22,7 @@ import ModalNotice from '../views/modal/ModalNotice';
 import ModalSuccess from '../views/modal/ModalSuccess';
 
 export const HOME = 'MuuveAppClone.Home';
+export const NUMPAD = 'MuuveAppClone.Numpad';
 export const ACCOUNT = 'MuuveAppClone.Account';
 export const CHECKOUT = 'MuuveAppClone.Checkout';
 export const INITIALIZE = 'MuuveAppClone.Initialize';
@@ -40,6 +42,7 @@ export const MODAL_SUCCESS = 'MuuveAppClone.ModalSuccess';
 export const Screens = new Map();
 
 Screens.set(HOME, Home);
+Screens.set(NUMPAD, Numpad);
 Screens.set(ACCOUNT, Account);
 Screens.set(INITIALIZE, Initialize);
 Screens.set(GROUP_ORDER, GroupOrder);
@@ -299,3 +302,19 @@ export const showModalSuccess = (passProps) => {
     });
   });
 };
+
+export const showNumpad = (passProps) =>
+  Navigation.showOverlay({
+    component: {
+      name: NUMPAD,
+      passProps,
+      options: {
+        layout: {
+          componentBackgroundColor: 'transparent',
+        },
+        overlay: {
+          interceptTouchOutside: false,
+        },
+      },
+    },
+  });

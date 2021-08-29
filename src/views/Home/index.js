@@ -59,7 +59,13 @@ class Home extends React.PureComponent {
   }
 
   componentDidAppear() {
-    const {profile, groupOrder, removeParticipant, setCartItem} = this.props;
+    const {
+      profile,
+      groupOrder,
+      setCartItem,
+      removeParticipant,
+      isStartGroupOrder,
+    } = this.props;
 
     this.setState({mounted: true});
 
@@ -69,7 +75,7 @@ class Home extends React.PureComponent {
       false,
     );
 
-    if (isAlreadyLeft) {
+    if (isStartGroupOrder && isAlreadyLeft) {
       removeParticipant();
       setCartItem({});
     }
@@ -134,8 +140,8 @@ class Home extends React.PureComponent {
         {(loaded && mounted) || loading ? (
           <FlatList
             data={restaurantData}
-            contentContainerStyle={styles.flatList}
             renderItem={this.renderRestaurant}
+            contentContainerStyle={styles.flatList}
             ListHeaderComponent={this.renderHeaderComponent}
             keyExtractor={(restaurant) => restaurant.key}
             showsVerticalScrollIndicator={false}

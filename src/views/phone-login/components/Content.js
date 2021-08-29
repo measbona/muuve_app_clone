@@ -1,13 +1,6 @@
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
-import {
-  View,
-  Text,
-  Keyboard,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native';
+import {View, Text, StyleSheet, TouchableOpacity, Keyboard} from 'react-native';
 import {connect} from 'react-redux';
 import * as Navigator from '../../../navigation/screen';
 
@@ -57,27 +50,49 @@ const styles = StyleSheet.create({
 
 class Content extends React.PureComponent {
   state = {
-    code: [],
+    code: '',
     confirm: null,
-    mounted: true,
+    visibleOtpCode: true,
     loading: false,
     phoneNumber: '',
   };
 
-  componentDidUpdate() {
+  contentRef = React.createRef();
+
+  async componentDidUpdate() {
     const {code} = this.state;
 
-    if (code.length === 6) {
-      Keyboard.dismiss();
+    if (code.split('').length === 6) {
+      await this.contentRef.onClose();
     }
   }
 
+  onMounted = (ref) => {
+    this.contentRef = ref;
+  };
+
+  onChangeText = (num, type) => {
+    const {phoneNumber, code} = this.state;
+    let newNum = type === 'phoneNumber' ? phoneNumber : code;
+
+    newNum += num;
+
+    this.setState({[type]: newNum});
+  };
+
+  onDelete = (type) => {
+    const {phoneNumber, code} = this.state;
+    let data = type === 'phoneNumber' ? phoneNumber : code;
+
+    const newNum = data.slice(0, -1);
+
+    this.setState({[type]: newNum});
+  };
+
   onPress = () => {
-    const {mounted, phoneNumber} = this.state;
+    const {visibleOtpCode, phoneNumber} = this.state;
 
-    Keyboard.dismiss();
-
-    if (mounted) {
+    if (visibleOtpCode) {
       const number = utils.helpers.removeLeadZeroNumber(phoneNumber);
 
       return Navigator.showModalChoice({
@@ -99,14 +114,21 @@ class Content extends React.PureComponent {
   onPhoneAuth = async () => {
     const {phoneNumber} = this.state;
 
+    Keyboard.dismiss();
+
     try {
       const number = utils.helpers.removeLeadZeroNumber(phoneNumber);
       const confirmation = await Modules.Profile.phoneAuth(`+855${number}`);
 
       if (confirmation) {
-        this.setState({confirm: confirmation, loading: false, mounted: false});
+        this.setState({
+          loading: false,
+          confirm: confirmation,
+          visibleOtpCode: false,
+        });
       }
     } catch (error) {
+      alert(error.message);
       this.setState({loading: false});
     }
   };
@@ -121,9 +143,9 @@ class Content extends React.PureComponent {
       const isCorrect = await confirm.confirm(code);
 
       if (isCorrect) {
-        this.setState({loading: false});
+        await handleUserProfile({componentId});
 
-        return handleUserProfile({componentId});
+        return this.setState({loading: false});
       }
     } catch (error) {
       this.setState({loading: false});
@@ -137,69 +159,75 @@ class Content extends React.PureComponent {
   };
 
   renderVerificationInput = () => {
-    const {code} = this.state;
+    let {code} = this.state;
+
+    const arrayCode = code.split('');
 
     return (
-      <View style={styles.boxesWrapper}>
-        <View style={styles.boxWrapper}>
-          <TextInput
-            style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}
-            autoFocus
-            caretHidden
-            defaultValue={code[0]}
-            textAlign="center"
-            maxLength={6}
-            keyboardType="number-pad"
-            onChangeText={(val) => this.setState({code: val})}
-          />
-        </View>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() =>
+          Navigator.showNumpad({
+            type: 'enter-otp-code',
+            onMounted: this.onMounted,
+            onDelete: () => this.onDelete('code'),
+            onChangeText: (num) => this.onChangeText(num, 'code'),
+          })
+        }
+        style={styles.boxesWrapper}>
         <View style={styles.boxWrapper}>
           <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[1]}
+            {arrayCode[0]}
           </Text>
         </View>
         <View style={styles.boxWrapper}>
           <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[2]}
+            {arrayCode[1]}
           </Text>
         </View>
         <View style={styles.boxWrapper}>
           <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[3]}
+            {arrayCode[2]}
           </Text>
         </View>
         <View style={styles.boxWrapper}>
           <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[4]}
+            {arrayCode[3]}
           </Text>
         </View>
         <View style={styles.boxWrapper}>
           <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
-            {code[5]}
+            {arrayCode[4]}
           </Text>
         </View>
-      </View>
+        <View style={styles.boxWrapper}>
+          <Text style={[styles.text, {fontSize: 20, alignSelf: 'center'}]}>
+            {arrayCode[5]}
+          </Text>
+        </View>
+      </TouchableOpacity>
     );
   };
 
   render() {
-    const {phoneNumber, mounted, loading, code} = this.state;
+    const {phoneNumber, visibleOtpCode, loading, code} = this.state;
 
-    const buttonText = mounted ? 'NEXT' : 'GET STARTED';
-    const disabled = mounted ? phoneNumber.length <= 7 : code.length !== 6;
+    const buttonText = visibleOtpCode ? 'NEXT' : 'GET STARTED';
+    const disabled = visibleOtpCode
+      ? phoneNumber.split('').length <= 7
+      : code.split('').length !== 6;
 
     return (
-      <TouchableOpacity
-        style={styles.wrapper}
-        activeOpacity={1}
-        onPress={() => Keyboard.dismiss()}>
+      <TouchableOpacity style={styles.wrapper} activeOpacity={1}>
         <View>
           <Text style={styles.text}>Login with your phone number</Text>
         </View>
 
-        {mounted ? (
+        {visibleOtpCode ? (
           <PhoneInput
-            onChangeText={(num) => this.setState({phoneNumber: num})}
+            phoneNumber={phoneNumber}
+            onDelete={() => this.onDelete('phoneNumber')}
+            onChangeText={(num) => this.onChangeText(num, 'phoneNumber')}
           />
         ) : (
           this.renderVerificationInput()
@@ -217,12 +245,12 @@ class Content extends React.PureComponent {
           )}
         </TouchableOpacity>
 
-        {!mounted ? (
+        {!visibleOtpCode ? (
           <TouchableOpacity
             style={styles.didNotReceiveCode}
             activeOpacity={0.7}
             onPress={() =>
-              this.setState({mounted: true, confirm: null, code: ''})
+              this.setState({visibleOtpCode: true, confirm: null, code: ''})
             }>
             <Text style={styles.text}>Did not receiver a code?</Text>
           </TouchableOpacity>

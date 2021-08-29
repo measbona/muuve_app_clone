@@ -25,12 +25,12 @@ const styles = StyleSheet.create({
   },
 });
 
-export default (props) => {
+export default ({deliveryFee}) => {
   return (
     <View style={styles.wrapper}>
       <View style={styles.deliveryFee}>
         <MIcon name="motorcycle" size={20} color={utils.colors.blue} />
-        <Text style={styles.text}>$0.75</Text>
+        <Text style={styles.text}>{`$${deliveryFee}`}</Text>
       </View>
       <View style={styles.preparationTime}>
         <MCIcon

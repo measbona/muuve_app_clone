@@ -23,14 +23,20 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ({cart, orderType, order}) => {
+export default ({cart, orderType, order, restaurant}) => {
   const isOrderDetails = orderType === 'order-details';
 
   const total = isOrderDetails
-    ? parseFloat(order.sub_total)
+    ? parseFloat(order.total)
     : utils.helpers.sumCartTotal(cart);
 
-  const deliveryFee = isOrderDetails ? `$${order.delivery_fee}` : 'FREE';
+  const subTotal = isOrderDetails
+    ? parseFloat(order.sub_total)
+    : utils.helpers.sumCartTotal(cart) + restaurant.delivery_fee;
+
+  const deliveryFee = isOrderDetails
+    ? `$${order.delivery_fee}`
+    : `$${restaurant.delivery_fee}`;
 
   return (
     <View style={styles.wrapper}>
@@ -52,7 +58,7 @@ export default ({cart, orderType, order}) => {
         </View>
         <View style={styles.row}>
           <Text style={styles.text}>Grand Total</Text>
-          <Text style={styles.text}>${total}</Text>
+          <Text style={styles.text}>${subTotal}</Text>
         </View>
       </View>
     </View>

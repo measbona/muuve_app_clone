@@ -1,5 +1,6 @@
 import React from 'react';
 import {View, Text, StyleSheet} from 'react-native';
+import {get} from 'lodash';
 import ADIcon from 'react-native-vector-icons/AntDesign';
 
 import utils from '../../../utils';
@@ -36,7 +37,10 @@ const styles = StyleSheet.create({
 });
 
 export default (props) => {
-  const {merchantName} = props;
+  const {restaurant} = props;
+
+  const merchantName = get(restaurant, 'name', 'N/A');
+  const deliveryFee = get(restaurant, 'delivery_fee', 'FREE');
 
   return (
     <View style={[styles.wrapper, utils.shadows.logoutShadow]}>
@@ -47,7 +51,7 @@ export default (props) => {
       <Categories />
       <View style={styles.merchantPreparation}>
         <Rating />
-        <PreparationTime />
+        <PreparationTime deliveryFee={deliveryFee} />
       </View>
     </View>
   );
