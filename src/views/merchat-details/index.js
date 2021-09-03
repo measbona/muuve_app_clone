@@ -172,11 +172,6 @@ class MerchantDetails extends React.PureComponent {
       updateGroupOrderData,
     } = this.props;
 
-    let newSelectedItems = null;
-    const restaurantKey = restaurant.key;
-    const isIncreaseQuantity = Boolean(selectedItems[itemKey]);
-    const {uid} = profile;
-
     if (cartKey && cartKey !== restaurant.key) {
       return Navigator.showModalNotice({
         headline: 'Noticed',
@@ -187,33 +182,28 @@ class MerchantDetails extends React.PureComponent {
       });
     }
 
-    if (isIncreaseQuantity) {
-      const selectedItem = selectedItems[item.key];
-      newSelectedItems = {
-        ...selectedItems,
-        [selectedItem.key]: {
-          ...selectedItem,
-          quantity: selectedItem.quantity + 1,
-        },
-      };
-    } else {
-      newSelectedItems = {
-        ...selectedItems,
-        [itemKey]: {
-          quantity: 1,
-          key: itemKey,
-          name: item.name,
-          price: item.current_price,
-        },
-      };
-    }
+    const {quantity} = await Navigator.showItemDetail({item});
+    const itemQty = selectedItems[item.key]
+      ? selectedItems[item.key].quantity + quantity
+      : quantity;
+
+    const newSelectedItems = {
+      ...selectedItems,
+      [itemKey]: {
+        key: itemKey,
+        name: item.name,
+        quantity: itemQty,
+        images: item.images,
+        price: item.current_price,
+      },
+    };
 
     if (isStartGroupOrder) {
       const newGroupOrderData = {
         ...groupOrder,
         items: {
           ...groupOrder.items,
-          [uid]: newSelectedItems,
+          [profile.uid]: newSelectedItems,
         },
         sub_total: Number(
           parseFloat(groupOrder.sub_total + item.current_price).toFixed(2),
@@ -224,11 +214,12 @@ class MerchantDetails extends React.PureComponent {
     }
 
     if (!cartKey) {
-      setCartKey(restaurantKey);
+      setCartKey(restaurant.key);
     }
 
-    this.setState({selectedItems: newSelectedItems});
-    setCartItem(newSelectedItems);
+    this.setState({selectedItems: newSelectedItems}, () =>
+      setCartItem(newSelectedItems),
+    );
   };
 
   renderHeaderComponent = () => {

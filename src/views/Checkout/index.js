@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
-import {reduce, size, every} from 'lodash';
+import {omit, size, every} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 import firebase from '@react-native-firebase/app';
@@ -55,13 +55,13 @@ class Checkout extends React.PureComponent {
     }
   }
 
-  // componentDidDisappear() {
-  //   const {isStartGroupOrder, unSyncGroupOrder} = this.props;
+  componentDidDisappear() {
+    const {isStartGroupOrder, unSyncGroupOrder} = this.props;
 
-  //   if (isStartGroupOrder) {
-  //     unSyncGroupOrder();
-  //   }
-  // }
+    if (isStartGroupOrder) {
+      unSyncGroupOrder();
+    }
+  }
 
   validate = () => {
     const {isStartGroupOrder, groupOrder} = this.props;
@@ -145,51 +145,25 @@ class Checkout extends React.PureComponent {
     Navigator.goToGroupOrderCart(componentId);
   };
 
-  onDecrease = (item) => {
+  onDecrease = async (item) => {
     const {componentId, cart, setCartKey, setCartItem} = this.props;
-    let newSelectedItems = null;
 
-    if (item.quantity === 1) {
-      newSelectedItems = reduce(
-        cart,
-        (result, remainItem) => {
-          if (remainItem.key !== item.key) {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity,
-            };
-          }
+    let newSelectedItems = {};
+    const {quantity, removeItem} = await Navigator.showItemDetail({
+      item,
+      type: 'checkout',
+    });
 
-          return result;
-        },
-        {},
-      );
+    if (removeItem) {
+      newSelectedItems = omit(cart, [item.key]);
     } else {
-      newSelectedItems = reduce(
-        cart,
-        (result, remainItem) => {
-          if (remainItem.key === item.key) {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity - 1,
-            };
-          } else {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity,
-            };
-          }
-
-          return result;
+      newSelectedItems = {
+        ...cart,
+        [item.key]: {
+          ...item,
+          quantity,
         },
-        {},
-      );
+      };
     }
 
     if (size(newSelectedItems) === 0) {

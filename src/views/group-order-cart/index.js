@@ -57,11 +57,11 @@ class GroupOrderCart extends React.PureComponent {
     syncGroupOrder(groupOrder.group_key);
   }
 
-  // componentDidDisappear() {
-  //   const {unSyncGroupOrder} = this.props;
+  componentDidDisappear() {
+    const {unSyncGroupOrder} = this.props;
 
-  //   unSyncGroupOrder();
-  // }
+    unSyncGroupOrder();
+  }
 
   componentDidUpdate(prevProps) {
     const {profile, groupOrder, componentId} = this.props;

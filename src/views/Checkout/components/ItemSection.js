@@ -62,7 +62,8 @@ export default (props) => {
     let index = 0;
 
     return map(items, (item, key) => {
-      const itemPrice = item.quantity * parseFloat(item.price);
+      const itemPrice = item.quantity * item.price;
+      const itemTotal = Number(parseFloat(itemPrice).toFixed(2));
 
       index += 1;
 
@@ -109,7 +110,7 @@ export default (props) => {
               style={[styles.text, {fontSize: 15, color: utils.colors.black}]}>
               {`${item.quantity} x `}
             </Text>
-            <Text style={[styles.text, {fontSize: 15}]}>{`$${itemPrice}`}</Text>
+            <Text style={[styles.text, {fontSize: 15}]}>{`$${itemTotal}`}</Text>
           </View>
         </TouchableOpacity>
       );

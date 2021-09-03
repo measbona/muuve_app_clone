@@ -20,6 +20,7 @@ import Toast from '../lib/Toast';
 import ModalChoice from '../views/modal/ModalChoice';
 import ModalNotice from '../views/modal/ModalNotice';
 import ModalSuccess from '../views/modal/ModalSuccess';
+import ModalItemDetail from '../views/modal/ModalItemDetail';
 
 export const HOME = 'MuuveAppClone.Home';
 export const NUMPAD = 'MuuveAppClone.Numpad';
@@ -31,19 +32,21 @@ export const PHONE_LOGIN = 'MuuveAppClone.PhoneLogin';
 export const ACCOUNT_FORM = 'MuuveAppClone.AccountForm';
 export const ORDER_DETAILS = 'MuuveAppClone.OrderDetails';
 export const ORDER_HISTORY = 'MuuveAppClone.OrderHistory';
-export const MERCHANT_DETAILS = 'MuuveAppClone.MerchantDetails';
 export const GROUP_ORDER_CART = 'MuuveAppClone.GroupOrderCart';
+export const MERCHANT_DETAILS = 'MuuveAppClone.MerchantDetails';
 
 export const TOAST = 'MuuveAppClone.Toast';
 export const MODAL_CHOICE = 'MuuveAppClone.ModalChoice';
 export const MODAL_NOTICE = 'MuuveAppClone.ModalNotice';
 export const MODAL_SUCCESS = 'MuuveAppClone.ModalSuccess';
+export const MODAL_ITEM_DETAIL = 'MuuveAppClone.ModalItemDetail';
 
 export const Screens = new Map();
 
 Screens.set(HOME, Home);
 Screens.set(NUMPAD, Numpad);
 Screens.set(ACCOUNT, Account);
+Screens.set(CHECKOUT, Checkout);
 Screens.set(INITIALIZE, Initialize);
 Screens.set(GROUP_ORDER, GroupOrder);
 Screens.set(PHONE_LOGIN, PhoneLogin);
@@ -51,13 +54,13 @@ Screens.set(ACCOUNT_FORM, AccountForm);
 Screens.set(ORDER_HISTORY, OrderHistory);
 Screens.set(ORDER_DETAILS, OrderDetails);
 Screens.set(MERCHANT_DETAILS, MerchantDetails);
-Screens.set(CHECKOUT, Checkout);
 Screens.set(GROUP_ORDER_CART, GroupOrderCart);
 
 Screens.set(TOAST, Toast);
 Screens.set(MODAL_CHOICE, ModalChoice);
 Screens.set(MODAL_NOTICE, ModalNotice);
 Screens.set(MODAL_SUCCESS, ModalSuccess);
+Screens.set(MODAL_ITEM_DETAIL, ModalItemDetail);
 
 const hideBottomTabs = {
   bottomTabs: {
@@ -318,3 +321,17 @@ export const showNumpad = (passProps) =>
       },
     },
   });
+
+export const showItemDetail = (passProps) => {
+  return new Promise((resolve) => {
+    Navigation.showOverlay({
+      component: {
+        name: MODAL_ITEM_DETAIL,
+        passProps: {...passProps, resolve},
+        options: {
+          modalPresentationStyle: 'overCurrentContext',
+        },
+      },
+    });
+  });
+};
