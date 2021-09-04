@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
-import {omit, size, every} from 'lodash';
+import {every, filter, omit, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 import firebase from '@react-native-firebase/app';
@@ -55,16 +55,21 @@ class Checkout extends React.PureComponent {
     }
   }
 
-  componentDidDisappear() {
-    const {isStartGroupOrder, unSyncGroupOrder} = this.props;
+  // componentDidDisappear() {
+  //   const {isStartGroupOrder, unSyncGroupOrder} = this.props;
 
-    if (isStartGroupOrder) {
-      unSyncGroupOrder();
-    }
-  }
+  //   if (isStartGroupOrder) {
+  //     unSyncGroupOrder();
+  //   }
+  // }
 
   validate = () => {
     const {isStartGroupOrder, groupOrder} = this.props;
+
+    const participants = filter(
+      groupOrder.joined_users,
+      (user) => user.host === false,
+    );
 
     const isParticipantReady = every(
       groupOrder.joined_users,
@@ -72,18 +77,21 @@ class Checkout extends React.PureComponent {
     );
 
     return new Promise((resolve, reject) => {
-      if (isStartGroupOrder && !isParticipantReady) {
+      if (
+        (isStartGroupOrder && !isParticipantReady) ||
+        participants.length === 0
+      ) {
         return Navigator.showModalChoice({
           headline: 'Confirmation',
           description:
-            'We notice that some participants not yet ready to order. Do you want to continue?',
+            'We notice that some participants not yet ready to order. Do you want to checkout?',
           no: 'CANCEL',
           yes: 'CONTINUE',
           onPress: () => resolve(true),
         });
+      } else {
+        return resolve(true);
       }
-
-      return resolve(true);
     });
   };
 
@@ -151,7 +159,7 @@ class Checkout extends React.PureComponent {
     let newSelectedItems = {};
     const {quantity, removeItem} = await Navigator.showItemDetail({
       item,
-      type: 'checkout',
+      type: 'remove-item',
     });
 
     if (removeItem) {

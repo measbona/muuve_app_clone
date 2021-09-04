@@ -1,6 +1,8 @@
 import {createReducer, createActions} from 'reduxsauce';
 import Immutable from 'seamless-immutable';
 
+import {omit} from 'lodash';
+
 const {Types, Creators} = createActions(
   {
     getOrderHistory: null,
@@ -17,6 +19,10 @@ const {Types, Creators} = createActions(
     removeParticipant: null,
     setGroupOrderData: ['payload'],
     getGroupOrderData: ['groupKey'],
+
+    participantReady: ['payload'],
+    participantLeftGroup: ['payload'],
+    participantUpdateItem: ['payload'],
 
     updateGroupOrderData: ['payload'],
     removeGroupOrderData: ['groupKey'],
@@ -56,7 +62,7 @@ const updateGroupOrderDataHandler = (state = INITIAL_STATE, {payload}) =>
 const removeGroupOrderDataHandler = (state = INITIAL_STATE, {groupKey}) =>
   state.set('groupOrderData', {});
 
-const syncGroupOrderHandler = (state = INITIAL_STATE, {groupKey}) =>
+const syncGroupOrderHandler = (state = INITIAL_STATE) =>
   state.set('loading', true);
 
 const unSyncGroupOrderHandler = (state = INITIAL_STATE) =>
@@ -64,6 +70,23 @@ const unSyncGroupOrderHandler = (state = INITIAL_STATE) =>
 
 const removeParticipantHandler = (state = INITIAL_STATE) =>
   state
+    .set('url', '')
+    .set('groupOrderData', {})
+    .set('groupOrderEnabled', false);
+
+const participantUpdateItemHandler = (state = INITIAL_STATE, {payload}) =>
+  state.setIn(['groupOrderData', 'items', payload.uid], payload.data);
+
+const participantReadyHandler = (state = INITIAL_STATE, {payload}) =>
+  state.setIn(
+    ['groupOrderData', 'joined_users', payload.uid, 'ready'],
+    payload.val,
+  );
+
+const participantLeftGroupHandler = (state = INITIAL_STATE, {payload}) =>
+  state
+    .set('groupOrderData', omit(state.groupOrderData.items, payload.uid))
+    .set('groupOrderData', omit(state.groupOrderData.joined_users, payload.uid))
     .set('url', '')
     .set('groupOrderData', {})
     .set('groupOrderEnabled', false);
@@ -78,6 +101,10 @@ const HANDLERS = {
   [Types.SET_GROUP_ORDER_DATA]: setGroupOrderDataHandler,
   [Types.UPDATE_GROUP_ORDER_DATA]: updateGroupOrderDataHandler,
   [Types.REMOVE_GROUP_ORDER_DATA]: removeGroupOrderDataHandler,
+
+  [Types.PARTICIPANT_READY]: participantReadyHandler,
+  [Types.PARTICIPANT_LEFT_GROUP]: participantLeftGroupHandler,
+  [Types.PARTICIPANT_UPDATE_ITEM]: participantUpdateItemHandler,
 
   [Types.SET_LOADED]: setLoadedHandler,
   [Types.SET_LOADING]: setLoadingHandler,

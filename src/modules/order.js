@@ -106,7 +106,7 @@ export default class Order {
             },
           }
         : {
-            item: {},
+            items: {},
           }),
     };
 

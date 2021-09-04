@@ -128,9 +128,10 @@ export default (props) => {
   };
 
   const GroupOrder = () => {
-    const subTotal = groupOrder.sub_total;
     const participantCount = size(groupOrder.joined_users);
-    const itemCount = utils.helpers.countGroupOrderItem(groupOrder.items);
+    const {total: itemCount, subTotal} = utils.helpers.countGroupOrderItem(
+      groupOrder.items,
+    );
 
     const participants = filter(
       groupOrder.joined_users,

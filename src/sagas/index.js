@@ -29,6 +29,10 @@ export default store => {
       takeLatest(OrderTypes.UPDATE_GROUP_ORDER_DATA, OrderSagas.updateGroupOrderData),
       takeLatest(OrderTypes.REMOVE_GROUP_ORDER_DATA, OrderSagas.removeGroupOrderData),
 
+      takeLatest(OrderTypes.PARTICIPANT_READY, OrderSagas.participantReady),
+      takeLatest(OrderTypes.PARTICIPANT_LEFT_GROUP, OrderSagas.participantLeftGroup),
+      takeLatest(OrderTypes.PARTICIPANT_UPDATE_ITEM, OrderSagas.participantUpdateItem),
+
       takeLatest(ItemTypes.GET_ITEM, ItemSagas.getItem),
       takeEvery(RestaurantTypes.GET_RESTAURANTS, RestaurantSagas.getRestaurants),
     ]);

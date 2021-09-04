@@ -96,7 +96,7 @@ class ModalItemDetail extends React.PureComponent {
     const {type, item} = props;
 
     this.state = {
-      quantity: type === 'checkout' ? item.quantity : 1,
+      quantity: type === 'remove-item' ? item.quantity : 1,
       mounted: false,
       disabled: true,
     };
@@ -174,9 +174,9 @@ class ModalItemDetail extends React.PureComponent {
     const {item, type} = this.props;
 
     const disabled =
-      (type !== 'checkout' && disabledDecrease) || quantity === 0;
+      (type !== 'remove-item' && disabledDecrease) || quantity === 0;
 
-    const itemImageSource = item
+    const itemImageSource = Boolean(item.images)
       ? {uri: item.images.image}
       : require('../../assets/images/muuve_logo.png');
 

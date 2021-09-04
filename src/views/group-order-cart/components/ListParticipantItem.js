@@ -43,15 +43,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ({
-  uid,
-  user,
-  items,
-  onPress,
-  itemData,
-  isCurrentUser,
-  currentUserUid,
-}) => {
+export default ({user, items, onPress, isCurrentUser}) => {
   const itemCount = utils.helpers.countParticipantItem(items);
   const subTotal = utils.helpers.sumCartTotal(items);
   const lastItem = Object.values(items).pop();
@@ -91,14 +83,13 @@ export default ({
 
       {map(items, (item, key) => {
         const isLastItem = lastItem.key === key;
-        const itemImage = get(itemData[key], 'images.thumb', null);
 
         return (
           <View key={key}>
             <Item
               item={item}
               isGroupOrderListing
-              itemImage={itemImage}
+              itemImage={item.thumb}
               onPress={() => onPress(item)}
               disabled={disabled}
             />

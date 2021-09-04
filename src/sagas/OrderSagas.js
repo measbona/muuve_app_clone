@@ -8,7 +8,7 @@ import {
   cancelled,
 } from 'redux-saga/effects';
 import {eventChannel} from 'redux-saga';
-import {get, find} from 'lodash';
+import {get} from 'lodash';
 import * as Navigator from '../navigation/screen';
 import Firestore from '@react-native-firebase/firestore';
 
@@ -124,6 +124,7 @@ export function* getGroupOrderData({groupKey}) {
 
     yield put(OrderActions.setUrl(groupOrderLink, true));
     yield put(CartActions.setCartItem(cartData));
+    yield put(CartActions.setCartKey(data.restaurant.key));
 
     yield call(Navigator.setRootHome);
   } catch (error) {
@@ -167,5 +168,54 @@ export function* removeGroupOrderData({groupKey}) {
     yield put(OrderActions.setUrl('', false));
   } catch (error) {
     alert('Error while deleting Group Order', error.message || error);
+  }
+}
+
+export function* participantUpdateItem({payload}) {
+  const {group_key: groupKey} = yield select(
+    (state) => state.order.groupOrderData,
+  );
+
+  try {
+    const ref = Firestore().collection('group_orders').doc(groupKey);
+    const update = {
+      [`items.${payload.uid}`]: payload.data,
+    };
+
+    yield fork([ref, ref.update], update);
+  } catch (error) {
+    //
+  }
+}
+
+export function* participantReady({payload}) {
+  const {group_key: groupKey} = yield select(
+    (state) => state.order.groupOrderData,
+  );
+
+  try {
+    const ref = Firestore().collection('group_orders').doc(groupKey);
+    const update = {
+      [`joined_users.${payload.uid}.ready`]: payload.val,
+    };
+
+    yield fork([ref, ref.update], update);
+  } catch (error) {
+    //
+  }
+}
+
+export function* participantLeftGroup({payload}) {
+  try {
+    const ref = Firestore().collection('group_orders').doc(payload.groupKey);
+
+    const update = {
+      [`joined_users.${payload.uid}`]: Firestore.FieldValue.delete(),
+      [`items.${payload.uid}`]: Firestore.FieldValue.delete(),
+    };
+
+    yield fork([ref, ref.update], update);
+  } catch (error) {
+    //
   }
 }

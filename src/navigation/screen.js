@@ -6,7 +6,6 @@ import utils from '../utils';
 import Home from '../views/home';
 import Account from '../views/account';
 import Checkout from '../views/checkout';
-import Numpad from '../views/modal/Numpad';
 import Initialize from '../views/initialize';
 import PhoneLogin from '../views/phone-login';
 import GroupOrder from '../views/group-order';
@@ -17,6 +16,7 @@ import MerchantDetails from '../views/merchat-details';
 import GroupOrderCart from '../views/group-order-cart';
 
 import Toast from '../lib/Toast';
+import Numpad from '../views/modal/Numpad';
 import ModalChoice from '../views/modal/ModalChoice';
 import ModalNotice from '../views/modal/ModalNotice';
 import ModalSuccess from '../views/modal/ModalSuccess';

@@ -3,7 +3,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, Share, StyleSheet} from 'react-native';
-import {map, get, size, reduce, find} from 'lodash';
+import {map, get, omit, size, reduce, find} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 
@@ -16,7 +16,6 @@ import GroupOrderSectionInfo from './components/GroupOrderSectionInfo';
 import ListParticipantItem from './components/ListParticipantItem';
 
 import CartActions from '../../redux/CartRedux';
-import ItemActions from '../../redux/ItemRedux';
 import OrderActions from '../../redux/OrderRedux';
 
 const styles = StyleSheet.create({
@@ -32,39 +31,52 @@ const styles = StyleSheet.create({
 });
 
 class GroupOrderCart extends React.PureComponent {
-  state = {
-    mounted: false,
-    loading: false,
-  };
+  constructor(props) {
+    super(props);
 
-  componentDidMount() {
-    const {groupOrder, itemReducer, getItem} = this.props;
+    const {groupOrder} = props;
 
-    const merchantKey = groupOrder.restaurant.key;
+    this.state = {
+      mounted: false,
+      loading: false,
+      isLeftSession: false,
+      data: groupOrder || {},
+    };
+  }
 
-    if (!itemReducer[merchantKey]) {
-      getItem(merchantKey);
+  static getDerivedStateFromProps(props, state) {
+    const {data} = state;
+    const {groupOrder} = props;
+
+    if (groupOrder !== data) {
+      return {data: groupOrder};
     }
 
+    return null;
+  }
+
+  componentDidMount() {
     Navigator.bindComponent(this);
   }
 
   componentDidAppear() {
-    const {groupOrder, syncGroupOrder} = this.props;
+    const {data} = this.state;
+    const {syncGroupOrder} = this.props;
 
     this.setState({mounted: true});
 
-    syncGroupOrder(groupOrder.group_key);
+    syncGroupOrder(data.group_key);
   }
 
-  componentDidDisappear() {
-    const {unSyncGroupOrder} = this.props;
+  // componentDidDisappear() {
+  //   const {unSyncGroupOrder} = this.props;
 
-    unSyncGroupOrder();
-  }
+  //   unSyncGroupOrder();
+  // }
 
   componentDidUpdate(prevProps) {
-    const {profile, groupOrder, componentId} = this.props;
+    const {data, isLeftSession} = this.state;
+    const {profile, componentId, setCartKey, setCartItem} = this.props;
     const {groupOrder: prevGroupOrder} = prevProps;
 
     const hoster = find(
@@ -80,12 +92,20 @@ class GroupOrderCart extends React.PureComponent {
 
     const isParticipant = !get(currentUser, 'host', false);
 
-    if (isParticipant && size(prevGroupOrder) > 0 && size(groupOrder) === 0) {
+    if (
+      isParticipant &&
+      size(prevGroupOrder) > 0 &&
+      size(data) === 0 &&
+      !isLeftSession
+    ) {
       return Navigator.showModalNotice({
         headline: 'Noticed',
         description: `${hostName} has checkout your order.`,
         buttonName: 'Continue',
-        onPress: () => {
+        onPress: async () => {
+          await setCartKey(null);
+          await setCartItem({});
+
           Navigator.popToRoot(componentId);
         },
       });
@@ -93,11 +113,12 @@ class GroupOrderCart extends React.PureComponent {
   }
 
   onInvite = async () => {
-    const {groupOrder, profile} = this.props;
+    const {data} = this.state;
+    const {profile} = this.props;
 
     try {
       await Share.share({
-        message: `${profile.family_name} ${profile.first_name} would like to invite you to join the order.\n${groupOrder.link}`,
+        message: `${profile.family_name} ${profile.first_name} would like to invite you to join the order.\n${data.link}`,
       });
     } catch (error) {
       alert(error.message);
@@ -116,115 +137,69 @@ class GroupOrderCart extends React.PureComponent {
   };
 
   endSession = async () => {
+    const {data} = this.state;
     const {
-      cart,
       profile,
-      groupOrder,
+      setCartKey,
       componentId,
       setCartItem,
       removeGroupOrderData,
-      updateGroupOrderData,
+      participantLeftGroup,
     } = this.props;
 
-    this.setState({loading: true});
+    this.setState({loading: true, isLeftSession: true});
 
     const currentUser = find(
-      groupOrder.joined_users,
+      data.joined_users,
       (user) => user.key === profile.uid,
     );
 
     if (!currentUser.host) {
-      const newGroupOrderData = {
-        ...groupOrder,
-        items: {
-          ...groupOrder.items,
-          [profile.uid]: {},
-        },
-        joined_users: {
-          ...groupOrder.joined_users,
-          [profile.uid]: {},
-        },
-        sub_total: groupOrder.sub_total - utils.helpers.sumCartTotal(cart),
-      };
-
-      await updateGroupOrderData(newGroupOrderData);
-      await setCartItem({});
+      await participantLeftGroup({uid: profile.uid, groupKey: data.group_key});
     } else {
-      await removeGroupOrderData(groupOrder.group_key);
+      await removeGroupOrderData(data.group_key);
     }
 
+    await setCartKey(null);
+    await setCartItem({});
     this.setState({loading: false}, () => Navigator.popToRoot(componentId));
   };
 
-  onDecrease = (item) => {
+  onDecrease = async (item) => {
+    const {data} = this.state;
     const {
       profile,
-      groupOrder,
       componentId,
       setCartItem,
-      updateGroupOrderData,
+      participantUpdateItem,
     } = this.props;
 
-    const {uid} = profile;
-    const userItems = groupOrder.items[uid];
+    let newSelectedItems = {};
 
-    let newSelectedItems = null;
+    const {quantity, removeItem} = await Navigator.showItemDetail({
+      item,
+      type: 'remove-item',
+    });
 
-    if (item.quantity === 1) {
-      newSelectedItems = reduce(
-        userItems,
-        (result, remainItem) => {
-          if (remainItem.key !== item.key) {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity,
-            };
-          }
-
-          return result;
-        },
-        {},
-      );
+    if (removeItem) {
+      newSelectedItems = omit(data.items[profile.uid], item.key);
     } else {
-      newSelectedItems = reduce(
-        userItems,
-        (result, remainItem) => {
-          if (remainItem.key === item.key) {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity - 1,
-            };
-          } else {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity,
-            };
-          }
-
-          return result;
+      newSelectedItems = data.items[profile.uid] = {
+        ...data.items[profile.uid],
+        [item.key]: {
+          ...item,
+          quantity,
         },
-        {},
-      );
+      };
     }
 
-    const subTotal = Number(
-      parseFloat(groupOrder.sub_total - item.price).toFixed(2),
-    );
-
-    const newGroupOrderData = {
-      ...groupOrder,
-      items: {
-        ...groupOrder.items,
-        [uid]: newSelectedItems,
-      },
-      sub_total: size(newSelectedItems) === 0 ? 0 : subTotal,
+    const payload = {
+      uid: profile.uid,
+      data: newSelectedItems,
+      groupKey: data.group_key,
     };
+
+    participantUpdateItem(payload);
 
     if (size(newSelectedItems) === 0) {
       return Navigator.showModalNotice({
@@ -232,48 +207,36 @@ class GroupOrderCart extends React.PureComponent {
         description: 'Your cart is empty',
         buttonName: 'Back',
         onPress: () => {
-          updateGroupOrderData(newGroupOrderData);
-          setCartItem(newSelectedItems);
-
           Navigator.popBack(componentId);
         },
       });
     }
 
-    updateGroupOrderData(newGroupOrderData);
     setCartItem(newSelectedItems);
   };
 
   onReadyPress = () => {
-    const {groupOrder, profile, updateGroupOrderData} = this.props;
-    const {uid} = profile;
+    const {data} = this.state;
+    const {profile, participantReady} = this.props;
 
-    const isReady = get(groupOrder, ['joined_users', uid, 'ready'], false);
+    const isReady = get(data, ['joined_users', profile.uid, 'ready'], false);
 
-    const newGroupOrderData = {
-      ...groupOrder,
-      joined_users: {
-        ...groupOrder.joined_users,
-        [uid]: {
-          ...groupOrder.joined_users[uid],
-          ready: !isReady,
-        },
-      },
+    const payload = {
+      val: !isReady,
+      uid: profile.uid,
     };
 
-    updateGroupOrderData(newGroupOrderData);
+    participantReady(payload);
   };
 
   render() {
-    const {mounted, loading} = this.state;
-    const {componentId, groupOrder, itemReducer, profile} = this.props;
+    const {data, mounted, loading} = this.state;
+    const {componentId, profile} = this.props;
 
-    const groupOrderItems = groupOrder.items;
-    const restaurantKey = get(groupOrder, 'restaurant.key', '');
-    const itemData = itemReducer[restaurantKey];
+    const groupOrderItems = data.items;
 
     const currentUser = find(
-      groupOrder.joined_users,
+      data.joined_users,
       (user) => user.key === profile.uid,
     );
 
@@ -307,7 +270,7 @@ class GroupOrderCart extends React.PureComponent {
         />
         <GroupOrderSectionInfo
           loading={loading}
-          groupOrder={groupOrder}
+          groupOrder={data}
           onInvite={this.onInvite}
           onEndSession={this.onEndSession}
         />
@@ -318,8 +281,7 @@ class GroupOrderCart extends React.PureComponent {
               <ListParticipantItem
                 isCurrentUser
                 user={currentUser}
-                itemData={itemData}
-                groupOrder={groupOrder}
+                groupOrder={data}
                 onPress={this.onDecrease}
                 uid={get(currentUser, 'uid', '')}
                 currentUserUid={get(currentUser, 'uid', '')}
@@ -332,7 +294,7 @@ class GroupOrderCart extends React.PureComponent {
             </Animatable.View>
 
             {map(userItems.participantItems, (items, uid) => {
-              const user = groupOrder.joined_users[uid];
+              const user = data.joined_users[uid];
 
               return (
                 <Animatable.View key={uid} animation="fadeIn" duration={300}>
@@ -340,8 +302,7 @@ class GroupOrderCart extends React.PureComponent {
                     uid={uid}
                     user={user}
                     items={items}
-                    itemData={itemData}
-                    groupOrder={groupOrder}
+                    groupOrder={data}
                     currentUserUid={get(currentUser, 'uid', '')}
                   />
                 </Animatable.View>
@@ -369,13 +330,12 @@ class GroupOrderCart extends React.PureComponent {
 const mapState = ({cart, profile, order, item}) => ({
   cart: cart.data,
   profile: profile.data,
-  itemReducer: item.data,
   groupOrderLink: order.url,
   groupOrder: order.groupOrderData,
 });
 
 const mapDispatch = {
-  getItem: ItemActions.getItem,
+  setCartKey: CartActions.setCartKey,
   setCartItem: CartActions.setCartItem,
 
   syncGroupOrder: OrderActions.syncGroupOrder,
@@ -383,6 +343,10 @@ const mapDispatch = {
 
   updateGroupOrderData: OrderActions.updateGroupOrderData,
   removeGroupOrderData: OrderActions.removeGroupOrderData,
+
+  participantReady: OrderActions.participantReady,
+  participantLeftGroup: OrderActions.participantLeftGroup,
+  participantUpdateItem: OrderActions.participantUpdateItem,
 };
 
 export default connect(mapState, mapDispatch)(GroupOrderCart);
