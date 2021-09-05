@@ -1,4 +1,5 @@
 import {createStore, applyMiddleware, compose} from 'redux';
+import Reactotron from 'reactotron-react-native';
 import createSagaMiddleware from 'redux-saga';
 
 import rootReducer from '../redux';
@@ -8,6 +9,11 @@ export const ConfigureStore = () => {
   const enhancers = [];
   let sagaMonitor = null;
   let storeMonitor = null;
+
+  if (__DEV__) {
+    sagaMonitor = Reactotron.createSagaMonitor();
+    storeMonitor = Reactotron.createEnhancer();
+  }
 
   const sagaMiddleware = createSagaMiddleware({sagaMonitor});
 

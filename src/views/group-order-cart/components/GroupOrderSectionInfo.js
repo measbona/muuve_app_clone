@@ -54,7 +54,9 @@ export default (props) => {
   const initiatorName = get(initiator, 'name', '');
 
   const participantCount = size(groupOrder.joined_users);
-  const itemCount = utils.helpers.countGroupOrderItem(groupOrder.items);
+  const {total: itemCount, subTotal} = utils.helpers.countGroupOrderItem(
+    groupOrder.items,
+  );
 
   return (
     <View style={styles.mainWrapper}>
@@ -92,7 +94,7 @@ export default (props) => {
             </Text>
             <Text
               style={[styles.text, {fontSize: 12, color: utils.colors.border}]}>
-              {`Total: $${groupOrder.sub_total}`}
+              {`Total: $${subTotal}`}
             </Text>
           </View>
 

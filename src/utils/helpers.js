@@ -29,14 +29,19 @@ const sumCartTotal = (cart) => {
 
 const countGroupOrderItem = (items) => {
   let total = 0;
+  let subTotal = 0;
 
   forEach(items, (user) => {
     forEach(user, (item) => {
       total += item.quantity;
+      subTotal += item.price * item.quantity;
     });
   });
 
-  return Number(total);
+  return {
+    total: Number(total),
+    subTotal: Number(parseFloat(subTotal).toFixed(2)),
+  };
 };
 
 const countParticipantItem = (items) => {

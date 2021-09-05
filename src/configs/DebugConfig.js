@@ -8,8 +8,8 @@ if (__DEV__) {
   Reactotron.configure({
     name: 'Muuve',
     // host: '192.168.1.131',
-    // host: '192.168.1.9',
-    host: '10.10.20.253',
+    host: '192.168.1.9',
+    // host: '10.10.20.253',
   })
     .setAsyncStorageHandler(AsyncStorage)
     .useReactNative()

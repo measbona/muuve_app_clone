@@ -2,7 +2,7 @@
 import React from 'react';
 import {connect} from 'react-redux';
 import {View, ScrollView, StyleSheet} from 'react-native';
-import {reduce, size, every} from 'lodash';
+import {every, filter, omit, size} from 'lodash';
 import * as Navigator from '../../navigation/screen';
 import * as Animatable from 'react-native-animatable';
 import firebase from '@react-native-firebase/app';
@@ -66,24 +66,32 @@ class Checkout extends React.PureComponent {
   validate = () => {
     const {isStartGroupOrder, groupOrder} = this.props;
 
+    const participants = filter(
+      groupOrder.joined_users,
+      (user) => user.host === false,
+    );
+
     const isParticipantReady = every(
       groupOrder.joined_users,
       (participant) => participant.ready === true,
     );
 
     return new Promise((resolve, reject) => {
-      if (isStartGroupOrder && !isParticipantReady) {
+      if (
+        isStartGroupOrder &&
+        (!isParticipantReady || participants.length === 0)
+      ) {
         return Navigator.showModalChoice({
           headline: 'Confirmation',
           description:
-            'We notice that some participants not yet ready to order. Do you want to continue?',
+            'We notice that some participants not yet ready to order. Do you want to checkout?',
           no: 'CANCEL',
           yes: 'CONTINUE',
           onPress: () => resolve(true),
         });
+      } else {
+        return resolve(true);
       }
-
-      return resolve(true);
     });
   };
 
@@ -145,51 +153,25 @@ class Checkout extends React.PureComponent {
     Navigator.goToGroupOrderCart(componentId);
   };
 
-  onDecrease = (item) => {
+  onDecrease = async (item) => {
     const {componentId, cart, setCartKey, setCartItem} = this.props;
-    let newSelectedItems = null;
 
-    if (item.quantity === 1) {
-      newSelectedItems = reduce(
-        cart,
-        (result, remainItem) => {
-          if (remainItem.key !== item.key) {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity,
-            };
-          }
+    let newSelectedItems = {};
+    const {quantity, removeItem} = await Navigator.showItemDetail({
+      item,
+      type: 'remove-item',
+    });
 
-          return result;
-        },
-        {},
-      );
+    if (removeItem) {
+      newSelectedItems = omit(cart, [item.key]);
     } else {
-      newSelectedItems = reduce(
-        cart,
-        (result, remainItem) => {
-          if (remainItem.key === item.key) {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity - 1,
-            };
-          } else {
-            result[remainItem.key] = {
-              key: remainItem.key,
-              name: remainItem.name,
-              price: remainItem.price,
-              quantity: remainItem.quantity,
-            };
-          }
-
-          return result;
+      newSelectedItems = {
+        ...cart,
+        [item.key]: {
+          ...item,
+          quantity,
         },
-        {},
-      );
+      };
     }
 
     if (size(newSelectedItems) === 0) {

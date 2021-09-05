@@ -79,34 +79,34 @@ class MerchantDetails extends React.PureComponent {
     this.setState({mounted: true});
   }
 
-  componentDidUpdate(prevProps) {
-    const {profile, groupOrder, componentId} = this.props;
-    const {groupOrder: prevGroupOrder} = prevProps;
+  // componentDidUpdate(prevProps) {
+  //   const {profile, groupOrder, componentId} = this.props;
+  //   const {groupOrder: prevGroupOrder} = prevProps;
 
-    const hoster = find(
-      prevGroupOrder.joined_users,
-      (user) => user.host === true,
-    );
+  //   const hoster = find(
+  //     prevGroupOrder.joined_users,
+  //     (user) => user.host === true,
+  //   );
 
-    const hostName = get(hoster, 'name', 'N/A');
-    const currentUser = find(
-      prevGroupOrder.joined_users,
-      (user) => user.key === profile.uid,
-    );
+  //   const hostName = get(hoster, 'name', 'N/A');
+  //   const currentUser = find(
+  //     prevGroupOrder.joined_users,
+  //     (user) => user.key === profile.uid,
+  //   );
 
-    const isParticipant = !get(currentUser, 'host', false);
+  //   const isParticipant = !get(currentUser, 'host', false);
 
-    if (isParticipant && size(prevGroupOrder) > 0 && size(groupOrder) === 0) {
-      return Navigator.showModalNotice({
-        headline: 'Noticed',
-        description: `${hostName} has checkout your order.`,
-        buttonName: 'Continue',
-        onPress: () => {
-          Navigator.popToRoot(componentId);
-        },
-      });
-    }
-  }
+  //   if (isParticipant && size(prevGroupOrder) > 0 && size(groupOrder) === 0) {
+  //     return Navigator.showModalNotice({
+  //       headline: 'Noticed',
+  //       description: `${hostName} has checkout your order.`,
+  //       buttonName: 'Continue',
+  //       onPress: () => {
+  //         Navigator.popToRoot(componentId);
+  //       },
+  //     });
+  //   }
+  // }
 
   onCheckoutPress = () => {
     const {componentId, restaurant} = this.props;
@@ -168,14 +168,10 @@ class MerchantDetails extends React.PureComponent {
       setCartKey,
       groupOrder,
       setCartItem,
+      participantReady,
       isStartGroupOrder,
-      updateGroupOrderData,
+      participantUpdateItem,
     } = this.props;
-
-    let newSelectedItems = null;
-    const restaurantKey = restaurant.key;
-    const isIncreaseQuantity = Boolean(selectedItems[itemKey]);
-    const {uid} = profile;
 
     if (cartKey && cartKey !== restaurant.key) {
       return Navigator.showModalNotice({
@@ -187,48 +183,60 @@ class MerchantDetails extends React.PureComponent {
       });
     }
 
-    if (isIncreaseQuantity) {
-      const selectedItem = selectedItems[item.key];
-      newSelectedItems = {
-        ...selectedItems,
-        [selectedItem.key]: {
-          ...selectedItem,
-          quantity: selectedItem.quantity + 1,
-        },
-      };
-    } else {
-      newSelectedItems = {
-        ...selectedItems,
-        [itemKey]: {
-          quantity: 1,
-          key: itemKey,
-          name: item.name,
-          price: item.current_price,
-        },
-      };
-    }
+    const {quantity} = await Navigator.showItemDetail({item});
+
+    const itemQty = selectedItems[item.key]
+      ? selectedItems[item.key].quantity + quantity
+      : quantity;
+
+    const newSelectedItems = {
+      ...selectedItems,
+      [itemKey]: {
+        key: itemKey,
+        name: item.name,
+        quantity: itemQty,
+        images: item.images,
+        price: item.current_price,
+      },
+    };
 
     if (isStartGroupOrder) {
-      const newGroupOrderData = {
-        ...groupOrder,
-        items: {
-          ...groupOrder.items,
-          [uid]: newSelectedItems,
+      const participantItems = get(groupOrder, ['items', profile.uid], {});
+      const currentUser = get(groupOrder, ['joined_users', profile.uid], false);
+
+      const participantQty = participantItems[itemKey]
+        ? participantItems[itemKey].quantity + quantity
+        : quantity;
+
+      const payload = {
+        uid: profile.uid,
+        groupKey: groupOrder.group_key,
+        data: {
+          ...participantItems,
+          [itemKey]: {
+            key: itemKey,
+            name: item.name,
+            images: item.images,
+            quantity: participantQty,
+            price: item.current_price,
+          },
         },
-        sub_total: Number(
-          parseFloat(groupOrder.sub_total + item.current_price).toFixed(2),
-        ),
       };
 
-      updateGroupOrderData(newGroupOrderData);
+      if (!currentUser.host && currentUser.ready) {
+        participantReady({val: !currentUser.ready, uid: profile.uid});
+      }
+
+      participantUpdateItem(payload);
     }
 
     if (!cartKey) {
-      setCartKey(restaurantKey);
+      setCartKey(restaurant.key);
     }
 
-    this.setState({selectedItems: newSelectedItems});
-    setCartItem(newSelectedItems);
+    this.setState({selectedItems: newSelectedItems}, () =>
+      setCartItem(newSelectedItems),
+    );
   };
 
   renderHeaderComponent = () => {
@@ -388,6 +396,9 @@ const mapDispatch = {
 
   updateGroupOrderData: OrderActions.updateGroupOrderData,
   removeGroupOrderData: OrderActions.removeGroupOrderData,
+
+  participantReady: OrderActions.participantReady,
+  participantUpdateItem: OrderActions.participantUpdateItem,
 };
 
 export default connect(mapState, mapDispatch)(MerchantDetails);
