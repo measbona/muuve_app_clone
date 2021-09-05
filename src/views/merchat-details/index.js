@@ -184,6 +184,7 @@ class MerchantDetails extends React.PureComponent {
     }
 
     const {quantity} = await Navigator.showItemDetail({item});
+
     const itemQty = selectedItems[item.key]
       ? selectedItems[item.key].quantity + quantity
       : quantity;

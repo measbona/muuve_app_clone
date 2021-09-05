@@ -78,8 +78,8 @@ class Checkout extends React.PureComponent {
 
     return new Promise((resolve, reject) => {
       if (
-        (isStartGroupOrder && !isParticipantReady) ||
-        participants.length === 0
+        isStartGroupOrder &&
+        (!isParticipantReady || participants.length === 0)
       ) {
         return Navigator.showModalChoice({
           headline: 'Confirmation',
