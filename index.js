@@ -12,6 +12,8 @@ import '@react-native-firebase/dynamic-links';
 import {ConfigureStore} from './src/configs/Store';
 import './src/configs';
 
+console.disableYellowBox = true;
+
 const Store = ConfigureStore();
 
 registerScreen(Store);

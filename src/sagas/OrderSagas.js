@@ -67,7 +67,7 @@ function* subscribeGroupOrder({groupKey}) {
 export function* syncGroupOrder({groupKey}) {
   const groupOrderListener = yield fork(subscribeGroupOrder, {groupKey});
 
-  yield take(OrderTypes.UN_SYNC_GROUP_ORDER);
+  yield take([...OrderTypes.UN_SYNC_GROUP_ORDER]);
   yield cancel(groupOrderListener);
 }
 
