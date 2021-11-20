@@ -9,6 +9,8 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 17,
     borderTopRightRadius: 17,
     backgroundColor: utils.colors.white,
+    paddingTop: utils.device.isIphoneX ? 10 : 0,
+    paddingBottom: utils.device.isIphoneX ? 15 : 0,
   },
   button: {
     minHeight: 40,

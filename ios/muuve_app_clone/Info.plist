@@ -50,7 +50,6 @@
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Muuve App Clone will use your location information to help connect between customers, drivers, and restaurants.</string>
-	<string></string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -84,5 +83,10 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>FirebaseDynamicLinksCustomDomains</key>
+  <array>
+    <string>http://muuveclone.page.link</string>
+    <string>https://muuveclone.page.link</string>
+  </array>
 </dict>
 </plist>

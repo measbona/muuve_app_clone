@@ -19,6 +19,8 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 17,
     justifyContent: 'space-between',
     backgroundColor: utils.colors.yellow,
+    paddingTop: utils.device.isIphoneX ? 10 : 0,
+    paddingBottom: utils.device.isIphoneX ? 15 : 0,
   },
   itemCountWrapper: {
     marginVertical: 15,

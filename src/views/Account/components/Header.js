@@ -21,7 +21,7 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 17,
     justifyContent: 'space-between',
     backgroundColor: utils.colors.yellow,
-    paddingTop: StatusBar.currentHeight + 5.5,
+    paddingTop: utils.device.isIphoneX ? 50 : StatusBar.currentHeight + 5.5,
   },
   profileWrapper: {
     flexDirection: 'row',

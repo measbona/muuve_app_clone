@@ -63,9 +63,9 @@ const styles = StyleSheet.create({
     borderColor: utils.colors.yellow,
   },
   circleWrapper: {
-    width: 60,
     alignItems: 'center',
     justifyContent: 'center',
+    width: utils.device.isIphoneX ? null : 60,
   },
   circle: {
     width: 23,

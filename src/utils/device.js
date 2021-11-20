@@ -18,7 +18,7 @@ const paddinngTop = () => {
 
 const statusBar = {
   paddingBottom: 15,
-  paddingTop: StatusBar.currentHeight + 15,
+  paddingTop: isIphoneX ? 60 : StatusBar.currentHeight + 15,
 };
 
 export default {

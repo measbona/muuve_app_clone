@@ -26,6 +26,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 17,
     borderTopRightRadius: 17,
     backgroundColor: utils.colors.white,
+    paddingBottom: utils.device.isIphoneX ? 15 : 0,
   },
   button: {
     flex: 1,
