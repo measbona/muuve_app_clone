@@ -85,6 +85,7 @@ export default class Order {
       maximum_amount: 'unlimited',
       minimum_amount: 'unlimited',
       created_at: Number(moment().format('x')),
+      expired_at: Number(moment().add(10, 'minute').format('x')),
       restaurant: {
         key: restaurant.key,
         name: restaurant.name,

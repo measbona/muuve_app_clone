@@ -1,6 +1,7 @@
 /* eslint-disable dot-notation */
 /* eslint-disable react-native/no-inline-styles */
 import React from 'react';
+import moment from 'moment';
 import {connect} from 'react-redux';
 import {View, ScrollView, Share, StyleSheet} from 'react-native';
 import {map, get, omit, size, reduce, find} from 'lodash';
@@ -12,6 +13,7 @@ import utils from '../../utils';
 import NavBar from '../../lib/NavBar';
 import Loading from '../../lib/Loading';
 import ReadyToCheckout from './components/ReadyToCheckout';
+import ExpiredCountDown from './components/ExpiredCountDown';
 import GroupOrderSectionInfo from './components/GroupOrderSectionInfo';
 import ListParticipantItem from './components/ListParticipantItem';
 
@@ -37,6 +39,7 @@ class GroupOrderCart extends React.PureComponent {
     const {groupOrder} = props;
 
     this.state = {
+      remaining: 0,
       mounted: false,
       loading: false,
       isLeftSession: false,
@@ -56,6 +59,10 @@ class GroupOrderCart extends React.PureComponent {
   }
 
   componentDidMount() {
+    clearInterval(this.timer);
+
+    this.calculateRemaining();
+
     Navigator.bindComponent(this);
   }
 
@@ -65,7 +72,7 @@ class GroupOrderCart extends React.PureComponent {
 
     this.setState({mounted: true});
 
-    syncGroupOrder(data.group_key);
+    // syncGroupOrder(data.group_key);
   }
 
   // componentDidDisappear() {
@@ -75,7 +82,7 @@ class GroupOrderCart extends React.PureComponent {
   // }
 
   componentDidUpdate(prevProps) {
-    const {data, isLeftSession} = this.state;
+    const {data, isLeftSession, remaining} = this.state;
     const {profile, componentId, setCartKey, setCartItem} = this.props;
     const {groupOrder: prevGroupOrder} = prevProps;
 
@@ -93,14 +100,15 @@ class GroupOrderCart extends React.PureComponent {
     const isParticipant = !get(currentUser, 'host', false);
 
     if (
-      isParticipant &&
-      size(prevGroupOrder) > 0 &&
-      size(data) === 0 &&
-      !isLeftSession
+      (isParticipant &&
+        size(prevGroupOrder) > 0 &&
+        size(data) === 0 &&
+        !isLeftSession) ||
+      remaining === 0
     ) {
       return Navigator.showModalNotice({
         headline: 'Noticed',
-        description: `${hostName} has checkout your order.`,
+        description: `${hostName} has checkout the order.`,
         buttonName: 'Continue',
         onPress: async () => {
           await setCartKey(null);
@@ -111,6 +119,28 @@ class GroupOrderCart extends React.PureComponent {
       });
     }
   }
+
+  calculateRemaining = () => {
+    const {data} = this.state;
+
+    const now = moment();
+    const willExpired = moment(Number(data.expired_at));
+    const remaining = willExpired.diff(now, 'seconds');
+
+    this.setState({remaining}, this.countdown);
+  };
+
+  countdown = () => {
+    this.timer = setInterval(() => {
+      const {remaining} = this.state;
+
+      if (remaining > 0) {
+        this.setState({remaining: remaining - 1});
+      } else {
+        this.setState({remaining: 0});
+      }
+    }, 1000);
+  };
 
   onInvite = async () => {
     const {data} = this.state;
@@ -230,7 +260,7 @@ class GroupOrderCart extends React.PureComponent {
   };
 
   render() {
-    const {data, mounted, loading} = this.state;
+    const {data, mounted, loading, remaining} = this.state;
     const {componentId, profile} = this.props;
 
     const groupOrderItems = data.items;
@@ -274,6 +304,7 @@ class GroupOrderCart extends React.PureComponent {
           onInvite={this.onInvite}
           onEndSession={this.onEndSession}
         />
+        <ExpiredCountDown remaining={remaining} />
 
         {mounted ? (
           <ScrollView showsVerticalScrollIndicator={false}>

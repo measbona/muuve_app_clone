@@ -50,9 +50,9 @@ class Checkout extends React.PureComponent {
 
     this.setState({mounted: true});
 
-    if (isStartGroupOrder) {
-      syncGroupOrder(groupOrder.group_key);
-    }
+    // if (isStartGroupOrder) {
+    //   syncGroupOrder(groupOrder.group_key);
+    // }
   }
 
   // componentDidDisappear() {

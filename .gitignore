@@ -21,6 +21,9 @@ DerivedData
 *.ipa
 *.xcuserstate
 
+./ios/GoogleService-Info.plist
+./ios/muuve_app_clone/AppDelegate.m
+
 # Android/IntelliJ
 #
 build/
@@ -28,6 +31,11 @@ build/
 .gradle
 local.properties
 *.iml
+
+./android/app/src/main/AndroidManifest.xml
+./android/app/google-services.json
+./android/app/debug.keystore
+./android/app/proguard-rules.pro
 
 # node.js
 #
@@ -57,3 +65,13 @@ buck-out/
 
 # CocoaPods
 /ios/Pods/
+
+# Visual Studio Code
+.vscode
+
+# spec test
+__tests__
+
+# Package
+./package.json
+./package-lock.json

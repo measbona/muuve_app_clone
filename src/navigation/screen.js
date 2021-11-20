@@ -3,6 +3,7 @@ import FontIcon from 'react-native-vector-icons/Fontisto';
 import MCIcon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import utils from '../utils';
+
 import Home from '../views/home';
 import Account from '../views/account';
 import Checkout from '../views/checkout';
