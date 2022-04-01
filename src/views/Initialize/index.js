@@ -19,11 +19,11 @@ const styles = StyleSheet.create({
 export default () => {
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    delay(() => {
-      dispatch(AppActions.appInitial());
-    });
-  });
+  // useEffect(() => {
+  //   delay(() => {
+  //     dispatch(AppActions.appInitial());
+  //   });
+  // });
 
   return (
     <View style={styles.container}>
